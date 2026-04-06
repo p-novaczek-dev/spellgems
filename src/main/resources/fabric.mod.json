@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "spellgems",
+	"version": "${version}",
+	"name": "Spellgems",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/spellgems/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"pnovaczekdev.spellgems.Spellgems"
+		],
+		"client": [
+			"pnovaczekdev.spellgems.client.SpellgemsClient"
+		],
+		"fabric-datagen": [
+			"pnovaczekdev.spellgems.client.SpellgemsDataGenerator"
+		]
+	},
+	"mixins": [
+		"spellgems.mixins.json",
+		{
+			"config": "spellgems.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.18.6",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
