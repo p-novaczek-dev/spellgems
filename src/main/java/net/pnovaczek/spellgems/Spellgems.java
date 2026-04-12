@@ -1,4 +1,4 @@
-package pnovaczekdev.spellgems;
+package net.pnovaczek.spellgems;
 
 import net.fabricmc.api.ModInitializer;
 

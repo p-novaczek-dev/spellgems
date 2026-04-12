@@ -16,13 +16,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"pnovaczekdev.spellgems.Spellgems"
+			"net.pnovaczek.spellgems.Spellgems"
 		],
 		"client": [
-			"pnovaczekdev.spellgems.client.SpellgemsClient"
+			"net.pnovaczek.spellgems.client.SpellgemsClient"
 		],
 		"fabric-datagen": [
-			"pnovaczekdev.spellgems.client.SpellgemsDataGenerator"
+			"net.pnovaczek.spellgems.client.SpellgemsDataGenerator"
 		]
 	},
 	"mixins": [

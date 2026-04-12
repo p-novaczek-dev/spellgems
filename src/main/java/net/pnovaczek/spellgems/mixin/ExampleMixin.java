@@ -1,4 +1,4 @@
-package pnovaczekdev.spellgems.mixin;
+package net.pnovaczek.spellgems.mixin;
 
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;

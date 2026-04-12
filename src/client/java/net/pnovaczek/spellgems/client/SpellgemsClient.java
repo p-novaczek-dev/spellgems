@@ -1,4 +1,4 @@
-package pnovaczekdev.spellgems.client;
+package net.pnovaczek.spellgems.client;
 
 import net.fabricmc.api.ClientModInitializer;
 
