@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_mana_essence": {
+      "conditions": {
+        "items": [
+          {
+            "items": "spellgems:mana_essence"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "spellgems:mana_infuser"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_mana_essence"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "spellgems:mana_infuser"
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 0.7,
+  "group": "mana_essence",
+  "ingredient": "spellgems:mana_root",
+  "result": {
+    "id": "spellgems:mana_essence"
+  }
+}

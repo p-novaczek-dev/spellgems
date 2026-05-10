@@ -23,6 +23,9 @@
 		],
 		"fabric-datagen": [
 			"net.pnovaczek.spellgems.client.SpellgemsDataGenerator"
+		],
+		"jei_mod_plugin": [
+			"net.pnovaczek.spellgems.client.jei.SpellgemsJeiPlugin"
 		]
 	},
 	"mixins": [
@@ -33,9 +36,9 @@
 		}
 	],
 	"depends": {
-		"fabricloader": ">=0.18.6",
-		"minecraft": "~1.21.11",
-		"java": ">=21",
+		"fabricloader": ">=0.19.1",
+		"minecraft": "~26.1.2",
+		"java": ">=25",
 		"fabric-api": "*"
 	}
 }

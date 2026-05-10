@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "spellgems:block/spell_enchanting_table"
+    }
+  }
+}

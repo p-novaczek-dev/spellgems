@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "spellgems:block/spell_enchanting_table"
+  }
+}
