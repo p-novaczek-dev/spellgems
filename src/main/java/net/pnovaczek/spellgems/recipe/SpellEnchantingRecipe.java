@@ -107,7 +107,6 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
             if (item.isPresent()) return BuiltInRegistries.ITEM.get(item.get())
                     .map(holder -> Ingredient.of(holder.value()))
                     .orElse(null);
-            //if (item.isPresent()) return Ingredient.of(BuiltInRegistries.ITEM.get(item.get()).get().value());
             if (tag.isPresent()) {
                 TagKey<Item> tagKey = TagKey.create(Registries.ITEM, tag.get());
                 Iterable<Holder<Item>> iterableTags = BuiltInRegistries.ITEM.getTagOrEmpty(tagKey);

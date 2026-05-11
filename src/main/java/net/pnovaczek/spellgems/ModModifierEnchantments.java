@@ -7,11 +7,11 @@ import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class ModSpellModifierEffects {
+public final class ModModifierEnchantments {
 
     private static final Map<Identifier, ModifierEnchantment> REGISTRY = new HashMap<>();
 
-    private ModSpellModifierEffects() {}
+    private ModModifierEnchantments() {}
 
     public static void register(Identifier id, ModifierEnchantment modifier) {
         if (REGISTRY.containsKey(id)) {

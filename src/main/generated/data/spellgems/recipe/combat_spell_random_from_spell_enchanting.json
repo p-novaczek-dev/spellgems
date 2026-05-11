@@ -1,0 +1,16 @@
+{
+  "type": "spellgems:spell_enchanting",
+  "catalyst": {
+    "item": "minecraft:lapis_lazuli"
+  },
+  "category": "combat",
+  "input": {
+    "tag": "spellgems:combat_spell_gems"
+  },
+  "level_requirement": 0,
+  "result": {
+    "modifiers": 1,
+    "strikes": 1
+  },
+  "xp_cost": 0
+}

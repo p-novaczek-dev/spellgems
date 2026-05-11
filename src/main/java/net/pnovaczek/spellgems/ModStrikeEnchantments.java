@@ -7,10 +7,10 @@ import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantments;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ModSpellStrikeEffects {
+public class ModStrikeEnchantments {
     private static final Map<Identifier, StrikeEnchantment> REGISTRY = new HashMap<>();
 
-    private ModSpellStrikeEffects() {}
+    private ModStrikeEnchantments() {}
 
     public static void register(Identifier id, StrikeEnchantment modifier) {
         if (REGISTRY.containsKey(id)) {

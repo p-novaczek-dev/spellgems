@@ -8,10 +8,10 @@ import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantments;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ModSpellUtilityEffects {
+public class ModUtilityEnchantments {
     private static final Map<Identifier, UtilityEnchantment> REGISTRY = new HashMap<>();
 
-    private ModSpellUtilityEffects() {}
+    private ModUtilityEnchantments() {}
 
     public static void register(Identifier id, UtilityEnchantment modifier) {
         if (REGISTRY.containsKey(id)) {

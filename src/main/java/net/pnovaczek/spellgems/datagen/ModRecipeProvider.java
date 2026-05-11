@@ -68,18 +68,17 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 
                 SpellEnchantingRecipeBuilder.combat(
                          new SpellEnchantingRecipe.SpellEnchantInput(
-                                 null,
+                                 Optional.ofNullable(null),
                                  Optional.of(Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "combat_spell_gems")),
-                                 null),
+                                 Optional.ofNullable(null)),
                         new SpellEnchantingRecipe.CatalystDefinition(
                                 BuiltInRegistries.ITEM.getKey(Items.LAPIS_LAZULI),
                                 1),
                         30,
                         100,
                         1,
-                        1
-
-                );
+                        1)
+                        .save(exporter, "combat_spell_random");;
             }
         };
     }

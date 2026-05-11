@@ -23,6 +23,7 @@ import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantments;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -131,8 +132,8 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
     private SpellGemData applyRecipeEffects(SpellGemData data, SpellEnchantingRecipe recipe) {
         var result = recipe.getResult();
 
-        List<ModifierEnchantment> newModifiers = data.modifierEffects();
-        List<StrikeEnchantment> newStrikes = data.strikeEffects();
+        List<ModifierEnchantment> newModifiers = new ArrayList<>(data.modifierEffects());
+        List<StrikeEnchantment> newStrikes = new ArrayList<>(data.strikeEffects());
 
         // Combat - random selection
         result.modifiers().ifPresent(count -> {

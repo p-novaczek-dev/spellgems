@@ -1,5 +1,8 @@
 package net.pnovaczek.spellgems.item;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -11,6 +14,7 @@ import net.pnovaczek.spellgems.spell.Spell;
 import net.pnovaczek.spellgems.spell.SpellContext;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.ModSpells;
+import org.jspecify.annotations.NonNull;
 
 public class SpellGemItem extends Item {
 
@@ -30,6 +34,16 @@ public class SpellGemItem extends Item {
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;
+    }
+
+    @Override
+    public @NonNull Component getName(@NonNull ItemStack stack) {
+        MutableComponent name = super.getName(stack).copy();
+        var data = getSpellData(stack);
+        if (data != null && data.isEnchanted()) {
+            name.withStyle(ChatFormatting.AQUA);
+        }
+        return name;
     }
 
     @Override

@@ -21,8 +21,8 @@ public class Spellgems implements ModInitializer {
 		ModComponents.initialize();
 
 		ModSpells.initialize();
-		ModSpellModifierEffects.initialize();
-		ModSpellStrikeEffects.initialize();
-		ModSpellUtilityEffects.initialize();
+		ModModifierEnchantments.initialize();
+		ModStrikeEnchantments.initialize();
+		ModUtilityEnchantments.initialize();
 	}
 }
