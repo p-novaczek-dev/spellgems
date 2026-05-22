@@ -10,26 +10,33 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
+import net.pnovaczek.spellgems.entity.SpellProjectile;
 
-public class SpellProjectileRenderer<T extends Entity> extends EntityRenderer<T, EntityRenderState> {
+public class SpellProjectileRenderer extends EntityRenderer<SpellProjectile, SpellProjectileRenderState> {
 
     private static final Identifier TEXTURE =
             Identifier.fromNamespaceAndPath("spellgems", "textures/entity/projectiles/spell_projectile.png");
 
     public SpellProjectileRenderer(final Context context) {
         super(context);
-        this.shadowRadius = 0.2F;
-        this.shadowStrength = 0.7F;
+        this.shadowRadius = 0F;
+        this.shadowStrength = 0F;
     }
 
     @Override
-    public EntityRenderState createRenderState() {
-        return new EntityRenderState();
+    public void extractRenderState(SpellProjectile entity, SpellProjectileRenderState state, float partialTick) {
+        super.extractRenderState(entity, state, partialTick);
+        state.tintColor = entity.getTintColor();
+    }
+
+    @Override
+    public SpellProjectileRenderState createRenderState() {
+        return new SpellProjectileRenderState();
     }
 
     @Override
     public void submit(
-            final EntityRenderState state,
+            final SpellProjectileRenderState state,
             final PoseStack poseStack,
             final SubmitNodeCollector submitNodeCollector,
             final CameraRenderState camera
@@ -39,7 +46,7 @@ public class SpellProjectileRenderer<T extends Entity> extends EntityRenderer<T,
         poseStack.mulPose(camera.orientation);
         poseStack.translate(0.0F, 0.0F, 0.05F);
 
-        float scale = 0.5F;
+        float scale = 0.3F;
         poseStack.scale(scale, scale, scale);
 
         submitNodeCollector.submitCustomGeometry(
@@ -48,28 +55,28 @@ public class SpellProjectileRenderer<T extends Entity> extends EntityRenderer<T,
                 (pose, buffer) -> {
 
                     buffer.addVertex(pose.pose(), -0.5F, -0.5F, 0.0F)
-                            .setColor(255, 255, 255, 255)
+                            .setColor(state.tintColor)
                             .setUv(0.0F, 1.0F)
                             .setOverlay(OverlayTexture.NO_OVERLAY)
                             .setLight(state.lightCoords)
                             .setNormal(pose, 0.0F, 0.0F, 1.0F);
 
                     buffer.addVertex(pose.pose(), 0.5F, -0.5F, 0.0F)
-                            .setColor(255, 255, 255, 255)
+                            .setColor(state.tintColor)
                             .setUv(1.0F, 1.0F)
                             .setOverlay(OverlayTexture.NO_OVERLAY)
                             .setLight(state.lightCoords)
                             .setNormal(pose, 0.0F, 0.0F, 1.0F);
 
                     buffer.addVertex(pose.pose(), 0.5F, 0.5F, 0.0F)
-                            .setColor(255, 255, 255, 255)
+                            .setColor(state.tintColor)
                             .setUv(1.0F, 0.0F)
                             .setOverlay(OverlayTexture.NO_OVERLAY)
                             .setLight(state.lightCoords)
                             .setNormal(pose, 0.0F, 0.0F, 1.0F);
 
                     buffer.addVertex(pose.pose(), -0.5F, 0.5F, 0.0F)
-                            .setColor(255, 255, 255, 255)
+                            .setColor(state.tintColor)
                             .setUv(0.0F, 0.0F)
                             .setOverlay(OverlayTexture.NO_OVERLAY)
                             .setLight(state.lightCoords)

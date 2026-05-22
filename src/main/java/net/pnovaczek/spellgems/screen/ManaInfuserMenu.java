@@ -109,7 +109,6 @@ public class ManaInfuserMenu extends AbstractContainerMenu {
             return mayPlaceItem(stack);
         }
 
-        // TODO: change to mana tag to allow other items (e.g. mana essence block)
         public static boolean mayPlaceItem(ItemStack stack) {
             return stack.is(ModItems.MANA_ESSENCE);
         }

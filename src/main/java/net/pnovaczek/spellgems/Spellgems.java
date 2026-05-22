@@ -19,6 +19,7 @@ public class Spellgems implements ModInitializer {
 		ModEntities.initialize();
 		ModMenuTypes.initialize();
 		ModComponents.initialize();
+		ModEntityDataSerializers.register();
 
 		ModSpells.initialize();
 		ModModifierEnchantments.initialize();

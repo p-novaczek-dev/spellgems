@@ -26,8 +26,4 @@ public abstract class AbstractSpell implements Spell {
     public final  String tooltipDescriptionKey() {
         return "tooltip.spellgems.spell." + name() + ".description";
     }
-
-    public final SpellgemsConfig.SpellConfig spellConfig() {
-        return Spellgems.CONFIG.spells.getOrDefault(name(), new SpellgemsConfig.SpellConfig());
-    }
 }

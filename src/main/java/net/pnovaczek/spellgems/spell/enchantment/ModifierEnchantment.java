@@ -10,6 +10,10 @@ public record ModifierEnchantment(Identifier id) {
             ModifierEnchantment::id
     );
 
+    public boolean is(Identifier strikeId) {
+        return id.equals(strikeId);
+    }
+
     public String tooltipNameKey() {
         return "tooltip.spellgems.spell_enchantment." + id.getPath() + ".name";
     }

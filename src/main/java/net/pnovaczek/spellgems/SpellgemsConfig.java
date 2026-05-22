@@ -3,20 +3,23 @@ package net.pnovaczek.spellgems;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
-import net.pnovaczek.spellgems.spell.SpellContext;
-import net.pnovaczek.spellgems.spell.Spells;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SpellgemsConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public final Map<String, SpellConfig> spells = new HashMap<>();
+    public final SpellConfigs spells = new SpellConfigs();
     public int strikeEffectDuration = 100;
     public float spellEnchantmentDurabilityCostMultiplier = 2.0F;
+
+    public static class SpellConfigs {
+        public SpellCombatConfig projectile = new SpellCombatConfig();
+        public SpellCombatConfig nova = new SpellCombatConfig();
+        public SpellCombatConfig vortex = new SpellCombatConfig();
+        // Add additional spell entries here as they are implemented (e.g. blink, magnet, harvest, etc.)
+    }
 
     public static class SpellConfig {
         public int wandBaseDurabilityCost = 1;
@@ -40,13 +43,6 @@ public class SpellgemsConfig {
 
         if (config == null) {
             config = new SpellgemsConfig();
-
-            config.strikeEffectDuration = 100;
-            config.spellEnchantmentDurabilityCostMultiplier = 2.0F;
-            config.spells.put(Spells.PROJECTILE.getPath(), new SpellCombatConfig());
-            config.spells.put(Spells.NOVA.getPath(), new SpellCombatConfig());
-            config.spells.put(Spells.VORTEX.getPath(), new SpellCombatConfig());
-
             config.save();
         }
         return config;

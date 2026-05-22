@@ -23,6 +23,11 @@ public class ModItemTagProvider extends FabricTagsProvider.ItemTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider wrapperLookup) {
         builder(ModTags.COMBAT_SPELL_GEMS)
-                .add(ModItems.keyOfItem("spell_gem_projectile"));
+                .add(ModItems.keyOfItem("spell_gem_projectile"))
+                .add(ModItems.keyOfItem("spell_gem_nova"))
+                .add(ModItems.keyOfItem("spell_gem_vortex"));
+
+        builder(ModTags.WAND_ENCHANTABLE)
+                .add(ModItems.keyOfItem("astral_bow"));
     }
 }

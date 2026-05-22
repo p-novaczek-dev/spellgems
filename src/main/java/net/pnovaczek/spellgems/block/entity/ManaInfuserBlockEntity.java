@@ -40,7 +40,6 @@ public class ManaInfuserBlockEntity extends BlockEntity implements WorldlyContai
     public int manaBuffer;
     public static final int MAX_MANA = 64;
     private int progress = 0;
-    private static final int MAX_PROGRESS = 200; // hard-coded ticks for one craft (will be taken from recipes later)
     private final ContainerData data;
 
     public ManaInfuserBlockEntity(BlockPos pos, BlockState state) {

@@ -2,6 +2,8 @@ package net.pnovaczek.spellgems.item.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.Identifier;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
@@ -38,5 +40,40 @@ public record SpellGemData(
                 !strikeEffects.isEmpty() ||
                 !utilityEffects.isEmpty() ||
                 !potionEffects.isEmpty();
+    }
+
+    public CompoundTag save(CompoundTag tag) {
+        return CODEC.encodeStart(NbtOps.INSTANCE, this)
+                .result()
+                .map(nbt -> (CompoundTag) nbt)
+                .orElse(tag);
+    }
+
+    public static SpellGemData load(CompoundTag tag) {
+        return CODEC.parse(NbtOps.INSTANCE, tag)
+                .result()
+                .orElse(null);
+    }
+
+    public Integer getTintColor() {
+        if (strikeEffects.isEmpty()) {
+            return 0xFFFFFF;
+        }
+
+        long r = 0, g = 0, b = 0;
+        int count = strikeEffects.size();
+
+        for (StrikeEnchantment strike : strikeEffects) {
+            int color = strike.getTintColor();
+            r += (color >> 16) & 0xFF;
+            g += (color >> 8) & 0xFF;
+            b += color & 0xFF;
+        }
+
+        r /= count;
+        g /= count;
+        b /= count;
+
+        return (int) ((r << 16) | (g << 8) | b);
     }
 }

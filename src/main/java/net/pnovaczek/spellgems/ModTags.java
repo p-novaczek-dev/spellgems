@@ -23,6 +23,11 @@ public class ModTags {
             Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "catalyst_books")
     );
 
+    public static final TagKey<Item> WAND_ENCHANTABLE = TagKey.create(
+            Registries.ITEM,
+            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "wand_enchantable")
+    );
+
     public static void register() {
         // empty - just forces class loading if needed
     }
