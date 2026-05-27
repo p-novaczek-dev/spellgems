@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.pnovaczek.spellgems.entity.AstralArrow;
+import net.pnovaczek.spellgems.entity.InfernoCloud;
 import net.pnovaczek.spellgems.entity.SpellProjectile;
 
 public class ModEntities {
@@ -22,13 +23,20 @@ public class ModEntities {
                     .updateInterval(20)
     );
 
-
     public static final EntityType<SpellProjectile> SPELL_PROJECTILE = register(
             "spell_projectile",
             EntityType.Builder.<SpellProjectile>of(
                 (entityType, level) -> new SpellProjectile((EntityType<SpellProjectile>) entityType, level), MobCategory.MISC)
                     .sized(0.25F, 0.25F)
                     .clientTrackingRange(4));
+
+    public static final EntityType<InfernoCloud> INFERNO_CLOUD = register(
+            "inferno_cloud",
+            EntityType.Builder.<InfernoCloud>of(
+                (entityType, level) -> new InfernoCloud((EntityType<InfernoCloud>) entityType, level), MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(10)
+                    .updateInterval(20));
 
     private static <T extends net.minecraft.world.entity.Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {
         ResourceKey<EntityType<?>> entityKey = ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, name));

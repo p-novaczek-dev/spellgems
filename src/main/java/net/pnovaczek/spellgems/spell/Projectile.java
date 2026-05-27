@@ -156,7 +156,7 @@ public class Projectile extends AbstractSpell {
             living.hurtServer(serverLevel, projectile.damageSources().magic(), spellConfig.damage);
 
             for (var strike : strikes) {
-                strike.applyTo(living);
+                strike.applyTo(living, context.caster());
             }
 
             if (maxChains > 0) {

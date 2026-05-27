@@ -5,6 +5,8 @@ import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.pnovaczek.spellgems.ModEnchantmentEffects;
+
 public class Spellgems implements ModInitializer {
 	public static final String MOD_ID = "spellgems";
 	public static SpellgemsConfig CONFIG = SpellgemsConfig.load();
@@ -25,5 +27,7 @@ public class Spellgems implements ModInitializer {
 		ModModifierEnchantments.initialize();
 		ModStrikeEnchantments.initialize();
 		ModUtilityEnchantments.initialize();
+
+		ModEnchantmentEffects.register();
 	}
 }

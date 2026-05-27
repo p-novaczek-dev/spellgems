@@ -91,5 +91,7 @@
   "tooltip.spellgems.spell_enchantment.smelt.name": "Smelt",
   "tooltip.spellgems.spell_enchantment.smelt.description": "Smelts items obtained by the spell",
   "tooltip.spellgems.spell_enchantment.silk_touch.name": "Silk Touch",
-  "tooltip.spellgems.spell_enchantment.silk_touch.description": "Breaks blocks as they are"
+  "tooltip.spellgems.spell_enchantment.silk_touch.description": "Breaks blocks as they are",
+
+  "enchantment.spellgems.recharge": "Recharge"
 }

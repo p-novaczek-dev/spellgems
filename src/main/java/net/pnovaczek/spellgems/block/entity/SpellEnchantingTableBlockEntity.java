@@ -61,9 +61,4 @@ public class SpellEnchantingTableBlockEntity extends BlockEntity implements Name
         super.collectImplicitComponents(components);
         components.set(DataComponents.CUSTOM_NAME, this.name);
     }
-
-    @Override
-    public void removeComponentsFromTag(ValueOutput output) {
-        output.discard("CustomName");
-    }
 }

@@ -7,10 +7,10 @@
   "input": {
     "tag": "spellgems:combat_spell_gems"
   },
-  "level_requirement": 0,
+  "level_requirement": 30,
   "result": {
     "modifiers": 1,
     "strikes": 1
   },
-  "xp_cost": 0
+  "xp_cost": 100
 }

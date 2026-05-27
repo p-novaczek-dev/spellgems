@@ -1,5 +1,7 @@
 {
   "values": [
-    "spellgems:spell_gem_projectile"
+    "spellgems:spell_gem_projectile",
+    "spellgems:spell_gem_nova",
+    "spellgems:spell_gem_vortex"
   ]
 }
