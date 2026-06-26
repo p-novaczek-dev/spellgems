@@ -38,6 +38,13 @@ public class SpellgemsTooltips {
                     tooltip.addLineHoldShift();
                 }
             }
+            else if (stack.is(ModItems.RAW_SPELL_GEM)) {
+                if (Minecraft.getInstance().hasShiftDown()) {
+                    tooltip.addLineDetail("tooltip.spellgems.raw_spell_gem.description");
+                } else {
+                    tooltip.addLineHoldShift();
+                }
+            }
             else if (stack.getItem() instanceof SpellGemItem) {
                 var data = stack.getComponents().get(ModComponents.SPELL_GEM_DATA);
 

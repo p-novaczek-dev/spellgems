@@ -12,6 +12,7 @@ public class SpellgemsConfig {
 
     public final SpellConfigs spells = new SpellConfigs();
     public int strikeEffectDuration = 100;
+    public float strikeCloudDamage = 2.0F;
     public float spellEnchantmentDurabilityCostMultiplier = 2.0F;
 
     public static class SpellConfigs {

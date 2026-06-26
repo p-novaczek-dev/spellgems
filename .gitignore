@@ -41,3 +41,5 @@ replay_*.log
 /AGENTS.md
 /code_reference.json
 /spellgems_blueprint.json
+/temp/
+/mcps/

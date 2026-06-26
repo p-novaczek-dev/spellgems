@@ -3,8 +3,6 @@ package net.pnovaczek.spellgems.recipe;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -18,7 +16,6 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.pnovaczek.spellgems.Spellgems;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput> {
 
@@ -69,11 +66,18 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
     public boolean matches(SpellEnchantingRecipeInput recipeInput, Level level) {
         ItemStack target = recipeInput.target();
         ItemStack catalystStack = recipeInput.catalyst();
-        boolean baseMatch = input.getIngredient().test(target);
+
+        Ingredient targetIngredient = input.getIngredient();
+        if (targetIngredient == null || !targetIngredient.test(target)) {
+            return false;
+        }
+
         // spell match (placeholder – implement via your spell Component when ready)
-        boolean spellMatch = input.spell().map(s -> true /* check target component */).orElse(true);
-        boolean catalystMatch = catalystDef.asIngredient().test(catalystStack) && catalystStack.getCount() >= catalystDef.count();
-        return baseMatch && spellMatch && catalystMatch;
+        if (input.spell().isPresent()) {
+            // TODO: check target spell component against input.spell()
+        }
+
+        return catalystDef.hasSufficient(catalystStack);
     }
 
     @Override
@@ -109,11 +113,8 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
                     .orElse(null);
             if (tag.isPresent()) {
                 TagKey<Item> tagKey = TagKey.create(Registries.ITEM, tag.get());
-                Iterable<Holder<Item>> iterableTags = BuiltInRegistries.ITEM.getTagOrEmpty(tagKey);
-                return StreamSupport.stream(iterableTags.spliterator(), false)
-                        .map(HolderSet::direct)
+                return BuiltInRegistries.ITEM.get(tagKey)
                         .map(Ingredient::of)
-                        .findFirst()
                         .orElse(null);
             }
             return null;
@@ -131,6 +132,15 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
     }
 
     public record CatalystDefinition(Identifier item, int count) {
+        public boolean hasSufficient(ItemStack stack) {
+            if (stack.isEmpty() || stack.getCount() < this.count) {
+                return false;
+            }
+            return BuiltInRegistries.ITEM.get(this.item)
+                    .map(stack::is)
+                    .orElse(false);
+        }
+
         public Ingredient asIngredient() {
             return Ingredient.of(BuiltInRegistries.ITEM.get(item).get().value());
         }

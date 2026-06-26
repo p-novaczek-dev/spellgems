@@ -16,6 +16,9 @@ public class SpellgemsClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		EntityRenderers.register(ModEntities.ASTRAL_ARROW, AstralArrowRenderer::new);
 		EntityRenderers.register(ModEntities.SPELL_PROJECTILE, SpellProjectileRenderer::new);
+		EntityRenderers.register(ModEntities.INFERNO_CLOUD, NoopRenderer::new);
+		EntityRenderers.register(ModEntities.FROSTBITE_CLOUD, NoopRenderer::new);
+		EntityRenderers.register(ModEntities.PLAGUE_CLOUD, NoopRenderer::new);
 		MenuScreens.register(ModMenuTypes.MANA_INFUSER, ManaInfuserScreen::new);
 		MenuScreens.register(ModMenuTypes.SPELL_ENCHANTING_TABLE, SpellEnchantingScreen::new);
 		SpellgemsTooltips.register();

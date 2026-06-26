@@ -1,17 +1,19 @@
 package net.pnovaczek.spellgems.screen;
 
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.pnovaczek.spellgems.ModBlocks;
+import net.pnovaczek.spellgems.ModTags;
 import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModMenuTypes;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
@@ -41,6 +43,10 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
     private final ContainerLevelAccess access;
     private final Random random = new Random();
 
+    // One entry per button (0=top/utility, 1=middle/combat, 2=bottom/future)
+    private final int[] levelRequirements = new int[3];
+    private final int[] xpCosts = new int[3];
+
     public SpellEnchantingMenu(int containerId, Inventory inventory) {
         this(containerId, inventory, ContainerLevelAccess.NULL);
     }
@@ -52,26 +58,70 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
         // Target slot (spell gem or catalyst book)
         this.addSlot(new Slot(this.enchantSlots, 0, 15, 47) {
             @Override public int getMaxStackSize() { return 1; }
+            @Override public boolean mayPlace(ItemStack stack) { return isEnchantableTarget(stack); }
         });
 
-        // Catalyst slot
+        // Catalyst slot (stacks allowed; recipe defines how many are consumed per craft)
         this.addSlot(new Slot(this.enchantSlots, 1, 35, 47) {
-            @Override public boolean mayPlace(ItemStack stack) { return true; } // validated by recipe
+            @Override public int getMaxStackSize() { return 64; }
+            @Override public boolean mayPlace(ItemStack stack) { return isCatalystItem(stack); }
         });
 
         this.addStandardInventorySlots(inventory, 8, 84);
-    }
 
-    @Override
-    public void slotsChanged(Container container) {
-        if (container == this.enchantSlots) {
-            this.broadcastChanges();
+        // Register preview data for all 3 buttons (vanilla style)
+        for (int i = 0; i < 3; i++) {
+            this.addDataSlot(DataSlot.shared(this.levelRequirements, i));
+            this.addDataSlot(DataSlot.shared(this.xpCosts, i));
         }
     }
 
     @Override
+    public void slotsChanged(Container container) {
+        if (container != this.enchantSlots) {
+            return;
+        }
+
+        ItemStack targetStack = this.enchantSlots.getItem(0);
+        ItemStack catalystStack = this.enchantSlots.getItem(1);
+
+        // Clear all buttons by default
+        for (int i = 0; i < 3; i++) {
+            this.levelRequirements[i] = 0;
+            this.xpCosts[i] = 0;
+        }
+
+        if (targetStack.isEmpty() || catalystStack.isEmpty()) {
+            this.access.execute((level, pos) -> this.broadcastChanges());
+            return;
+        }
+
+        this.access.execute((level, pos) -> {
+            if (level.isClientSide()) {
+                return;
+            }
+
+            SpellEnchantingRecipeInput recipeInput = new SpellEnchantingRecipeInput(targetStack, catalystStack);
+
+            // Button 0 (top) = utility, button 1 (middle) = combat
+            findRecipeForButton(0, recipeInput, level);
+            findRecipeForButton(1, recipeInput, level);
+            // Button 2 (bottom) = future (tomes / catalyst books) - leave at 0 for now
+
+            this.broadcastChanges();
+        });
+    }
+
+    private void findRecipeForButton(int buttonIndex, SpellEnchantingRecipeInput input, net.minecraft.world.level.Level level) {
+        findMatchingRecipe(buttonIndex, input, level).ifPresent(recipe -> {
+            this.levelRequirements[buttonIndex] = recipe.getLevelRequirement();
+            this.xpCosts[buttonIndex] = recipe.getXpCost();
+        });
+    }
+
+    @Override
     public boolean clickMenuButton(Player player, int buttonId) {
-        if (buttonId != 0) return false;
+        if (buttonId < 0 || buttonId > 2) return false;
 
         ItemStack targetStack = this.enchantSlots.getItem(0);
         ItemStack catalystStack = this.enchantSlots.getItem(1);
@@ -83,50 +133,82 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
         SpellEnchantingRecipeInput recipeInput = new SpellEnchantingRecipeInput(targetStack, catalystStack);
 
         this.access.execute((level, pos) -> {
-            if (level instanceof ServerLevel serverLevel) {
-                Optional<RecipeHolder<SpellEnchantingRecipe>> optionalRecipe =
-                        serverLevel.recipeAccess().getRecipeFor(SpellEnchantingRecipe.TYPE, recipeInput, level);
-
-                if (optionalRecipe.isEmpty()) return;
-
-                SpellEnchantingRecipe recipe = optionalRecipe.get().value();
-
-                // XP / level checks
-                if (player.experienceLevel < recipe.getLevelRequirement() ||
-                        player.totalExperience < recipe.getXpCost()) {
-                    return;
-                }
-
-                // Apply enchantment effects to SpellGemData
-                SpellGemData currentData = targetStack.getOrDefault(
-                        ModComponents.SPELL_GEM_DATA,
-                        SpellGemData.create(Spells.PROJECTILE) // fallback
-                );
-
-                SpellGemData newData = applyRecipeEffects(currentData, recipe);
-
-                targetStack.set(ModComponents.SPELL_GEM_DATA, newData);
-
-                // Consume catalyst
-                catalystStack.shrink(recipe.getCatalystDef().count());
-                if (catalystStack.isEmpty()) {
-                    this.enchantSlots.setItem(1, ItemStack.EMPTY);
-                }
-
-                // Consume XP
-                player.giveExperiencePoints(-recipe.getXpCost());
-
-                // Feedback
-                level.playSound(null, pos, net.minecraft.sounds.SoundEvents.ENCHANTMENT_TABLE_USE,
-                        net.minecraft.sounds.SoundSource.BLOCKS, 1.0F,
-                        level.getRandom().nextFloat() * 0.1F + 0.9F);
-
-                this.enchantSlots.setChanged();
-                this.slotsChanged(this.enchantSlots);
+            if (level.isClientSide()) {
                 return;
             }
+
+            Optional<SpellEnchantingRecipe> optionalRecipe = findMatchingRecipe(buttonId, recipeInput, level);
+            if (optionalRecipe.isEmpty()) {
+                return;
+            }
+
+            SpellEnchantingRecipe recipe = optionalRecipe.get();
+
+            if (!recipe.getCatalystDef().hasSufficient(catalystStack)) {
+                return;
+            }
+
+            // XP / level checks
+            if (player.experienceLevel < recipe.getLevelRequirement() ||
+                    player.totalExperience < recipe.getXpCost()) {
+                return;
+            }
+
+            SpellGemData currentData = targetStack.getOrDefault(
+                    ModComponents.SPELL_GEM_DATA,
+                    SpellGemData.create(Spells.PROJECTILE) // fallback
+            );
+
+            SpellGemData newData = applyRecipeEffects(currentData, recipe);
+
+            targetStack.set(ModComponents.SPELL_GEM_DATA, newData);
+
+            // Consume only the recipe-required amount from the catalyst stack
+            catalystStack.shrink(recipe.getCatalystDef().count());
+            if (catalystStack.isEmpty()) {
+                this.enchantSlots.setItem(1, ItemStack.EMPTY);
+            }
+
+            player.giveExperiencePoints(-recipe.getXpCost());
+
+            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.ENCHANTMENT_TABLE_USE,
+                    net.minecraft.sounds.SoundSource.BLOCKS, 1.0F,
+                    level.getRandom().nextFloat() * 0.1F + 0.9F);
+
+            this.enchantSlots.setChanged();
+            this.slotsChanged(this.enchantSlots);
         });
         return true;
+    }
+
+    private static Optional<SpellEnchantingRecipe> findMatchingRecipe(
+            int buttonId, SpellEnchantingRecipeInput input, net.minecraft.world.level.Level level) {
+        String category = categoryForButton(buttonId);
+        if (category == null) {
+            return Optional.empty();
+        }
+
+        if (!(level.recipeAccess() instanceof RecipeManager recipeManager)) {
+            return Optional.empty();
+        }
+
+        for (var holder : recipeManager.getRecipes()) {
+            if (holder.value().getType() != SpellEnchantingRecipe.TYPE) continue;
+            if (!(holder.value() instanceof SpellEnchantingRecipe recipe)) continue;
+            if (!category.equals(recipe.getCategory())) continue;
+            if (recipe.matches(input, level)) {
+                return Optional.of(recipe);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static @org.jspecify.annotations.Nullable String categoryForButton(int buttonId) {
+        return switch (buttonId) {
+            case 0 -> "utility";
+            case 1 -> "combat";
+            default -> null;
+        };
     }
 
     private SpellGemData applyRecipeEffects(SpellGemData data, SpellEnchantingRecipe recipe) {
@@ -178,9 +260,73 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
         return list;
     }
 
+    /** Legacy single-button getters (point at middle/combat button for backward compat) */
+    public int getLevelRequirement() {
+        return this.levelRequirements[1];
+    }
+
+    public int getXpCost() {
+        return this.xpCosts[1];
+    }
+
+    /** Per-button access for the 3-button vanilla-style layout */
+    public int getLevelRequirement(int button) {
+        return (button >= 0 && button < 3) ? this.levelRequirements[button] : 0;
+    }
+
+    public int getXpCost(int button) {
+        return (button >= 0 && button < 3) ? this.xpCosts[button] : 0;
+    }
+
+    private static boolean isEnchantableTarget(ItemStack stack) {
+        return stack.is(ModTags.COMBAT_SPELL_GEMS)
+                || stack.is(ModTags.UTILITY_SPELL_GEMS)
+                || stack.is(ModTags.CATALYST_BOOKS);
+    }
+
+    private static boolean isCatalystItem(ItemStack stack) {
+        return stack.is(Items.LAPIS_LAZULI);
+    }
+
     @Override
     public ItemStack quickMoveStack(Player player, int slotIndex) {
-        return ItemStack.EMPTY; // TODO: implement proper quick-move if desired
+        ItemStack clicked = ItemStack.EMPTY;
+        Slot slot = this.slots.get(slotIndex);
+
+        if (slot != null && slot.hasItem()) {
+            ItemStack stack = slot.getItem();
+            clicked = stack.copy();
+
+            if (slotIndex == 0 || slotIndex == 1) {
+                if (!this.moveItemStackTo(stack, 2, 38, true)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (isCatalystItem(stack)) {
+                if (!this.moveItemStackTo(stack, 1, 2, false)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (isEnchantableTarget(stack)) {
+                if (!this.moveItemStackTo(stack, 0, 1, false)) {
+                    return ItemStack.EMPTY;
+                }
+            } else {
+                return ItemStack.EMPTY;
+            }
+
+            if (stack.isEmpty()) {
+                slot.setByPlayer(ItemStack.EMPTY);
+            } else {
+                slot.setChanged();
+            }
+
+            if (stack.getCount() == clicked.getCount()) {
+                return ItemStack.EMPTY;
+            }
+
+            slot.onTake(player, stack);
+        }
+
+        return clicked;
     }
 
     @Override

@@ -8,7 +8,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.pnovaczek.spellgems.entity.AstralArrow;
+import net.pnovaczek.spellgems.entity.FrostbiteCloud;
 import net.pnovaczek.spellgems.entity.InfernoCloud;
+import net.pnovaczek.spellgems.entity.PlagueCloud;
 import net.pnovaczek.spellgems.entity.SpellProjectile;
 
 public class ModEntities {
@@ -34,6 +36,22 @@ public class ModEntities {
             "inferno_cloud",
             EntityType.Builder.<InfernoCloud>of(
                 (entityType, level) -> new InfernoCloud((EntityType<InfernoCloud>) entityType, level), MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(10)
+                    .updateInterval(20));
+
+    public static final EntityType<FrostbiteCloud> FROSTBITE_CLOUD = register(
+            "frostbite_cloud",
+            EntityType.Builder.<FrostbiteCloud>of(
+                (entityType, level) -> new FrostbiteCloud((EntityType<FrostbiteCloud>) entityType, level), MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(10)
+                    .updateInterval(20));
+
+    public static final EntityType<PlagueCloud> PLAGUE_CLOUD = register(
+            "plague_cloud",
+            EntityType.Builder.<PlagueCloud>of(
+                (entityType, level) -> new PlagueCloud((EntityType<PlagueCloud>) entityType, level), MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .clientTrackingRange(10)
                     .updateInterval(20));

@@ -136,6 +136,37 @@ public class SpellProjectile extends AbstractHurtingProjectile {
         }
     }
 
+    @Override
+    public void onClientRemoval() {
+        // Spawn impact particles on the client when the server removes this projectile.
+        // This is much more reliable than spawning on the server right before discard().
+        spawnImpactParticles();
+        super.onClientRemoval();
+    }
+
+    private void spawnImpactParticles() {
+        if (!this.level().isClientSide()) {
+            return;
+        }
+
+        CompoundTag tag = this.entityData.get(DATA_SPELL_GEM);
+        if (tag.isEmpty()) return;
+
+        SpellGemData data = SpellGemData.load(tag);
+
+        if (data == null) return;
+
+        for (var strike : data.strikeEffects()) {
+            // Burst of particles on impact/discard (more intense than trail)
+            for (int i = 0; i < 12; i++) {
+                double vx = (random.nextDouble() - 0.5) * 0.4;
+                double vy = (random.nextDouble() - 0.5) * 0.4;
+                double vz = (random.nextDouble() - 0.5) * 0.4;
+                strike.addParticle(level(), getX(), getY(), getZ(), random, vx, vy, vz);
+            }
+        }
+    }
+
     public int getTintColor() {
         return this.entityData.get(DATA_TINT_COLOR);
     }

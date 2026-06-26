@@ -26,6 +26,11 @@ public class ModItems {
             Item::new,
             new Item.Properties());
 
+    public static final Item RAW_SPELL_GEM = register(
+            "raw_spell_gem",
+            Item::new,
+            new Item.Properties());
+
     public static final BlockItem MANA_ROOT = register(
             "mana_root",
             p -> new BlockItem(ModBlocks.MANA_ROOT, p),

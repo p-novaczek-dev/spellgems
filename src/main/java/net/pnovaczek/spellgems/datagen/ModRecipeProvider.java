@@ -66,6 +66,34 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                     .unlockedBy("has_iron_ingot", has(net.minecraft.world.item.Items.IRON_INGOT))
                     .save(exporter, "schimmersteel_ingot");
 
+                // Raw Spellgem: amethyst_shard (infused) + lapis (infusing) + 8 mana essence
+                ManaInfuserRecipeBuilder.create(
+                        Ingredient.of(Items.AMETHYST_SHARD),
+                        Ingredient.of(Items.LAPIS_LAZULI),
+                        ModItems.RAW_SPELL_GEM,
+                        8)
+                    .unlockedBy("has_amethyst_shard", has(Items.AMETHYST_SHARD))
+                    .save(exporter, "raw_spell_gem");
+
+                // Spell gems from raw + specific item (shapeless, per blueprint)
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_PROJECTILE)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.ARROW)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_NOVA)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.GUNPOWDER)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_VORTEX)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.SLIME_BALL)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
                 SpellEnchantingRecipeBuilder.combat(
                          new SpellEnchantingRecipe.SpellEnchantInput(
                                  Optional.ofNullable(null),
@@ -74,7 +102,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         new SpellEnchantingRecipe.CatalystDefinition(
                                 BuiltInRegistries.ITEM.getKey(Items.LAPIS_LAZULI),
                                 1),
-                        30,
+                        20,
                         100,
                         1,
                         1)

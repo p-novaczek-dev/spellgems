@@ -46,7 +46,7 @@ public class SpellProjectileRenderer extends EntityRenderer<SpellProjectile, Spe
         poseStack.mulPose(camera.orientation);
         poseStack.translate(0.0F, 0.0F, 0.05F);
 
-        float scale = 0.3F;
+        float scale = 1.0F;
         poseStack.scale(scale, scale, scale);
 
         submitNodeCollector.submitCustomGeometry(

@@ -4,6 +4,8 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -11,7 +13,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.entity.FrostbiteCloud;
 import net.pnovaczek.spellgems.entity.InfernoCloud;
+import net.pnovaczek.spellgems.entity.PlagueCloud;
 
 public record StrikeEnchantment(Identifier id) {
 
@@ -37,13 +41,43 @@ public record StrikeEnchantment(Identifier id) {
             living.addEffect(new MobEffectInstance(MobEffects.LEVITATION, duration, 0));
         } else if (is(StrikeEnchantments.INFERNO)) {
             if (living.getRemainingFireTicks() > 0 && !level.isClientSide()) {
-                InfernoCloud cloud = new InfernoCloud(level, pos.x(), pos.y(), pos.z(), caster);
+                InfernoCloud cloud = new InfernoCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster);
                 level.addFreshEntity(cloud);
+                level.playSound(
+                        null,
+                        pos.x(), pos.y(), pos.z(),
+                        SoundEvents.FIRECHARGE_USE,
+                        SoundSource.PLAYERS,
+                        0.8F,
+                        1.0F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
+                );
             }
         } else if (is(StrikeEnchantments.FROSTBITE)) {
-            // TODO: if target freezing, apply wither + immobilize (high slowness) (~8 lines)
+            if (living.getTicksFrozen() > 0 && !level.isClientSide()) {
+                FrostbiteCloud cloud = new FrostbiteCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster);
+                level.addFreshEntity(cloud);
+                level.playSound(
+                        null,
+                        pos.x(), pos.y(), pos.z(),
+                        SoundEvents.POWDER_SNOW_BREAK,
+                        SoundSource.PLAYERS,
+                        0.8F,
+                        1.0F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
+                );
+            }
         } else if (is(StrikeEnchantments.PLAGUE)) {
-            // TODO: if target poisoned, apply wither + slowness (~5 lines)
+            if (living.hasEffect(MobEffects.POISON) && !level.isClientSide()) {
+                PlagueCloud cloud = new PlagueCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster);
+                level.addFreshEntity(cloud);
+                level.playSound(
+                        null,
+                        pos.x(), pos.y(), pos.z(),
+                        SoundEvents.SLIME_SQUISH,
+                        SoundSource.PLAYERS,
+                        0.8F,
+                        1.0F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
+                );
+            }
         } else if (is(StrikeEnchantments.LIGHTNING)) {
             // TODO: if target slowed, spawn lightning bolt (~6 lines)
         } else if (is(StrikeEnchantments.EXPLOSION)) {
@@ -105,7 +139,7 @@ public record StrikeEnchantment(Identifier id) {
             randomSpread = 0.4D;
         }
         else if (is(StrikeEnchantments.FROSTBITE)) {
-            particleType = ParticleTypes.CRIT;
+            particleType = ParticleTypes.SNOWFLAKE;
             randomSpread = 0.4D;
         }
         else if (is(StrikeEnchantments.FLAME)) {

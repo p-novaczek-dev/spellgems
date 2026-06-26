@@ -7,7 +7,7 @@
   "input": {
     "tag": "spellgems:combat_spell_gems"
   },
-  "level_requirement": 30,
+  "level_requirement": 20,
   "result": {
     "modifiers": 1,
     "strikes": 1

@@ -8,30 +8,30 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.pnovaczek.spellgems.ModEntities;
 
-public class InfernoCloud extends SpellAreaEffectCloud {
+public class FrostbiteCloud extends SpellAreaEffectCloud {
 
     /**
      * Required for entity registration in ModEntities.
      */
-    public InfernoCloud(EntityType<? extends InfernoCloud> entityType, Level level) {
+    public FrostbiteCloud(EntityType<? extends FrostbiteCloud> entityType, Level level) {
         super(entityType, level);
         this.setRadius(CLOUD_RADIUS);
         this.setDuration(CLOUD_DURATION);
-        this.setCustomParticle(ParticleTypes.FLAME);
+        this.setCustomParticle(ParticleTypes.SNOWFLAKE);
     }
 
     /**
-     * Convenience constructor used when spawning from spell logic.
+     * Convenience constructor used when spawning from strike logic.
      */
-    public InfernoCloud(Level level, double x, double y, double z, LivingEntity owner) {
-        this(ModEntities.INFERNO_CLOUD, level);
+    public FrostbiteCloud(Level level, double x, double y, double z, LivingEntity owner) {
+        this(ModEntities.FROSTBITE_CLOUD, level);
         this.setPos(x, y, z);
         this.setOwner(owner);
     }
 
     @Override
     protected void applyEffectToTarget(LivingEntity target) {
-        target.setRemainingFireTicks(EFFECT_DURATION);
+        target.setTicksFrozen(EFFECT_DURATION);
         target.addEffect(new MobEffectInstance(MobEffects.WITHER, EFFECT_DURATION, 0));
     }
 }

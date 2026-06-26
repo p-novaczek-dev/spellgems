@@ -1,0 +1,10 @@
+{
+  "type": "spellgems:mana_infusing",
+  "infused_item": "minecraft:amethyst_shard",
+  "infusing_item": "minecraft:lapis_lazuli",
+  "mana_cost": 8,
+  "processing_time": 200,
+  "result": {
+    "id": "spellgems:raw_spell_gem"
+  }
+}

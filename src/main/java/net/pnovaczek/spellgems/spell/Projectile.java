@@ -73,7 +73,7 @@ public class Projectile extends AbstractSpell {
                     isBurst = true;
                     shotCount = 5;
                 } else if (mod.is(ModifierEnchantments.CHAINING)) {
-                    chainCount = 2;
+                    chainCount = 5;
                 }
             }
 
