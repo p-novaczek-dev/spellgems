@@ -9,15 +9,23 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.entity.AstralArrow;
 import net.pnovaczek.spellgems.entity.FrostbiteCloud;
 import net.pnovaczek.spellgems.entity.InfernoCloud;
 import net.pnovaczek.spellgems.entity.PlagueCloud;
 
 public record StrikeEnchantment(Identifier id) {
+
+    private static final int VOLLEY_ARROW_COUNT = 8;
 
     public static final Codec<StrikeEnchantment> CODEC = Identifier.CODEC.xmap(
             StrikeEnchantment::new,
@@ -79,19 +87,78 @@ public record StrikeEnchantment(Identifier id) {
                 );
             }
         } else if (is(StrikeEnchantments.LIGHTNING)) {
-            // TODO: if target slowed, spawn lightning bolt (~6 lines)
+            if (living.hasEffect(MobEffects.SLOWNESS) && !level.isClientSide()) {
+                LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
+                if (bolt != null) {
+                    bolt.snapTo(pos.x, pos.y, pos.z);
+                    if (caster instanceof ServerPlayer serverPlayer) {
+                        bolt.setCause(serverPlayer);
+                    }
+                    level.addFreshEntity(bolt);
+                }
+            }
         } else if (is(StrikeEnchantments.EXPLOSION)) {
-            // TODO: if target levitating, create explosion at target pos (~5 lines)
+            if (living.hasEffect(MobEffects.LEVITATION) && !level.isClientSide()) {
+                level.explode(caster, pos.x, pos.y, pos.z, 2.0F, false, Level.ExplosionInteraction.MOB);
+            }
         } else if (is(StrikeEnchantments.DRAIN)) {
-            // TODO: heal caster per target + extra dmg if withered (requires caster param; ~15 lines)
+            if (!level.isClientSide()) {
+                float amount = Spellgems.CONFIG.drainHealPerTarget;
+                caster.heal(amount);
+                if (living.hasEffect(MobEffects.WITHER) && level instanceof ServerLevel serverLevel) {
+                    living.hurtServer(serverLevel, caster.damageSources().magic(), amount);
+                }
+            }
         } else if (is(StrikeEnchantments.THERMAL_INVERSION)) {
-            // TODO: if target burning, apply freezing + levitation (~6 lines)
+            if (living.getRemainingFireTicks() > 0) {
+                living.setTicksFrozen(duration);
+                living.addEffect(new MobEffectInstance(MobEffects.LEVITATION, duration, 0));
+            }
         } else if (is(StrikeEnchantments.PURIFY)) {
-            // TODO: extra dmg (elsewhere?) + if poisoned set on fire (~4 lines)
+            if (!level.isClientSide() && level instanceof ServerLevel serverLevel) {
+                living.hurtServer(serverLevel, caster.damageSources().magic(), Spellgems.CONFIG.strikeCloudDamage);
+                if (living.hasEffect(MobEffects.POISON)) {
+                    living.setRemainingFireTicks(duration);
+                }
+            }
         } else if (is(StrikeEnchantments.VOLLEY)) {
-            // TODO: if slowed/levitating, spawn 8 astral arrows raining (~20+ lines; new entity logic)
+            if (!level.isClientSide()
+                    && (living.hasEffect(MobEffects.SLOWNESS) || living.hasEffect(MobEffects.LEVITATION))) {
+                RandomSource random = level.getRandom();
+                double targetCenterY = living.getY() + living.getBbHeight() * 0.5;
+
+                for (int i = 0; i < VOLLEY_ARROW_COUNT; i++) {
+                    double spawnX = living.getX() + (random.nextDouble() - 0.5) * 4.0;
+                    double spawnZ = living.getZ() + (random.nextDouble() - 0.5) * 4.0;
+                    double spawnY = targetCenterY + 8.0 + random.nextDouble() * 4.0;
+
+                    AstralArrow arrow = new AstralArrow(level, caster);
+                    arrow.setPos(spawnX, spawnY, spawnZ);
+
+                    double dx = living.getX() - spawnX + (random.nextDouble() - 0.5) * 2.0;
+                    double dy = targetCenterY - spawnY;
+                    double dz = living.getZ() - spawnZ + (random.nextDouble() - 0.5) * 2.0;
+                    arrow.shoot(dx, dy, dz, 1.2F, 10.0F);
+
+                    level.addFreshEntity(arrow);
+                }
+
+                level.playSound(
+                        null,
+                        pos.x(), pos.y(), pos.z(),
+                        SoundEvents.ARROW_SHOOT,
+                        SoundSource.PLAYERS,
+                        0.6F,
+                        0.8F + random.nextFloat() * 0.4F
+                );
+            }
         } else if (is(StrikeEnchantments.VENGEANCE)) {
-            // TODO: extra dmg scaled by caster missing health (needs caster; ~10 lines)
+            if (!level.isClientSide() && level instanceof ServerLevel serverLevel) {
+                float missingHealth = caster.getMaxHealth() - caster.getHealth();
+                if (missingHealth > 0.0F) {
+                    living.hurtServer(serverLevel, caster.damageSources().magic(), missingHealth);
+                }
+            }
         }
     }
 

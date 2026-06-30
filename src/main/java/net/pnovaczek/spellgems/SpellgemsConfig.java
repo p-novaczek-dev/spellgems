@@ -13,12 +13,13 @@ public class SpellgemsConfig {
     public final SpellConfigs spells = new SpellConfigs();
     public int strikeEffectDuration = 100;
     public float strikeCloudDamage = 2.0F;
+    public float drainHealPerTarget = 2.0F;
     public float spellEnchantmentDurabilityCostMultiplier = 2.0F;
 
     public static class SpellConfigs {
         public SpellCombatConfig projectile = new SpellCombatConfig();
-        public SpellCombatConfig nova = new SpellCombatConfig();
-        public SpellCombatConfig vortex = new SpellCombatConfig();
+        public NovaSpellConfig nova = new NovaSpellConfig();
+        public VortexSpellConfig vortex = new VortexSpellConfig();
         // Add additional spell entries here as they are implemented (e.g. blink, magnet, harvest, etc.)
     }
 
@@ -28,6 +29,28 @@ public class SpellgemsConfig {
 
     public static class SpellCombatConfig extends SpellConfig {
         public float damage = 1.0F;
+    }
+
+    public static class NovaSpellConfig extends SpellCombatConfig {
+        public float radius = 4.0F;
+        public float centerYOffset = 0.75F;
+        public float knockbackStrength = 0.3F;
+        public float powerDamageMultiplier = 2.0F;
+        public float expandRadiusMultiplier = 1.5F;
+    }
+
+    public static class VortexSpellConfig extends SpellCombatConfig {
+        public float radius = 3.0F;
+        public float maxDistance = 16.0F;
+        public float pullDistance = 2.5F;
+        public float pullStrength = 1.5F;
+        public float expandRadiusMultiplier = 1.5F;
+        public int particleCount = 48;
+        public float particleSpeed = 0.12F;
+
+        public VortexSpellConfig() {
+            damage = 0.0F;
+        }
     }
 
     public static SpellgemsConfig load() {

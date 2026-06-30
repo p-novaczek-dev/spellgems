@@ -1,4 +1,6 @@
 {
+  "itemGroup.spellgems": "Spellgems",
+
   "item.spellgems.astral_bow": "Astral Bow",
   "item.spellgems.mana_essence": "Mana Essence",
   "item.spellgems.mana_root": "Mana Root",
@@ -95,5 +97,12 @@
   "tooltip.spellgems.spell_enchantment.silk_touch.name": "Silk Touch",
   "tooltip.spellgems.spell_enchantment.silk_touch.description": "Breaks blocks as they are",
 
-  "enchantment.spellgems.recharge": "Recharge"
+  "enchantment.spellgems.recharge": "Recharge",
+
+  "recipe.spellgems.combat_spell_random.description": "Random combat enchantments",
+
+  "container.spellgems.spell_enchanting_table": "Spells",
+  "container.spellgems.spell_enchanting.level_requirement": "Requires level %s",
+  "container.spellgems.spell_enchanting.xp_cost": "%s levels",
+  "container.spellgems.spell_enchanting.catalyst": "%s %s"
 }

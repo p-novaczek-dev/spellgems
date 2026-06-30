@@ -43,3 +43,5 @@ replay_*.log
 /spellgems_blueprint.json
 /temp/
 /mcps/
+/terminals/
+/net/

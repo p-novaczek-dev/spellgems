@@ -18,25 +18,28 @@ public class SpellEnchantingRecipeBuilder implements RecipeBuilder {
     private final SpellEnchantingRecipe.CatalystDefinition catalyst;
     private final int levelRequirement;
     private final int xpCost;
+    private final String description;
     private final SpellEnchantingRecipe.SpellEnchantResult result;
 
     private SpellEnchantingRecipeBuilder(String category, SpellEnchantingRecipe.SpellEnchantInput input,
                                          SpellEnchantingRecipe.CatalystDefinition catalyst,
-                                         int levelRequirement, int xpCost,
+                                         int levelRequirement, int xpCost, String description,
                                          SpellEnchantingRecipe.SpellEnchantResult result) {
         this.category = category;
         this.input = input;
         this.catalyst = catalyst;
         this.levelRequirement = levelRequirement;
         this.xpCost = xpCost;
+        this.description = description;
         this.result = result;
     }
 
     public static SpellEnchantingRecipeBuilder combat(SpellEnchantingRecipe.SpellEnchantInput input,
                                                       SpellEnchantingRecipe.CatalystDefinition catalyst,
                                                       int levelRequirement, int xpCost,
+                                                      String description,
                                                       int modifiers, int strikes) {
-        return new SpellEnchantingRecipeBuilder("combat", input, catalyst, levelRequirement, xpCost,
+        return new SpellEnchantingRecipeBuilder("combat", input, catalyst, levelRequirement, xpCost, description,
                 new SpellEnchantingRecipe.SpellEnchantResult(Optional.of(modifiers), Optional.of(strikes),
                         Optional.empty(), false));
     }
@@ -44,8 +47,9 @@ public class SpellEnchantingRecipeBuilder implements RecipeBuilder {
     public static SpellEnchantingRecipeBuilder utility(SpellEnchantingRecipe.SpellEnchantInput input,
                                                        SpellEnchantingRecipe.CatalystDefinition catalyst,
                                                        int levelRequirement, int xpCost,
+                                                       String description,
                                                        String utilityEnchant) {
-        return new SpellEnchantingRecipeBuilder("utility", input, catalyst, levelRequirement, xpCost,
+        return new SpellEnchantingRecipeBuilder("utility", input, catalyst, levelRequirement, xpCost, description,
                 new SpellEnchantingRecipe.SpellEnchantResult(Optional.empty(), Optional.empty(),
                         Optional.of(Identifier.parse(utilityEnchant)), false));
     }
@@ -57,14 +61,13 @@ public class SpellEnchantingRecipeBuilder implements RecipeBuilder {
 
     @Override
     public ResourceKey<Recipe<?>> defaultId() {
-        // use a sensible default based on result or input
-        return RecipeBuilder.getDefaultRecipeId(null); // TODO: set default
+        return RecipeBuilder.getDefaultRecipeId(null);
     }
 
     @Override
     public void save(RecipeOutput output, ResourceKey<Recipe<?>> location) {
         SpellEnchantingRecipe recipe = new SpellEnchantingRecipe(
-                category, input, catalyst, levelRequirement, xpCost, result);
+                category, input, catalyst, levelRequirement, xpCost, description, result);
         output.accept(location, recipe, null);
     }
 

@@ -4,6 +4,7 @@
     "item": "minecraft:lapis_lazuli"
   },
   "category": "combat",
+  "description": "recipe.spellgems.combat_spell_random.description",
   "input": {
     "tag": "spellgems:combat_spell_gems"
   },

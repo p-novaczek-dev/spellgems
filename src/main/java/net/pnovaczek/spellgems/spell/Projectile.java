@@ -1,7 +1,5 @@
 package net.pnovaczek.spellgems.spell;
 
-import com.google.common.collect.Lists;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -20,27 +18,6 @@ import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantments;
 import java.util.List;
 
 public class Projectile extends AbstractSpell {
-
-    private record PendingBurstShot(int targetTick, Runnable action) {}
-
-    private static final List<PendingBurstShot> PENDING_BURST_SHOTS = Lists.newArrayList();
-    private static boolean schedulerRegistered = false;
-
-    private static void ensureBurstSchedulerRegistered() {
-        if (schedulerRegistered) return;
-        schedulerRegistered = true;
-
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            int currentTick = server.getTickCount();
-            PENDING_BURST_SHOTS.removeIf(shot -> {
-                if (currentTick >= shot.targetTick) {
-                    shot.action.run();
-                    return true;
-                }
-                return false;
-            });
-        });
-    }
 
     @Override
     public Identifier id() {
@@ -77,7 +54,6 @@ public class Projectile extends AbstractSpell {
                 }
             }
 
-            ensureBurstSchedulerRegistered();
             ProjectileHitHandler baseHandler = createHitHandler(context, strikes, chainCount);
 
             for (int i = 0; i < shotCount; i++) {
@@ -100,9 +76,7 @@ public class Projectile extends AbstractSpell {
                     spawnShot(context, direction, baseHandler, player, level, strikes);
                 } else {
                     int delayTicks = i * 3;
-                    int targetTick = level.getServer().getTickCount() + delayTicks;
-
-                    PENDING_BURST_SHOTS.add(new PendingBurstShot(targetTick, () -> {
+                    SpellBurstScheduler.scheduleServer(level.getServer().getTickCount(), delayTicks, () -> {
                         if (!player.isAlive()) return;
 
                         Vec3 currentLook = player.getLookAngle();
@@ -113,7 +87,7 @@ public class Projectile extends AbstractSpell {
                         ).normalize();
 
                         spawnShot(context, dir, baseHandler, player, level, strikes);
-                    }));
+                    });
                 }
             }
 

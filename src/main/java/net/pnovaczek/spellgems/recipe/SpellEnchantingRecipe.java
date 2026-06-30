@@ -25,6 +25,7 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
             CatalystDefinition.CODEC.fieldOf("catalyst").forGetter(SpellEnchantingRecipe::getCatalystDef),
             Codec.INT.fieldOf("level_requirement").forGetter(SpellEnchantingRecipe::getLevelRequirement),
             Codec.INT.fieldOf("xp_cost").forGetter(SpellEnchantingRecipe::getXpCost),
+            Codec.STRING.fieldOf("description").forGetter(SpellEnchantingRecipe::getDescription),
             SpellEnchantResult.CODEC.fieldOf("result").forGetter(SpellEnchantingRecipe::getResult)
     ).apply(instance, SpellEnchantingRecipe::new));
 
@@ -34,6 +35,7 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
             CatalystDefinition.STREAM_CODEC, SpellEnchantingRecipe::getCatalystDef,
             ByteBufCodecs.INT, SpellEnchantingRecipe::getLevelRequirement,
             ByteBufCodecs.INT, SpellEnchantingRecipe::getXpCost,
+            ByteBufCodecs.STRING_UTF8, SpellEnchantingRecipe::getDescription,
             SpellEnchantResult.STREAM_CODEC, SpellEnchantingRecipe::getResult,
             SpellEnchantingRecipe::new);
 
@@ -50,23 +52,21 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
     private final CatalystDefinition catalystDef;
     private final int levelRequirement;
     private final int xpCost;
+    private final String description;
     private final SpellEnchantResult result;
 
     public SpellEnchantingRecipe(String category, SpellEnchantInput input, CatalystDefinition catalystDef,
-                                 int levelRequirement, int xpCost, SpellEnchantResult result) {
+                                 int levelRequirement, int xpCost, String description, SpellEnchantResult result) {
         this.category = category;
         this.input = input;
         this.catalystDef = catalystDef;
         this.levelRequirement = levelRequirement;
         this.xpCost = xpCost;
+        this.description = description;
         this.result = result;
     }
 
-    @Override
-    public boolean matches(SpellEnchantingRecipeInput recipeInput, Level level) {
-        ItemStack target = recipeInput.target();
-        ItemStack catalystStack = recipeInput.catalyst();
-
+    public boolean matchesTarget(ItemStack target) {
         Ingredient targetIngredient = input.getIngredient();
         if (targetIngredient == null || !targetIngredient.test(target)) {
             return false;
@@ -77,7 +77,16 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
             // TODO: check target spell component against input.spell()
         }
 
-        return catalystDef.hasSufficient(catalystStack);
+        return true;
+    }
+
+    @Override
+    public boolean matches(SpellEnchantingRecipeInput recipeInput, Level level) {
+        if (!matchesTarget(recipeInput.target())) {
+            return false;
+        }
+
+        return catalystDef.hasSufficient(recipeInput.catalyst());
     }
 
     @Override
@@ -103,6 +112,7 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
     public CatalystDefinition getCatalystDef() { return catalystDef; }
     public int getLevelRequirement() { return levelRequirement; }
     public int getXpCost() { return xpCost; }
+    public String getDescription() { return description; }
     public SpellEnchantResult getResult() { return result; }
 
     // Sub-records (exact JSON mapping)

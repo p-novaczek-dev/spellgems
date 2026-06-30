@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.pnovaczek.spellgems.ModEnchantmentEffects;
+import net.pnovaczek.spellgems.network.ModNetworking;
 
 public class Spellgems implements ModInitializer {
 	public static final String MOD_ID = "spellgems";
@@ -17,6 +18,7 @@ public class Spellgems implements ModInitializer {
 		ModBlocks.initialize();
 		ModBlockEntities.initialize();
 		ModItems.initialize();
+		ModCreativeModeTabs.initialize();
 		ModRecipeTypes.register();
 		ModEntities.initialize();
 		ModMenuTypes.initialize();
@@ -29,5 +31,6 @@ public class Spellgems implements ModInitializer {
 		ModUtilityEnchantments.initialize();
 
 		ModEnchantmentEffects.register();
+		ModNetworking.registerPayloadTypes();
 	}
 }

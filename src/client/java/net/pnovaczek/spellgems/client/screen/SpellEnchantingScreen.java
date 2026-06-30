@@ -3,25 +3,30 @@ package net.pnovaczek.spellgems.client.screen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.EnchantmentNames;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.object.book.BookModel;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+import java.util.Locale;
 
 public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchantingMenu> {
 
-    // Use the vanilla enchanting table GUI background + button sprites for consistent look
     private static final Identifier ENCHANTING_TABLE_LOCATION =
             Identifier.withDefaultNamespace("textures/gui/container/enchanting_table.png");
     private static final Identifier ENCHANTING_BOOK_LOCATION =
@@ -34,16 +39,18 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
     private static final Identifier ENCHANTMENT_SLOT_SPRITE =
             Identifier.withDefaultNamespace("container/enchanting_table/enchantment_slot");
 
-    private static final Identifier[] ENABLED_LEVEL_SPRITES = new Identifier[]{
-            Identifier.withDefaultNamespace("container/enchanting_table/level_1"),
-            Identifier.withDefaultNamespace("container/enchanting_table/level_2"),
-            Identifier.withDefaultNamespace("container/enchanting_table/level_3")
-    };
-    private static final Identifier[] DISABLED_LEVEL_SPRITES = new Identifier[]{
-            Identifier.withDefaultNamespace("container/enchanting_table/level_1_disabled"),
-            Identifier.withDefaultNamespace("container/enchanting_table/level_2_disabled"),
-            Identifier.withDefaultNamespace("container/enchanting_table/level_3_disabled")
-    };
+    private static final Identifier SCROLLER_SPRITE =
+            Identifier.withDefaultNamespace("widget/scroller");
+    private static final Identifier SCROLLER_BACKGROUND_SPRITE =
+            Identifier.withDefaultNamespace("widget/scroller_background");
+
+    private static final int BUTTON_X = 60;
+    private static final int BUTTON_WIDTH = 108;
+    private static final int BUTTON_HEIGHT = 19;
+    private static final int BUTTON_START_Y = 14;
+    private static final int BUTTON_SPACING = 19;
+    private static final int VISIBLE_BUTTON_COUNT = 3;
+    private static final int SCROLLBAR_WIDTH = 6;
 
     private final RandomSource random = RandomSource.create();
     private BookModel bookModel;
@@ -54,13 +61,7 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
     public float open;
     public float oOpen;
     private ItemStack last = ItemStack.EMPTY;
-
-    // Vanilla 3-button layout constants
-    private static final int BUTTON_X = 60;
-    private static final int BUTTON_WIDTH = 108;
-    private static final int BUTTON_HEIGHT = 19;
-    private static final int BUTTON_START_Y = 14;
-    private static final int BUTTON_SPACING = 19;
+    private int scrollOffset;
 
     public SpellEnchantingScreen(SpellEnchantingMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -70,7 +71,6 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
     protected void init() {
         super.init();
         this.bookModel = new BookModel(this.minecraft.getEntityModels().bakeLayer(ModelLayers.BOOK));
-        this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;
     }
 
     @Override
@@ -84,33 +84,29 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
         int left = (this.width - this.imageWidth) / 2;
         int top = (this.height - this.imageHeight) / 2;
 
-        // Draw the vanilla enchanting table background
         graphics.blit(RenderPipelines.GUI_TEXTURED, ENCHANTING_TABLE_LOCATION, left, top, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
-
-        // Draw the animated book (same as vanilla enchanting table)
         this.renderBook(graphics, left, top);
 
-        ItemStack target = this.menu.getSlot(0).getItem();
+        int recipeCount = this.menu.getRecipeCount();
+        boolean scrollable = recipeCount > VISIBLE_BUTTON_COUNT;
+        int buttonWidth = scrollable ? BUTTON_WIDTH - SCROLLBAR_WIDTH : BUTTON_WIDTH;
 
-        // Three buttons in vanilla layout
-        for (int i = 0; i < 3; i++) {
+        for (int visibleIndex = 0; visibleIndex < VISIBLE_BUTTON_COUNT; visibleIndex++) {
+            int recipeIndex = this.scrollOffset + visibleIndex;
             int btnX = left + BUTTON_X;
-            int btnY = top + BUTTON_START_Y + BUTTON_SPACING * i;
+            int btnY = top + BUTTON_START_Y + BUTTON_SPACING * visibleIndex;
 
-            int req = this.menu.getLevelRequirement(i);
-            int cost = this.menu.getXpCost(i);
-            boolean hasPreview = req > 0 || cost > 0;
+            if (recipeIndex >= recipeCount) {
+                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ENCHANTMENT_SLOT_DISABLED_SPRITE, btnX, btnY, buttonWidth, BUTTON_HEIGHT);
+                continue;
+            }
 
-            boolean hovered = isHovering(BUTTON_X, BUTTON_START_Y + BUTTON_SPACING * i, BUTTON_WIDTH, BUTTON_HEIGHT, mouseX, mouseY);
-
-            // Determine if this button should be active based on gem type (user requirement)
-            boolean buttonAllowedByType = isButtonAllowedForCurrentItem(i, target);
-
-            boolean canAfford = this.minecraft.player.experienceLevel >= req && this.minecraft.player.totalExperience >= cost;
-            boolean active = hasPreview && buttonAllowedByType;
+            int req = this.menu.getLevelRequirement(recipeIndex);
+            boolean hovered = isHoveringRecipeButton(visibleIndex, mouseX, mouseY);
+            boolean canAfford = meetsLevelRequirement(recipeIndex) && meetsXpRequirement(recipeIndex) && meetsCatalystRequirement(recipeIndex);
 
             Identifier slotSprite;
-            if (!active) {
+            if (!canAfford) {
                 slotSprite = ENCHANTMENT_SLOT_DISABLED_SPRITE;
             } else if (hovered) {
                 slotSprite = ENCHANTMENT_SLOT_HIGHLIGHTED_SPRITE;
@@ -118,34 +114,49 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
                 slotSprite = ENCHANTMENT_SLOT_SPRITE;
             }
 
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, slotSprite, btnX, btnY, BUTTON_WIDTH, BUTTON_HEIGHT);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, slotSprite, btnX, btnY, buttonWidth, BUTTON_HEIGHT);
 
-            if (active) {
-                // Level indicator sprite (use the button index for visual variety, like vanilla)
-                Identifier levelSprite = canAfford ? ENABLED_LEVEL_SPRITES[i] : DISABLED_LEVEL_SPRITES[i];
-                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, levelSprite, btnX + 1, btnY + 1, 16, 16);
+            String reqText = String.valueOf(req);
+            int leftPosText = btnX + 20;
+            int textWidth = 86 - this.font.width(reqText);
+            EnchantmentNames.getInstance().initSeed(this.minecraft.player.getEnchantmentSeed() + recipeIndex);
+            FormattedText glyphName = EnchantmentNames.getInstance().getRandomName(this.font, textWidth);
 
-                int leftPosText = btnX + 20;
-                int col;
-                if (!canAfford) {
-                    col = -12550384;
-                } else if (hovered) {
-                    col = -128;
-                } else {
-                    col = -9937334;
-                }
-
-                // Level requirement number (upper)
-                String reqText = String.valueOf(req);
-                graphics.text(this.font, reqText, leftPosText, btnY + 2, col);
-
-                // XP cost number (lower, right aligned)
-                String costText = String.valueOf(cost);
-                int costX = leftPosText + 66 - this.font.width(costText);
-                int costCol = (!canAfford) ? -12550384 : (hovered ? -128 : -8323296);
-                graphics.text(this.font, costText, costX, btnY + 9, costCol);
+            int nameCol = -9937334;
+            if (!canAfford) {
+                graphics.textWithWordWrap(
+                        this.font, glyphName, leftPosText, btnY + 2, textWidth,
+                        ARGB.opaque((nameCol & 16711422) >> 1), false
+                );
+            } else {
+                graphics.textWithWordWrap(
+                        this.font, glyphName, leftPosText, btnY + 2, textWidth,
+                        hovered ? -128 : nameCol, false
+                );
             }
+
+            int reqX = leftPosText + 86 - this.font.width(reqText);
+            int col = !canAfford ? -12550384 : (hovered ? -128 : -8323296);
+            graphics.text(this.font, reqText, reqX, btnY + 9, col);
         }
+
+        if (scrollable) {
+            renderScrollbar(graphics, left, top, mouseX, mouseY);
+        }
+    }
+
+    private void renderScrollbar(GuiGraphicsExtractor graphics, int left, int top, int mouseX, int mouseY) {
+        int scrollbarX = left + BUTTON_X + BUTTON_WIDTH - SCROLLBAR_WIDTH;
+        int scrollbarY = top + BUTTON_START_Y;
+        int scrollbarHeight = BUTTON_SPACING * VISIBLE_BUTTON_COUNT;
+        int maxScroll = maxScrollOffset();
+        int scrollerHeight = Math.max(32, scrollbarHeight * VISIBLE_BUTTON_COUNT / Math.max(VISIBLE_BUTTON_COUNT, this.menu.getRecipeCount()));
+        int scrollerY = maxScroll == 0
+                ? scrollbarY
+                : scrollbarY + this.scrollOffset * (scrollbarHeight - scrollerHeight) / maxScroll;
+
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_BACKGROUND_SPRITE, scrollbarX, scrollbarY, SCROLLBAR_WIDTH, scrollbarHeight);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, scrollbarX, scrollerY, SCROLLBAR_WIDTH, scrollerHeight);
     }
 
     private void renderBook(GuiGraphicsExtractor graphics, int left, int top) {
@@ -159,57 +170,96 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
         graphics.book(this.bookModel, ENCHANTING_BOOK_LOCATION, 40.0F, open, flip, x0, y0, x1, y1);
     }
 
-    private boolean isButtonAllowedForCurrentItem(int buttonIndex, ItemStack target) {
-        if (target.isEmpty()) return false;
-
-        // Top button (0) → utility spell gems
-        if (buttonIndex == 0) {
-            return target.is(net.pnovaczek.spellgems.ModTags.UTILITY_SPELL_GEMS);
-        }
-        // Middle button (1) → combat spell gems
-        if (buttonIndex == 1) {
-            return target.is(net.pnovaczek.spellgems.ModTags.COMBAT_SPELL_GEMS);
-        }
-        // Bottom button (2) → disabled for now (future: catalyst books / tomes)
-        return false;
-    }
-
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float ignored) {
         super.extractRenderState(graphics, mouseX, mouseY, ignored);
 
-        ItemStack target = this.menu.getSlot(0).getItem();
-
-        for (int i = 0; i < 3; i++) {
-            int btnY = BUTTON_START_Y + BUTTON_SPACING * i;
-
-            if (!isHovering(BUTTON_X, btnY, BUTTON_WIDTH, BUTTON_HEIGHT, mouseX, mouseY)) {
+        for (int visibleIndex = 0; visibleIndex < VISIBLE_BUTTON_COUNT; visibleIndex++) {
+            int recipeIndex = this.scrollOffset + visibleIndex;
+            if (recipeIndex >= this.menu.getRecipeCount()) {
                 continue;
             }
 
-            int req = this.menu.getLevelRequirement(i);
-            int cost = this.menu.getXpCost(i);
-            if (req <= 0 && cost <= 0) {
+            if (!isHoveringRecipeButton(visibleIndex, mouseX, mouseY)) {
                 continue;
             }
 
-            // Only show rich tooltip for the button that is allowed for this item type
-            if (!isButtonAllowedForCurrentItem(i, target)) {
-                continue;
-            }
-
-            List<Component> texts = Lists.<Component>newArrayList();
-            if (this.minecraft.player.experienceLevel < req) {
-                texts.add(
-                        Component.translatable("container.enchant.level.requirement", req)
-                                .withStyle(ChatFormatting.RED)
-                );
-            } else {
-                texts.add(Component.literal(cost + " XP").withStyle(ChatFormatting.GRAY));
-            }
+            List<Component> texts = buildRecipeTooltip(recipeIndex);
             graphics.setComponentTooltipForNextFrame(this.font, texts, mouseX, mouseY);
-            break; // only one tooltip at a time
+            break;
         }
+    }
+
+    private List<Component> buildRecipeTooltip(int recipeIndex) {
+        List<Component> texts = Lists.newArrayList();
+
+        String descriptionKey = this.menu.getRecipeDescription(recipeIndex);
+        if (!descriptionKey.isEmpty()) {
+            texts.add(Component.translatable(descriptionKey).withStyle(ChatFormatting.WHITE));
+            texts.add(CommonComponents.EMPTY);
+        }
+
+        int levelRequirement = this.menu.getLevelRequirement(recipeIndex);
+        if (!meetsLevelRequirement(recipeIndex)) {
+            texts.add(Component.translatable("container.spellgems.spell_enchanting.level_requirement", levelRequirement)
+                    .withStyle(ChatFormatting.RED));
+        } else {
+            texts.add(Component.translatable("container.spellgems.spell_enchanting.level_requirement", levelRequirement)
+                    .withStyle(ChatFormatting.GRAY));
+        }
+
+        String relativeLevelCost = formatRelativeLevelCost(this.menu.getXpCost(recipeIndex));
+        if (!meetsXpRequirement(recipeIndex)) {
+            texts.add(Component.translatable("container.spellgems.spell_enchanting.xp_cost", relativeLevelCost)
+                    .withStyle(ChatFormatting.RED));
+        } else {
+            texts.add(Component.translatable("container.spellgems.spell_enchanting.xp_cost", relativeLevelCost)
+                    .withStyle(ChatFormatting.GRAY));
+        }
+
+        int catalystItemId = this.menu.getCatalystItemId(recipeIndex);
+        int catalystCount = this.menu.getCatalystCount(recipeIndex);
+        Item catalystItem = Item.byId(catalystItemId);
+        MutableComponent catalystLabel = Component.translatable(
+                "container.spellgems.spell_enchanting.catalyst",
+                catalystCount,
+                catalystItem.getName(new ItemStack(catalystItem))
+        );
+        texts.add(meetsCatalystRequirement(recipeIndex)
+                ? catalystLabel.withStyle(ChatFormatting.GRAY)
+                : catalystLabel.withStyle(ChatFormatting.RED));
+
+        return texts;
+    }
+
+    private String formatRelativeLevelCost(int xpCost) {
+        int xpPerLevel = this.minecraft.player.getXpNeededForNextLevel();
+        double relativeLevels = (double) xpCost / xpPerLevel;
+        return String.format(Locale.ROOT, "%.1f", relativeLevels);
+    }
+
+    private boolean meetsLevelRequirement(int recipeIndex) {
+        return this.minecraft.player.experienceLevel >= this.menu.getLevelRequirement(recipeIndex);
+    }
+
+    private boolean meetsXpRequirement(int recipeIndex) {
+        return this.minecraft.player.totalExperience >= this.menu.getXpCost(recipeIndex);
+    }
+
+    private boolean meetsCatalystRequirement(int recipeIndex) {
+        ItemStack catalystStack = this.menu.getSlot(1).getItem();
+        Item catalystItem = Item.byId(this.menu.getCatalystItemId(recipeIndex));
+        int catalystCount = this.menu.getCatalystCount(recipeIndex);
+        return !catalystStack.isEmpty()
+                && catalystStack.is(catalystItem)
+                && catalystStack.getCount() >= catalystCount;
+    }
+
+    private boolean isHoveringRecipeButton(int visibleIndex, int mouseX, int mouseY) {
+        int buttonWidth = this.menu.getRecipeCount() > VISIBLE_BUTTON_COUNT
+                ? BUTTON_WIDTH - SCROLLBAR_WIDTH
+                : BUTTON_WIDTH;
+        return isHovering(BUTTON_X, BUTTON_START_Y + BUTTON_SPACING * visibleIndex, buttonWidth, BUTTON_HEIGHT, mouseX, mouseY);
     }
 
     @Override
@@ -217,19 +267,22 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
         int xo = (this.width - this.imageWidth) / 2;
         int yo = (this.height - this.imageHeight) / 2;
 
-        // Check all three buttons (vanilla layout)
-        for (int i = 0; i < 3; i++) {
-            double xx = event.x() - (xo + BUTTON_X);
-            double yy = event.y() - (yo + BUTTON_START_Y + BUTTON_SPACING * i);
+        for (int visibleIndex = 0; visibleIndex < VISIBLE_BUTTON_COUNT; visibleIndex++) {
+            int recipeIndex = this.scrollOffset + visibleIndex;
+            if (recipeIndex >= this.menu.getRecipeCount()) {
+                continue;
+            }
 
-            if (xx >= 0.0 && yy >= 0.0 && xx < BUTTON_WIDTH && yy < BUTTON_HEIGHT) {
-                // Only allow click if the button is allowed for the current item type
-                ItemStack target = this.menu.getSlot(0).getItem();
-                if (isButtonAllowedForCurrentItem(i, target)) {
-                    if (this.menu.clickMenuButton(this.minecraft.player, i)) {
-                        this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, i);
-                        return true;
-                    }
+            int buttonWidth = this.menu.getRecipeCount() > VISIBLE_BUTTON_COUNT
+                    ? BUTTON_WIDTH - SCROLLBAR_WIDTH
+                    : BUTTON_WIDTH;
+            double xx = event.x() - (xo + BUTTON_X);
+            double yy = event.y() - (yo + BUTTON_START_Y + BUTTON_SPACING * visibleIndex);
+
+            if (xx >= 0.0 && yy >= 0.0 && xx < buttonWidth && yy < BUTTON_HEIGHT) {
+                if (this.menu.clickMenuButton(this.minecraft.player, recipeIndex)) {
+                    this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, recipeIndex);
+                    return true;
                 }
             }
         }
@@ -237,10 +290,29 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
         return super.mouseClicked(event, doubleClick);
     }
 
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (this.menu.getRecipeCount() > VISIBLE_BUTTON_COUNT
+                && isHovering(BUTTON_X, BUTTON_START_Y, BUTTON_WIDTH, BUTTON_SPACING * VISIBLE_BUTTON_COUNT, mouseX, mouseY)) {
+            int previousOffset = this.scrollOffset;
+            this.scrollOffset = Mth.clamp(this.scrollOffset - (int) Math.signum(scrollY), 0, maxScrollOffset());
+            return this.scrollOffset != previousOffset;
+        }
+
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    private int maxScrollOffset() {
+        return Math.max(0, this.menu.getRecipeCount() - VISIBLE_BUTTON_COUNT);
+    }
+
     public void tickBook() {
+        this.scrollOffset = Mth.clamp(this.scrollOffset, 0, maxScrollOffset());
+
         ItemStack current = this.menu.getSlot(0).getItem();
         if (!ItemStack.matches(current, this.last)) {
             this.last = current;
+            this.scrollOffset = 0;
 
             do {
                 this.flipT = this.flipT + (this.random.nextInt(4) - this.random.nextInt(4));
@@ -249,14 +321,7 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
 
         this.oFlip = this.flip;
         this.oOpen = this.open;
-        boolean shouldBeOpen = false;
-
-        for (int i = 0; i < 3; i++) {
-            if (this.menu.getXpCost(i) != 0) {
-                shouldBeOpen = true;
-                break;
-            }
-        }
+        boolean shouldBeOpen = this.menu.getRecipeCount() > 0;
 
         if (shouldBeOpen) {
             this.open += 0.2F;
@@ -266,7 +331,6 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
 
         this.open = Mth.clamp(this.open, 0.0F, 1.0F);
         float diff = (this.flipT - this.flip) * 0.4F;
-        float max = 0.2F;
         diff = Mth.clamp(diff, -0.2F, 0.2F);
         this.flipA = this.flipA + (diff - this.flipA) * 0.9F;
         this.flip = this.flip + this.flipA;

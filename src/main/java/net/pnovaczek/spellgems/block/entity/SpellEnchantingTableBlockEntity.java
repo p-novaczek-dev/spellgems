@@ -16,7 +16,7 @@ import org.jspecify.annotations.Nullable;
 
 public class SpellEnchantingTableBlockEntity extends BlockEntity implements Nameable {
 
-    private static final Component DEFAULT_NAME = Component.translatable("container.spell_enchanting_table");
+    private static final Component DEFAULT_NAME = Component.translatable("container.spellgems.spell_enchanting_table");
 
     private @Nullable Component name;
 

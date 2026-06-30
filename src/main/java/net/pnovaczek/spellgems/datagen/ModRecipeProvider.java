@@ -104,6 +104,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                                 1),
                         20,
                         100,
+                        "recipe.spellgems.combat_spell_random.description",
                         1,
                         1)
                         .save(exporter, "combat_spell_random");;
