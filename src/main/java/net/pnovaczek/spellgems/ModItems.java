@@ -9,7 +9,9 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.pnovaczek.spellgems.item.AstralBowItem;
 import net.pnovaczek.spellgems.item.SpellGemItem;
+import net.pnovaczek.spellgems.item.SpellTomeItem;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
+import net.pnovaczek.spellgems.item.data.TomeData;
 import net.pnovaczek.spellgems.spell.Spells;
 
 import java.util.function.Function;
@@ -64,6 +66,14 @@ public class ModItems {
             new Item.Properties()
                     .stacksTo(1)
                     .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.VORTEX))
+    );
+
+    public static final SpellTomeItem SPELL_TOME = register(
+            "spell_tome",
+            SpellTomeItem::new,
+            new Item.Properties()
+                    .stacksTo(1)
+                    .component(ModComponents.TOME_DATA, TomeData.create())
     );
 
     private static <T extends Item> T register(String name, Function<Item.Properties, T> itemFactory, Item.Properties properties) {

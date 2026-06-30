@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "B": "minecraft:book",
+    "O": "minecraft:obsidian",
+    "S": "spellgems:shimmersteel_ingot"
+  },
+  "pattern": [
+    " B ",
+    "SSS",
+    "OOO"
+  ],
+  "result": {
+    "count": 1,
+    "id": "spellgems:spell_enchanting_table"
+  }
+}

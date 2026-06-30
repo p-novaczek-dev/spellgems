@@ -14,7 +14,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.pnovaczek.spellgems.ModComponents;
+import net.pnovaczek.spellgems.ModTags;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.item.data.SpellGemData;
 import java.util.Optional;
 
 public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput> {
@@ -68,13 +71,16 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
 
     public boolean matchesTarget(ItemStack target) {
         Ingredient targetIngredient = input.getIngredient();
-        if (targetIngredient == null || !targetIngredient.test(target)) {
+        if (targetIngredient == null || targetIngredient.isEmpty() || !targetIngredient.test(target)) {
             return false;
         }
 
-        // spell match (placeholder – implement via your spell Component when ready)
-        if (input.spell().isPresent()) {
-            // TODO: check target spell component against input.spell()
+        if (target.is(ModTags.COMBAT_SPELL_GEMS) || target.is(ModTags.UTILITY_SPELL_GEMS)) {
+            SpellGemData data = target.get(ModComponents.SPELL_GEM_DATA);
+            if (data == null || data.isEnchanted()) {
+                return false;
+            }
+            return input.spell().map(data.spellId()::equals).orElse(true);
         }
 
         return true;
@@ -123,9 +129,7 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
                     .orElse(null);
             if (tag.isPresent()) {
                 TagKey<Item> tagKey = TagKey.create(Registries.ITEM, tag.get());
-                return BuiltInRegistries.ITEM.get(tagKey)
-                        .map(Ingredient::of)
-                        .orElse(null);
+                return Ingredient.of(BuiltInRegistries.ITEM.getOrThrow(tagKey));
             }
             return null;
         }

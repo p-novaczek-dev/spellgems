@@ -8,6 +8,7 @@ import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.ModSpells;
 import net.pnovaczek.spellgems.item.SpellGemItem;
+import net.pnovaczek.spellgems.item.SpellTomeItem;
 import net.pnovaczek.spellgems.spell.Spell;
 
 public class SpellgemsTooltips {
@@ -41,6 +42,22 @@ public class SpellgemsTooltips {
             else if (stack.is(ModItems.RAW_SPELL_GEM)) {
                 if (Minecraft.getInstance().hasShiftDown()) {
                     tooltip.addLineDetail("tooltip.spellgems.raw_spell_gem.description");
+                } else {
+                    tooltip.addLineHoldShift();
+                }
+            }
+            else if (stack.is(ModItems.SPELL_TOME)) {
+                var data = SpellTomeItem.getTomeData(stack);
+
+                if (data != null && data.isEnchanted()) {
+                    tooltip.addLineAttribute(data.tooltipNameKey());
+                    if (Minecraft.getInstance().hasShiftDown()) {
+                        tooltip.addLineDetail(data.tooltipDescriptionKey());
+                    } else {
+                        tooltip.addLineHoldShift();
+                    }
+                } else if (Minecraft.getInstance().hasShiftDown()) {
+                    tooltip.addLineDetail("tooltip.spellgems.spell_tome.description");
                 } else {
                     tooltip.addLineHoldShift();
                 }

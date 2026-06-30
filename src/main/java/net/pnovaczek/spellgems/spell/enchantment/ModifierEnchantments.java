@@ -16,6 +16,10 @@ public class ModifierEnchantments {
     public static final Identifier BURST = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "burst");
     public static final Identifier EXPAND = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "expand");
 
+    public static List<Identifier> getAll() {
+        return List.of(CHAINING, MULTISHOT, PIERCING, POWER, BURST, EXPAND);
+    }
+
     public static List<Identifier> getCompatible(Identifier spellId) {
         if (spellId.equals(Spells.PROJECTILE)) {
             return List.of(CHAINING, MULTISHOT, PIERCING, POWER, BURST);

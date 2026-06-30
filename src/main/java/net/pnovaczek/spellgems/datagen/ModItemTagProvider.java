@@ -29,5 +29,8 @@ public class ModItemTagProvider extends FabricTagsProvider.ItemTagsProvider {
 
         builder(ModTags.WAND_ENCHANTABLE)
                 .add(ModItems.keyOfItem("astral_bow"));
+
+        builder(ModTags.CATALYST_BOOKS)
+                .add(ModItems.keyOfItem("spell_tome"));
     }
 }

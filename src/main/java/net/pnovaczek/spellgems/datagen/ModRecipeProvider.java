@@ -94,20 +94,62 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
                         .save(exporter);
 
+                // Spell Enchanting Table: 1 book + 2 shimmersteel + 4 obsidian
+                shaped(RecipeCategory.DECORATIONS, ModBlocks.SPELL_ENCHANTING_TABLE)
+                        .pattern(" B ")
+                        .pattern("SSS")
+                        .pattern("OOO")
+                        .define('B', Items.BOOK)
+                        .define('S', ModItems.SHIMMERSTEEL_INGOT)
+                        .define('O', Blocks.OBSIDIAN)
+                        .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
+                        .save(exporter);
+
+                var lapisCatalyst = new SpellEnchantingRecipe.CatalystDefinition(
+                        BuiltInRegistries.ITEM.getKey(Items.LAPIS_LAZULI),
+                        1);
+
+                // Combat spell gem: 1 random modifier + 1 random strike
                 SpellEnchantingRecipeBuilder.combat(
-                         new SpellEnchantingRecipe.SpellEnchantInput(
-                                 Optional.ofNullable(null),
-                                 Optional.of(Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "combat_spell_gems")),
-                                 Optional.ofNullable(null)),
-                        new SpellEnchantingRecipe.CatalystDefinition(
-                                BuiltInRegistries.ITEM.getKey(Items.LAPIS_LAZULI),
-                                1),
+                        new SpellEnchantingRecipe.SpellEnchantInput(
+                                Optional.empty(),
+                                Optional.of(Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "combat_spell_gems")),
+                                Optional.empty()),
+                        lapisCatalyst,
                         20,
-                        100,
+                        62,
                         "recipe.spellgems.combat_spell_random.description",
                         1,
                         1)
-                        .save(exporter, "combat_spell_random");;
+                        .save(exporter, "combat_spell_random");
+
+                // Spell tome: 1 random modifier (player chooses this option)
+                SpellEnchantingRecipeBuilder.combat(
+                        new SpellEnchantingRecipe.SpellEnchantInput(
+                                Optional.of(BuiltInRegistries.ITEM.getKey(Items.BOOK)),
+                                Optional.empty(),
+                                Optional.empty()),
+                        lapisCatalyst,
+                        20,
+                        62,
+                        "recipe.spellgems.combat_tome_modifier.description",
+                        1,
+                        0)
+                        .save(exporter, "combat_tome_modifier");
+
+                // Spell tome: 1 random strike (player chooses this option)
+                SpellEnchantingRecipeBuilder.combat(
+                        new SpellEnchantingRecipe.SpellEnchantInput(
+                                Optional.of(BuiltInRegistries.ITEM.getKey(Items.BOOK)),
+                                Optional.empty(),
+                                Optional.empty()),
+                        lapisCatalyst,
+                        20,
+                        62,
+                        "recipe.spellgems.combat_tome_strike.description",
+                        0,
+                        1)
+                        .save(exporter, "combat_tome_strike");
             }
         };
     }

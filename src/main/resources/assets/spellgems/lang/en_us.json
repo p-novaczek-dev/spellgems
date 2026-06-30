@@ -9,6 +9,7 @@
   "item.spellgems.spell_gem_projectile": "Spell Gem",
   "item.spellgems.spell_gem_nova": "Spell Gem",
   "item.spellgems.spell_gem_vortex": "Spell Gem",
+  "item.spellgems.spell_tome": "Spell Tome",
 
   "block.spellgems.mana_infuser": "Mana Infuser",
   "block.spellgems.spell_enchanting_table": "Spell Enchanting Table",
@@ -17,6 +18,7 @@
   "tooltip.spellgems.shift_hint": "Hold Shift for details",
   "tooltip.spellgems.error": "ERROR",
   "tooltip.spellgems.raw_spell_gem.description": "Must be combined with a specific item in a crafting table to create a functional spell gem",
+  "tooltip.spellgems.spell_tome.description": "Can be applied to spell gems in an anvil",
   "tooltip.spellgems.astral_bow.astral_arrows": "Does not use arrows from inventory",
   "tooltip.spellgems.astral_bow.potion_gems": "Can be equipped with Potion Gems to fire tipped arrows",
   "tooltip.spellgems.mana_infuser.mana_level": "%s Mana",
@@ -100,6 +102,8 @@
   "enchantment.spellgems.recharge": "Recharge",
 
   "recipe.spellgems.combat_spell_random.description": "Random combat enchantments",
+  "recipe.spellgems.combat_tome_modifier.description": "Random combat modifier",
+  "recipe.spellgems.combat_tome_strike.description": "Random combat on-hit",
 
   "container.spellgems.spell_enchanting_table": "Spells",
   "container.spellgems.spell_enchanting.level_requirement": "Requires level %s",

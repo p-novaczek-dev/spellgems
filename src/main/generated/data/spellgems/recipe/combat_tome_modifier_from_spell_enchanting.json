@@ -4,14 +4,13 @@
     "item": "minecraft:lapis_lazuli"
   },
   "category": "combat",
-  "description": "recipe.spellgems.combat_spell_random.description",
+  "description": "recipe.spellgems.combat_tome_modifier.description",
   "input": {
-    "tag": "spellgems:combat_spell_gems"
+    "item": "minecraft:book"
   },
   "level_requirement": 20,
   "result": {
-    "modifiers": 1,
-    "strikes": 1
+    "modifiers": 1
   },
   "xp_cost": 62
 }

@@ -18,10 +18,12 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.pnovaczek.spellgems.ModBlocks;
+import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.ModTags;
 import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModMenuTypes;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
+import net.pnovaczek.spellgems.item.data.TomeData;
 import net.pnovaczek.spellgems.network.ModNetworking;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipeLookup;
@@ -30,6 +32,7 @@ import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantments;
+import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -211,13 +214,25 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
                 return;
             }
 
-            SpellGemData currentData = targetStack.getOrDefault(
-                    ModComponents.SPELL_GEM_DATA,
-                    SpellGemData.create(Spells.PROJECTILE)
-            );
-
-            SpellGemData newData = applyRecipeEffects(currentData, recipe);
-            targetStack.set(ModComponents.SPELL_GEM_DATA, newData);
+            if (targetStack.is(Items.BOOK)) {
+                TomeData newData = applyTomeRecipe(TomeData.create(), recipe);
+                if (!newData.isEnchanted()) {
+                    return;
+                }
+                ItemStack result = new ItemStack(ModItems.SPELL_TOME);
+                result.set(ModComponents.TOME_DATA, newData);
+                this.enchantSlots.setItem(0, result);
+            } else {
+                SpellGemData currentData = targetStack.getOrDefault(
+                        ModComponents.SPELL_GEM_DATA,
+                        SpellGemData.create(Spells.PROJECTILE)
+                );
+                if (currentData.isEnchanted()) {
+                    return;
+                }
+                SpellGemData newData = applySpellGemRecipe(currentData, recipe);
+                targetStack.set(ModComponents.SPELL_GEM_DATA, newData);
+            }
 
             catalystStack.shrink(recipe.getCatalystDef().count());
             if (catalystStack.isEmpty()) {
@@ -279,11 +294,36 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
         return this.recipeData.get(recipeDataIndex(recipeIndex) + fieldOffset);
     }
 
-    private SpellGemData applyRecipeEffects(SpellGemData data, SpellEnchantingRecipe recipe) {
+    private TomeData applyTomeRecipe(TomeData data, SpellEnchantingRecipe recipe) {
+        var result = recipe.getResult();
+
+        if (result.modifiers().orElse(0) > 0) {
+            List<Identifier> modifiers = ModifierEnchantments.getAll();
+            if (!modifiers.isEmpty()) {
+                return new TomeData(modifiers.get(random.nextInt(modifiers.size())));
+            }
+        }
+
+        if (result.strikes().orElse(0) > 0) {
+            List<Identifier> strikes = StrikeEnchantments.getAll();
+            if (!strikes.isEmpty()) {
+                return new TomeData(strikes.get(random.nextInt(strikes.size())));
+            }
+        }
+
+        if (result.utility().isPresent()) {
+            return new TomeData(result.utility().get());
+        }
+
+        return data;
+    }
+
+    private SpellGemData applySpellGemRecipe(SpellGemData data, SpellEnchantingRecipe recipe) {
         var result = recipe.getResult();
 
         List<ModifierEnchantment> newModifiers = new ArrayList<>(data.modifierEffects());
         List<StrikeEnchantment> newStrikes = new ArrayList<>(data.strikeEffects());
+        List<UtilityEnchantment> newUtilities = new ArrayList<>(data.utilityEffects());
 
         result.modifiers().ifPresent(count -> {
             List<Identifier> compatible = ModifierEnchantments.getCompatible(data.spellId());
@@ -301,9 +341,7 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
             }
         });
 
-        result.utility().ifPresent(enchantId -> {
-            // TODO: apply utility enchantment via your utility system
-        });
+        result.utility().ifPresent(enchantId -> newUtilities.add(new UtilityEnchantment(enchantId)));
 
         if (result.potion()) {
             // TODO: apply potion-based effect (depends on catalyst potion)
@@ -313,15 +351,15 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
                 data.spellId(),
                 newModifiers,
                 newStrikes,
-                data.utilityEffects(),
+                newUtilities,
                 data.potionEffects()
         );
     }
 
     private static boolean isEnchantableTarget(ItemStack stack) {
-        return stack.is(ModTags.COMBAT_SPELL_GEMS)
-                || stack.is(ModTags.UTILITY_SPELL_GEMS)
-                || stack.is(ModTags.CATALYST_BOOKS);
+        return stack.is(Items.BOOK)
+                || stack.is(ModTags.COMBAT_SPELL_GEMS)
+                || stack.is(ModTags.UTILITY_SPELL_GEMS);
     }
 
     private static boolean isCatalystItem(ItemStack stack) {

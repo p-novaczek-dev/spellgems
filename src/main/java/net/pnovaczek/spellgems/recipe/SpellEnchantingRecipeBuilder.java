@@ -40,7 +40,9 @@ public class SpellEnchantingRecipeBuilder implements RecipeBuilder {
                                                       String description,
                                                       int modifiers, int strikes) {
         return new SpellEnchantingRecipeBuilder("combat", input, catalyst, levelRequirement, xpCost, description,
-                new SpellEnchantingRecipe.SpellEnchantResult(Optional.of(modifiers), Optional.of(strikes),
+                new SpellEnchantingRecipe.SpellEnchantResult(
+                        modifiers > 0 ? Optional.of(modifiers) : Optional.empty(),
+                        strikes > 0 ? Optional.of(strikes) : Optional.empty(),
                         Optional.empty(), false));
     }
 
