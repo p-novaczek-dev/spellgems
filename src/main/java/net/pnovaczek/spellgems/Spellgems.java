@@ -5,7 +5,6 @@ import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.pnovaczek.spellgems.ModEnchantmentEffects;
 import net.pnovaczek.spellgems.network.ModNetworking;
 
 public class Spellgems implements ModInitializer {
@@ -32,5 +31,6 @@ public class Spellgems implements ModInitializer {
 
 		ModEnchantmentEffects.register();
 		ModNetworking.registerPayloadTypes();
+		ModNetworking.registerServerReceivers();
 	}
 }

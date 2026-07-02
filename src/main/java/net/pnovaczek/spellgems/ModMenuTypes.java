@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.MenuType;
 import net.pnovaczek.spellgems.screen.ManaInfuserMenu;
 import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
+import net.pnovaczek.spellgems.screen.WandMenu;
 
 public class ModMenuTypes {
 
@@ -19,6 +20,11 @@ public class ModMenuTypes {
     public static final MenuType<SpellEnchantingMenu> SPELL_ENCHANTING_TABLE = register(
             "spell_enchanting_table",
             SpellEnchantingMenu::new
+    );
+
+    public static final MenuType<WandMenu> WAND = register(
+            "wand",
+            WandMenu::new
     );
 
     private static <T extends net.minecraft.world.inventory.AbstractContainerMenu> MenuType<T> register(

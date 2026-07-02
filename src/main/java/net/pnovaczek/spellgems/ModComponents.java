@@ -7,6 +7,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.Identifier;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.TomeData;
+import net.pnovaczek.spellgems.item.data.WandData;
 
 import java.util.function.UnaryOperator;
 
@@ -24,6 +25,13 @@ public final class ModComponents {
             builder -> builder
                     .persistent(TomeData.CODEC)
                     .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(TomeData.CODEC))
+    );
+
+    public static final DataComponentType<WandData> WAND_DATA = register(
+            "wand_data",
+            builder -> builder
+                    .persistent(WandData.CODEC)
+                    .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(WandData.CODEC))
     );
 
     private static <T> DataComponentType<T> register(

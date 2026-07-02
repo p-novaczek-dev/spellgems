@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.pnovaczek.spellgems.item.AstralBowItem;
 import net.pnovaczek.spellgems.item.SpellGemItem;
 import net.pnovaczek.spellgems.item.SpellTomeItem;
+import net.pnovaczek.spellgems.item.WandItem;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.TomeData;
 import net.pnovaczek.spellgems.spell.Spells;
@@ -37,6 +38,12 @@ public class ModItems {
             "mana_root",
             p -> new BlockItem(ModBlocks.MANA_ROOT, p),
             new Item.Properties());
+
+    public static final WandItem WAND = register(
+            "wand",
+            WandItem::new,
+            new Item.Properties().durability(384).stacksTo(1).repairable(ModItems.SHIMMERSTEEL_INGOT)
+    );
 
     public static final AstralBowItem ASTRAL_BOW = register(
             "astral_bow",

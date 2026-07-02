@@ -94,6 +94,15 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
                         .save(exporter);
 
+                // Wand: 1 stick + 1 shimmersteel (shimmersteel above stick)
+                shaped(RecipeCategory.TOOLS, ModItems.WAND)
+                        .pattern("S")
+                        .pattern("|")
+                        .define('S', ModItems.SHIMMERSTEEL_INGOT)
+                        .define('|', Items.STICK)
+                        .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
+                        .save(exporter);
+
                 // Spell Enchanting Table: 1 book + 2 shimmersteel + 4 obsidian
                 shaped(RecipeCategory.DECORATIONS, ModBlocks.SPELL_ENCHANTING_TABLE)
                         .pattern(" B ")

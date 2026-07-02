@@ -2,8 +2,10 @@ package net.pnovaczek.spellgems.client;
 
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.pnovaczek.spellgems.client.SpellgemsKeyMappings;
 import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.ModSpells;
@@ -31,7 +33,20 @@ public class SpellgemsTooltips {
 
             LineAdder tooltip = new LineAdder();
 
-            if (stack.is(ModItems.ASTRAL_BOW)) {
+            if (stack.is(ModItems.WAND)) {
+                if (Minecraft.getInstance().hasShiftDown()) {
+                    tooltip.addLineDetail("tooltip.spellgems.wand.configure");
+                    tooltip.addLineDetail("tooltip.spellgems.wand.cast");
+                    lines.add(Component.literal(" ")
+                            .append(Component.translatable(
+                                    "tooltip.spellgems.wand.cycle",
+                                    KeyMapping.createNameSupplier(SpellgemsKeyMappings.CYCLE_SPELL_KEY.getName()).get()
+                            ).withStyle(ChatFormatting.DARK_GRAY)));
+                } else {
+                    tooltip.addLineHoldShift();
+                }
+            }
+            else if (stack.is(ModItems.ASTRAL_BOW)) {
                 if (Minecraft.getInstance().hasShiftDown()) {
                     tooltip.addLineDetail("tooltip.spellgems.astral_bow.astral_arrows");
                     tooltip.addLineDetail("tooltip.spellgems.astral_bow.potion_gems");
@@ -103,7 +118,6 @@ public class SpellgemsTooltips {
                     }
                 }
             }
-
         });
     }
 }

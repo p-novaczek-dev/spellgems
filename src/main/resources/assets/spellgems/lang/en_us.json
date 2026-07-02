@@ -1,6 +1,7 @@
 {
   "itemGroup.spellgems": "Spellgems",
 
+  "item.spellgems.wand": "Wand",
   "item.spellgems.astral_bow": "Astral Bow",
   "item.spellgems.mana_essence": "Mana Essence",
   "item.spellgems.mana_root": "Mana Root",
@@ -19,6 +20,11 @@
   "tooltip.spellgems.error": "ERROR",
   "tooltip.spellgems.raw_spell_gem.description": "Must be combined with a specific item in a crafting table to create a functional spell gem",
   "tooltip.spellgems.spell_tome.description": "Can be applied to spell gems in an anvil",
+  "key.spellgems.cycle_spell": "Cycle Spell",
+  "key.category.spellgems.spellgems": "Spellgems",
+  "tooltip.spellgems.wand.configure": "Shift + Right-click to configure spells",
+  "tooltip.spellgems.wand.cast": "Left-click to cast selected spell",
+  "tooltip.spellgems.wand.cycle": "Hold %s + mouse wheel to switch selected spell",
   "tooltip.spellgems.astral_bow.astral_arrows": "Does not use arrows from inventory",
   "tooltip.spellgems.astral_bow.potion_gems": "Can be equipped with Potion Gems to fire tipped arrows",
   "tooltip.spellgems.mana_infuser.mana_level": "%s Mana",
@@ -105,6 +111,7 @@
   "recipe.spellgems.combat_tome_modifier.description": "Random combat modifier",
   "recipe.spellgems.combat_tome_strike.description": "Random combat on-hit",
 
+  "container.spellgems.wand": "Wand",
   "container.spellgems.spell_enchanting_table": "Spells",
   "container.spellgems.spell_enchanting.level_requirement": "Requires level %s",
   "container.spellgems.spell_enchanting.xp_cost": "%s levels",
