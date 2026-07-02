@@ -5,16 +5,29 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.pnovaczek.spellgems.client.SpellgemsKeyMappings;
 import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.ModSpells;
+import net.pnovaczek.spellgems.inventory.AstralBowContainer;
+import net.pnovaczek.spellgems.inventory.WandContainer;
 import net.pnovaczek.spellgems.item.SpellGemItem;
 import net.pnovaczek.spellgems.item.SpellTomeItem;
+import net.pnovaczek.spellgems.item.data.AstralBowData;
+import net.pnovaczek.spellgems.item.data.SpellGemData;
+import net.pnovaczek.spellgems.item.data.WandData;
 import net.pnovaczek.spellgems.spell.Spell;
 import net.pnovaczek.spellgems.spell.Spells;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
+import net.pnovaczek.spellgems.wand.WandSpellLabels;
+
+import java.util.List;
+import java.util.function.BiConsumer;
 
 public class SpellgemsTooltips {
     public static void register() {
@@ -36,8 +49,15 @@ public class SpellgemsTooltips {
 
             LineAdder tooltip = new LineAdder();
 
+            if (stack.is(ModItems.WAND) || stack.is(ModItems.ASTRAL_BOW)) {
+                stripVanillaContainerLines(lines);
+            }
+
             if (stack.is(ModItems.WAND)) {
                 if (Minecraft.getInstance().hasShiftDown()) {
+                    appendEquippedGems(stack, WandContainer.SIZE, WandContainer::loadInto,
+                            stack.getOrDefault(ModComponents.WAND_DATA, WandData.DEFAULT).selectedSlot(),
+                            lines);
                     tooltip.addLineDetail("tooltip.spellgems.wand.configure");
                     tooltip.addLineDetail("tooltip.spellgems.wand.cast");
                     lines.add(Component.literal(" ")
@@ -51,8 +71,16 @@ public class SpellgemsTooltips {
             }
             else if (stack.is(ModItems.ASTRAL_BOW)) {
                 if (Minecraft.getInstance().hasShiftDown()) {
+                    appendEquippedGems(stack, AstralBowContainer.SIZE, AstralBowContainer::loadInto,
+                            stack.getOrDefault(ModComponents.ASTRAL_BOW_DATA, AstralBowData.DEFAULT).selectedSlot(),
+                            lines);
                     tooltip.addLineDetail("tooltip.spellgems.astral_bow.astral_arrows");
-                    tooltip.addLineDetail("tooltip.spellgems.astral_bow.potion_gems");
+                    tooltip.addLineDetail("tooltip.spellgems.astral_bow.configure");
+                    lines.add(Component.literal(" ")
+                            .append(Component.translatable(
+                                    "tooltip.spellgems.astral_bow.cycle",
+                                    KeyMapping.createNameSupplier(SpellgemsKeyMappings.CYCLE_SPELL_KEY.getName()).get()
+                            ).withStyle(ChatFormatting.DARK_GRAY)));
                 } else {
                     tooltip.addLineHoldShift();
                 }
@@ -142,5 +170,57 @@ public class SpellgemsTooltips {
                 }
             }
         });
+    }
+
+    private static void stripVanillaContainerLines(List<Component> lines) {
+        lines.removeIf(SpellgemsTooltips::isVanillaContainerLine);
+    }
+
+    private static boolean isVanillaContainerLine(Component line) {
+        if (line.getContents() instanceof TranslatableContents translatable) {
+            String key = translatable.getKey();
+            return "item.container.item_count".equals(key) || "item.container.more_items".equals(key);
+        }
+        return false;
+    }
+
+    private static void appendEquippedGems(
+            ItemStack containerItem,
+            int slotCount,
+            BiConsumer<SimpleContainer, ItemStack> loader,
+            int selectedSlot,
+            List<Component> lines
+    ) {
+        SimpleContainer slots = new SimpleContainer(slotCount);
+        loader.accept(slots, containerItem);
+
+        int selected = Mth.clamp(selectedSlot, 0, slotCount - 1);
+        boolean anyGems = false;
+
+        for (int i = 0; i < slotCount; i++) {
+            ItemStack gemStack = slots.getItem(i);
+            if (gemStack.isEmpty()) {
+                continue;
+            }
+
+            SpellGemData data = SpellGemItem.getSpellData(gemStack);
+            if (data == null) {
+                continue;
+            }
+
+            anyGems = true;
+            Component gemLine = WandSpellLabels.formatSelection(data);
+            if (i == selected) {
+                gemLine = Component.literal("> ").append(gemLine);
+            } else {
+                gemLine = Component.literal("  ").append(gemLine);
+            }
+            lines.add(Component.literal(" ").append(gemLine.copy().withStyle(ChatFormatting.GRAY)));
+        }
+
+        if (!anyGems) {
+            lines.add(Component.translatable("tooltip.spellgems.equipped_gems.empty")
+                    .withStyle(ChatFormatting.GRAY));
+        }
     }
 }

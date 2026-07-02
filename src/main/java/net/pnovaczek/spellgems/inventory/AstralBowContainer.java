@@ -8,15 +8,15 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 
-public final class WandContainer {
+public final class AstralBowContainer {
 
     public static final int SIZE = 9;
 
-    private WandContainer() {
+    private AstralBowContainer() {
     }
 
-    public static void loadInto(SimpleContainer container, ItemStack wand) {
-        ItemContainerContents contents = wand.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
+    public static void loadInto(SimpleContainer container, ItemStack bow) {
+        ItemContainerContents contents = bow.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
         NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         contents.copyInto(items);
         for (int i = 0; i < SIZE; i++) {
@@ -24,8 +24,8 @@ public final class WandContainer {
         }
     }
 
-    public static void loadInto(Container container, ItemStack wand) {
-        ItemContainerContents contents = wand.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
+    public static void loadInto(Container container, ItemStack bow) {
+        ItemContainerContents contents = bow.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
         NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         contents.copyInto(items);
         for (int i = 0; i < SIZE; i++) {
@@ -33,13 +33,13 @@ public final class WandContainer {
         }
     }
 
-    public static void saveFrom(Container container, ItemStack wand) {
+    public static void saveFrom(Container container, ItemStack bow) {
         NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         for (int i = 0; i < SIZE; i++) {
             items.set(i, container.getItem(i));
         }
-        wand.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(items));
-        wand.set(DataComponents.TOOLTIP_DISPLAY,
+        bow.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(items));
+        bow.set(DataComponents.TOOLTIP_DISPLAY,
                 TooltipDisplay.DEFAULT.withHidden(DataComponents.CONTAINER, true));
     }
 }

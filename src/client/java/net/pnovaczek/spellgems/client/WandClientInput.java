@@ -39,6 +39,7 @@ public final class WandClientInput {
                 && client.player != null
                 && client.screen == null
                 && cycleKey.isDown()
-                && client.player.getMainHandItem().is(ModItems.WAND);
+                && (client.player.getMainHandItem().is(ModItems.WAND)
+                        || client.player.getMainHandItem().is(ModItems.ASTRAL_BOW));
     }
 }

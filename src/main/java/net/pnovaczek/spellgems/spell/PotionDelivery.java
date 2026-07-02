@@ -1,5 +1,6 @@
 package net.pnovaczek.spellgems.spell;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -9,7 +10,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.Level;
@@ -28,8 +28,35 @@ public final class PotionDelivery {
     public static void apply(ServerLevel level, LivingEntity caster, PotionEnchantment enchantment) {
         switch (enchantment.delivery()) {
             case DRINK -> applyDrink(level, caster, enchantment);
-            case SPLASH -> applySplash(level, caster, enchantment);
-            case LINGERING -> applyLingering(level, caster, enchantment);
+            case SPLASH -> applySplashAt(level, caster, caster.position(), enchantment);
+            case LINGERING -> applyLingeringAt(level, caster, caster.position(), enchantment);
+        }
+    }
+
+    public static void applyOnEntityHit(
+            ServerLevel level,
+            LivingEntity shooter,
+            LivingEntity target,
+            Vec3 hitPos,
+            PotionEnchantment enchantment
+    ) {
+        switch (enchantment.delivery()) {
+            case DRINK -> applyDrinkToTarget(level, target, enchantment);
+            case SPLASH -> applySplashAt(level, shooter, hitPos, enchantment);
+            case LINGERING -> applyLingeringAt(level, shooter, hitPos, enchantment);
+        }
+    }
+
+    public static void applyOnBlockHit(
+            ServerLevel level,
+            LivingEntity shooter,
+            Vec3 hitPos,
+            PotionEnchantment enchantment
+    ) {
+        switch (enchantment.delivery()) {
+            case DRINK -> { }
+            case SPLASH -> applySplashAt(level, shooter, hitPos, enchantment);
+            case LINGERING -> applyLingeringAt(level, shooter, hitPos, enchantment);
         }
     }
 
@@ -38,12 +65,19 @@ public final class PotionDelivery {
         playDrinkSound(level, caster);
     }
 
-    private static void applySplash(ServerLevel level, LivingEntity caster, PotionEnchantment enchantment) {
-        ItemStack potionItem = enchantment.toItemStack();
+    private static void applyDrinkToTarget(ServerLevel level, LivingEntity target, PotionEnchantment enchantment) {
+        enchantment.contents().applyToLivingEntity(target, enchantment.durationScale());
+    }
+
+    private static void applySplashAt(
+            ServerLevel level,
+            LivingEntity source,
+            Vec3 hitPos,
+            PotionEnchantment enchantment
+    ) {
         PotionContents contents = enchantment.contents();
         float durationScale = enchantment.durationScale();
 
-        Vec3 hitPos = caster.position();
         AABB potionAabb = new AABB(hitPos, hitPos).inflate(0.5, 0.25, 0.5);
         AABB effectAabb = potionAabb.inflate(4.0, 2.0, 4.0);
         List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, effectAabb);
@@ -59,22 +93,23 @@ public final class PotionDelivery {
                 double dist = potionAabb.distanceToSqr(entity.getBoundingBox().inflate(margin));
                 if (dist < 16.0) {
                     double scale = 1.0 - Math.sqrt(dist) / 4.0;
-                    applyScaledEffects(level, caster, entity, mobEffects, durationScale, scale);
+                    applyScaledEffects(level, source, entity, mobEffects, durationScale, scale);
                 }
             }
         }
 
-        int eventType = contents.potion().isPresent()
-                && contents.potion().get().value().hasInstantEffects() ? 2007 : 2002;
-        level.levelEvent(eventType, caster.blockPosition(), contents.getColor());
-        level.playSound(null, hitPos.x, hitPos.y, hitPos.z, SoundEvents.GENERIC_SPLASH,
-                SoundSource.PLAYERS, 1.0F, 1.0F);
+        playSplashEffects(level, hitPos, contents);
     }
 
-    private static void applyLingering(ServerLevel level, LivingEntity caster, PotionEnchantment enchantment) {
+    private static void applyLingeringAt(
+            ServerLevel level,
+            LivingEntity source,
+            Vec3 hitPos,
+            PotionEnchantment enchantment
+    ) {
         ItemStack potionItem = enchantment.toItemStack();
-        AreaEffectCloud cloud = new AreaEffectCloud(level, caster.getX(), caster.getY(), caster.getZ());
-        cloud.setOwner(caster);
+        AreaEffectCloud cloud = new AreaEffectCloud(level, hitPos.x, hitPos.y, hitPos.z);
+        cloud.setOwner(source);
         cloud.setRadius(3.0F);
         cloud.setRadiusOnUse(-0.5F);
         cloud.setDuration(600);
@@ -86,7 +121,13 @@ public final class PotionDelivery {
         PotionContents contents = enchantment.contents();
         int eventType = contents.potion().isPresent()
                 && contents.potion().get().value().hasInstantEffects() ? 2007 : 2002;
-        level.levelEvent(eventType, caster.blockPosition(), contents.getColor());
+        level.levelEvent(eventType, BlockPos.containing(hitPos), contents.getColor());
+    }
+
+    private static void playSplashEffects(ServerLevel level, Vec3 hitPos, PotionContents contents) {
+        int eventType = contents.potion().isPresent()
+                && contents.potion().get().value().hasInstantEffects() ? 2007 : 2002;
+        level.levelEvent(eventType, BlockPos.containing(hitPos), contents.getColor());
     }
 
     private static void applyScaledEffects(

@@ -9,8 +9,10 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+import net.minecraft.world.item.ItemStack;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.astralbow.AstralBowCaster;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.wand.WandSpellCaster;
 import net.pnovaczek.spellgems.wand.WandSpellLabels;
@@ -45,11 +47,23 @@ public final class WandSpellHighlight {
             return;
         }
 
-        if (!WandSpellCaster.applyLocalCycle(client.player, direction)) {
+        ItemStack held = client.player.getMainHandItem();
+        boolean cycled;
+        if (held.is(ModItems.WAND)) {
+            cycled = WandSpellCaster.applyLocalCycle(client.player, direction);
+        } else if (held.is(ModItems.ASTRAL_BOW)) {
+            cycled = AstralBowCaster.applyLocalCycle(client.player, direction);
+        } else {
             return;
         }
 
-        SpellGemData data = WandSpellLabels.getSelectedGemData(client.player);
+        if (!cycled) {
+            return;
+        }
+
+        SpellGemData data = held.is(ModItems.WAND)
+                ? WandSpellLabels.getSelectedGemData(client.player)
+                : AstralBowCaster.getSelectedGemData(client.player);
         if (data == null) {
             return;
         }
@@ -78,7 +92,12 @@ public final class WandSpellHighlight {
         }
 
         Minecraft client = Minecraft.getInstance();
-        if (client.player == null || !client.player.getMainHandItem().is(ModItems.WAND)) {
+        if (client.player == null) {
+            return;
+        }
+
+        ItemStack held = client.player.getMainHandItem();
+        if (!held.is(ModItems.WAND) && !held.is(ModItems.ASTRAL_BOW)) {
             return;
         }
 

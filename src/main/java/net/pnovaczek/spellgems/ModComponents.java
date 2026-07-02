@@ -5,6 +5,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.Identifier;
+import net.pnovaczek.spellgems.item.data.AstralBowData;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.TomeData;
 import net.pnovaczek.spellgems.item.data.WandData;
@@ -32,6 +33,13 @@ public final class ModComponents {
             builder -> builder
                     .persistent(WandData.CODEC)
                     .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(WandData.CODEC))
+    );
+
+    public static final DataComponentType<AstralBowData> ASTRAL_BOW_DATA = register(
+            "astral_bow_data",
+            builder -> builder
+                    .persistent(AstralBowData.CODEC)
+                    .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(AstralBowData.CODEC))
     );
 
     private static <T> DataComponentType<T> register(

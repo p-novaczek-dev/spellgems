@@ -7,17 +7,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.pnovaczek.spellgems.Spellgems;
-import net.pnovaczek.spellgems.screen.WandMenu;
+import net.pnovaczek.spellgems.screen.AstralBowMenu;
 
-public class WandScreen extends AbstractContainerScreen<WandMenu> {
+public class AstralBowScreen extends AbstractContainerScreen<AstralBowMenu> {
 
     private static final Identifier CONTAINER_TEXTURE =
-            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "textures/gui/container/wand.png");
+            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "textures/gui/container/astral_bow.png");
 
     private static final int TEXTURE_WIDTH = 256;
     private static final int TEXTURE_HEIGHT = 256;
 
-    public WandScreen(WandMenu menu, Inventory inventory, Component title) {
+    public AstralBowScreen(AstralBowMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
     }
 
@@ -39,7 +39,7 @@ public class WandScreen extends AbstractContainerScreen<WandMenu> {
     public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         super.extractContents(graphics, mouseX, mouseY, delta);
 
-        int selectedSlot = SelectedGemSlotIndicator.getWandSelectedSlot(this.minecraft);
+        int selectedSlot = SelectedGemSlotIndicator.getAstralBowSelectedSlot(this.minecraft);
         graphics.pose().pushMatrix();
         graphics.pose().translate(this.leftPos, this.topPos);
         SelectedGemSlotIndicator.render(graphics, this.font, selectedSlot);

@@ -5,6 +5,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.pnovaczek.spellgems.item.SpellGemItem;
+import net.pnovaczek.spellgems.item.data.SpellGemData;
 import org.jspecify.annotations.Nullable;
 
 public final class PotionEnchantments {
@@ -14,6 +16,14 @@ public final class PotionEnchantments {
 
     public static boolean isValidCatalyst(ItemStack stack) {
         return fromCatalyst(stack) != null;
+    }
+
+    public static @Nullable PotionEnchantment fromSpellGem(ItemStack stack) {
+        SpellGemData data = SpellGemItem.getSpellData(stack);
+        if (data == null || data.potionEffects().isEmpty()) {
+            return null;
+        }
+        return data.potionEffects().getFirst();
     }
 
     public static @Nullable PotionEnchantment fromCatalyst(ItemStack stack) {

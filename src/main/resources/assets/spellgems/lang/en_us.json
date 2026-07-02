@@ -21,14 +21,16 @@
   "key.category.spellgems.spellgems": "Spellgems",
 
   "tooltip.spellgems.shift_hint": "Hold Shift for details",
+  "tooltip.spellgems.equipped_gems.empty": "No spell gems equipped",
   "tooltip.spellgems.error": "ERROR",
   "tooltip.spellgems.raw_spell_gem.description": "Must be combined with a specific item in a crafting table to create a functional spell gem",
   "tooltip.spellgems.spell_tome.description": "Can be applied to spell gems in an anvil",
   "tooltip.spellgems.wand.configure": "Shift + Right-click to configure spells",
   "tooltip.spellgems.wand.cast": "Left-click to cast selected spell",
-  "tooltip.spellgems.wand.cycle": "Hold %s + mouse wheel to switch selected spell",
+  "tooltip.spellgems.wand.cycle": "Hold %s + mouse wheel to select spell",
+  "tooltip.spellgems.astral_bow.configure": "Shift + right-click to equip potion gems",
+  "tooltip.spellgems.astral_bow.cycle": "Hold %s + mouse wheel to select potion",
   "tooltip.spellgems.astral_bow.astral_arrows": "Does not use arrows from inventory",
-  "tooltip.spellgems.astral_bow.potion_gems": "Can be equipped with Potion Gems to fire tipped arrows",
   "tooltip.spellgems.mana_infuser.mana_level": "%s Mana",
 
   "tooltip.spellgems.spell.projectile.name": "Projectile",
@@ -115,6 +117,7 @@
   "recipe.spellgems.potion_spell_enchant.description": "Imbue with potion effect",
 
   "container.spellgems.wand": "Wand",
+  "container.spellgems.astral_bow": "Astral Bow",
   "container.spellgems.spell_enchanting_table": "Spells",
   "container.spellgems.spell_enchanting.level_requirement": "Requires level %s",
   "container.spellgems.spell_enchanting.xp_cost": "%s levels",

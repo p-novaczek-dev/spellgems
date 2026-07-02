@@ -1,6 +1,5 @@
 package net.pnovaczek.spellgems.item;
 
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -8,19 +7,17 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
+import net.pnovaczek.spellgems.astralbow.AstralBowCaster;
 import net.pnovaczek.spellgems.entity.AstralArrow;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
+import net.pnovaczek.spellgems.screen.AstralBowMenu;
+import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
 
 public class AstralBowItem extends BowItem {
 
@@ -30,6 +27,28 @@ public class AstralBowItem extends BowItem {
 
     @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (player.isShiftKeyDown()) {
+            if (level.isClientSide()) {
+                return InteractionResult.SUCCESS;
+            }
+
+            InteractionHand openHand = hand;
+            player.openMenu(new MenuProvider() {
+                @Override
+                public Component getDisplayName() {
+                    return stack.getHoverName();
+                }
+
+                @Override
+                public AbstractContainerMenu createMenu(int containerId, net.minecraft.world.entity.player.Inventory inventory, Player p) {
+                    return new AstralBowMenu(containerId, inventory, openHand);
+                }
+            });
+
+            return InteractionResult.SUCCESS;
+        }
+
         player.startUsingItem(hand);
         return InteractionResult.CONSUME;
     }
@@ -48,7 +67,11 @@ public class AstralBowItem extends BowItem {
         }
 
         if (level instanceof ServerLevel serverLevel) {
+            PotionEnchantment potion = AstralBowCaster.getSelectedPotionEnchantment(stack);
             AstralArrow arrow = new AstralArrow(level, player);
+            if (potion != null) {
+                arrow.setPotionEnchantment(potion);
+            }
             arrow.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, power * 3.0F, 1.0F);
             serverLevel.addFreshEntity(arrow);
         }

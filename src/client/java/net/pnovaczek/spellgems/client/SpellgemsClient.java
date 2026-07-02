@@ -10,6 +10,7 @@ import net.pnovaczek.spellgems.client.network.ModClientNetworking;
 import net.pnovaczek.spellgems.spell.SpellBurstScheduler;
 import net.pnovaczek.spellgems.client.render.AstralArrowRenderer;
 import net.pnovaczek.spellgems.client.render.SpellProjectileRenderer;
+import net.pnovaczek.spellgems.client.screen.AstralBowScreen;
 import net.pnovaczek.spellgems.client.screen.ManaInfuserScreen;
 import net.pnovaczek.spellgems.client.screen.SpellEnchantingScreen;
 import net.pnovaczek.spellgems.client.screen.WandScreen;
@@ -25,6 +26,7 @@ public class SpellgemsClient implements ClientModInitializer {
 		MenuScreens.register(ModMenuTypes.MANA_INFUSER, ManaInfuserScreen::new);
 		MenuScreens.register(ModMenuTypes.SPELL_ENCHANTING_TABLE, SpellEnchantingScreen::new);
 		MenuScreens.register(ModMenuTypes.WAND, WandScreen::new);
+		MenuScreens.register(ModMenuTypes.ASTRAL_BOW, AstralBowScreen::new);
 		SpellgemsKeyMappings.register();
 		SpellgemsTooltips.register();
 		ModClientNetworking.register();

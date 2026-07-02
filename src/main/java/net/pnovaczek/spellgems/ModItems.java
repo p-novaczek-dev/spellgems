@@ -1,12 +1,14 @@
 package net.pnovaczek.spellgems;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.pnovaczek.spellgems.item.AstralBowItem;
 import net.pnovaczek.spellgems.item.SpellGemItem;
 import net.pnovaczek.spellgems.item.SpellTomeItem;
@@ -39,16 +41,26 @@ public class ModItems {
             p -> new BlockItem(ModBlocks.MANA_ROOT, p),
             new Item.Properties());
 
+    private static final TooltipDisplay HIDE_CONTAINER_TOOLTIP =
+            TooltipDisplay.DEFAULT.withHidden(DataComponents.CONTAINER, true);
+
     public static final WandItem WAND = register(
             "wand",
             WandItem::new,
-            new Item.Properties().durability(384).stacksTo(1).repairable(ModItems.SHIMMERSTEEL_INGOT)
+            new Item.Properties()
+                    .durability(384)
+                    .stacksTo(1)
+                    .repairable(ModItems.SHIMMERSTEEL_INGOT)
+                    .component(DataComponents.TOOLTIP_DISPLAY, HIDE_CONTAINER_TOOLTIP)
     );
 
     public static final AstralBowItem ASTRAL_BOW = register(
             "astral_bow",
             AstralBowItem::new,
-            new Item.Properties().durability(384)
+            new Item.Properties()
+                    .durability(384)
+                    .repairable(ModItems.SHIMMERSTEEL_INGOT)
+                    .component(DataComponents.TOOLTIP_DISPLAY, HIDE_CONTAINER_TOOLTIP)
     );
 
     public static final SpellGemItem SPELL_GEM_PROJECTILE = register(

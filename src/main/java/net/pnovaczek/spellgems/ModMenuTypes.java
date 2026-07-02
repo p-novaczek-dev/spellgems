@@ -6,6 +6,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.MenuType;
+import net.pnovaczek.spellgems.screen.AstralBowMenu;
 import net.pnovaczek.spellgems.screen.ManaInfuserMenu;
 import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
 import net.pnovaczek.spellgems.screen.WandMenu;
@@ -25,6 +26,11 @@ public class ModMenuTypes {
     public static final MenuType<WandMenu> WAND = register(
             "wand",
             WandMenu::new
+    );
+
+    public static final MenuType<AstralBowMenu> ASTRAL_BOW = register(
+            "astral_bow",
+            AstralBowMenu::new
     );
 
     private static <T extends net.minecraft.world.inventory.AbstractContainerMenu> MenuType<T> register(

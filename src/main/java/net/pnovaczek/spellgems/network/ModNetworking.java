@@ -3,8 +3,11 @@ package net.pnovaczek.spellgems.network;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
+import net.pnovaczek.spellgems.astralbow.AstralBowCaster;
 import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
 import net.pnovaczek.spellgems.wand.WandSpellCaster;
+import net.pnovaczek.spellgems.ModItems;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
@@ -27,10 +30,14 @@ public final class ModNetworking {
                 context.server().execute(() -> WandSpellCaster.tryCast(context.player())));
 
         ServerPlayNetworking.registerGlobalReceiver(WandCycleSpellPayload.TYPE, (payload, context) ->
-                context.server().execute(() -> WandSpellCaster.cycleSelectedSpell(
-                        context.player(),
-                        payload.direction()
-                )));
+                context.server().execute(() -> {
+                    ItemStack held = context.player().getMainHandItem();
+                    if (held.is(ModItems.WAND)) {
+                        WandSpellCaster.cycleSelectedSpell(context.player(), payload.direction());
+                    } else if (held.is(ModItems.ASTRAL_BOW)) {
+                        AstralBowCaster.cycleSelectedGem(context.player(), payload.direction());
+                    }
+                }));
     }
 
     public static void sendRecipeDescriptions(ServerPlayer player, SpellEnchantingMenu menu, List<String> descriptions) {
