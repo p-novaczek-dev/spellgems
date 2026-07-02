@@ -10,18 +10,20 @@
   "item.spellgems.spell_gem_projectile": "Spell Gem",
   "item.spellgems.spell_gem_nova": "Spell Gem",
   "item.spellgems.spell_gem_vortex": "Spell Gem",
+  "item.spellgems.spell_gem_potion": "Spell Gem",
   "item.spellgems.spell_tome": "Spell Tome",
 
   "block.spellgems.mana_infuser": "Mana Infuser",
   "block.spellgems.spell_enchanting_table": "Spell Enchanting Table",
   "block.spellgems.mana_root": "Mana Root",
 
+  "key.spellgems.cycle_spell": "Cycle Spell",
+  "key.category.spellgems.spellgems": "Spellgems",
+
   "tooltip.spellgems.shift_hint": "Hold Shift for details",
   "tooltip.spellgems.error": "ERROR",
   "tooltip.spellgems.raw_spell_gem.description": "Must be combined with a specific item in a crafting table to create a functional spell gem",
   "tooltip.spellgems.spell_tome.description": "Can be applied to spell gems in an anvil",
-  "key.spellgems.cycle_spell": "Cycle Spell",
-  "key.category.spellgems.spellgems": "Spellgems",
   "tooltip.spellgems.wand.configure": "Shift + Right-click to configure spells",
   "tooltip.spellgems.wand.cast": "Left-click to cast selected spell",
   "tooltip.spellgems.wand.cycle": "Hold %s + mouse wheel to switch selected spell",
@@ -56,7 +58,7 @@
   "tooltip.spellgems.spell.grow.name": "Grow",
   "tooltip.spellgems.spell.grow.description": "Applies bone meal effect to crops in a 9×9 area using bone meal from the player's hotbar",
   "tooltip.spellgems.spell.potion.name": "Potion",
-  "tooltip.spellgems.spell.potion.description": "Can be enchanted with a potion effect; casting the spell applies the potion effect to the player",
+  "tooltip.spellgems.spell.potion.description": "Can be enchanted with any potion",
 
   "tooltip.spellgems.spell_enchantment.chaining.name": "Chaining",
   "tooltip.spellgems.spell_enchantment.chaining.description": "After hitting a target, jumps to another nearby target (maximum 5 targets total)",
@@ -110,10 +112,12 @@
   "recipe.spellgems.combat_spell_random.description": "Random combat enchantments",
   "recipe.spellgems.combat_tome_modifier.description": "Random combat modifier",
   "recipe.spellgems.combat_tome_strike.description": "Random combat on-hit",
+  "recipe.spellgems.potion_spell_enchant.description": "Imbue with potion effect",
 
   "container.spellgems.wand": "Wand",
   "container.spellgems.spell_enchanting_table": "Spells",
   "container.spellgems.spell_enchanting.level_requirement": "Requires level %s",
   "container.spellgems.spell_enchanting.xp_cost": "%s levels",
-  "container.spellgems.spell_enchanting.catalyst": "%s %s"
+  "container.spellgems.spell_enchanting.catalyst": "%s %s",
+  "container.spellgems.spell_enchanting.catalyst.any_potion": "%s Potion"
 }

@@ -27,5 +27,6 @@ public final class ModSpells {
         register(Spells.PROJECTILE, new Projectile());
         register(Spells.NOVA, new Nova());
         register(Spells.VORTEX, new Vortex());
+        register(Spells.POTION, new PotionSpell());
     }
 }

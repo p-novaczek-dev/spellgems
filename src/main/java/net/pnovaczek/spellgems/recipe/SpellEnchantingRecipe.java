@@ -12,12 +12,14 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModTags;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
+import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantments;
 import java.util.Optional;
 
 public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput> {
@@ -145,10 +147,21 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
                 SpellEnchantInput::new);
     }
 
-    public record CatalystDefinition(Identifier item, int count) {
+    public record CatalystDefinition(Identifier item, int count, boolean anyPotion) {
+        public CatalystDefinition(Identifier item, int count) {
+            this(item, count, false);
+        }
+
+        public static CatalystDefinition anyPotion(int count) {
+            return new CatalystDefinition(BuiltInRegistries.ITEM.getKey(Items.POTION), count, true);
+        }
+
         public boolean hasSufficient(ItemStack stack) {
             if (stack.isEmpty() || stack.getCount() < this.count) {
                 return false;
+            }
+            if (this.anyPotion) {
+                return PotionEnchantments.isValidCatalyst(stack);
             }
             return BuiltInRegistries.ITEM.get(this.item)
                     .map(stack::is)
@@ -158,13 +171,16 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
         public Ingredient asIngredient() {
             return Ingredient.of(BuiltInRegistries.ITEM.get(item).get().value());
         }
+
         public static final Codec<CatalystDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Identifier.CODEC.fieldOf("item").forGetter(CatalystDefinition::item),
-                Codec.INT.optionalFieldOf("count", 1).forGetter(CatalystDefinition::count)
+                Codec.INT.optionalFieldOf("count", 1).forGetter(CatalystDefinition::count),
+                Codec.BOOL.optionalFieldOf("any_potion", false).forGetter(CatalystDefinition::anyPotion)
         ).apply(instance, CatalystDefinition::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, CatalystDefinition> STREAM_CODEC = StreamCodec.composite(
                 Identifier.STREAM_CODEC, CatalystDefinition::item,
                 ByteBufCodecs.INT, CatalystDefinition::count,
+                ByteBufCodecs.BOOL, CatalystDefinition::anyPotion,
                 CatalystDefinition::new);
     }
 

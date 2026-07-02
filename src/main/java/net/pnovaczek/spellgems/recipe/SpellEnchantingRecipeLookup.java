@@ -11,7 +11,7 @@ import java.util.List;
 public final class SpellEnchantingRecipeLookup {
 
     public static final int MAX_RECIPES = 16;
-    public static final int FIELDS_PER_RECIPE = 4;
+    public static final int FIELDS_PER_RECIPE = 5;
 
     private SpellEnchantingRecipeLookup() {
     }

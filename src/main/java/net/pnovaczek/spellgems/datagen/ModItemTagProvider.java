@@ -27,6 +27,9 @@ public class ModItemTagProvider extends FabricTagsProvider.ItemTagsProvider {
                 .add(ModItems.keyOfItem("spell_gem_nova"))
                 .add(ModItems.keyOfItem("spell_gem_vortex"));
 
+        builder(ModTags.UTILITY_SPELL_GEMS)
+                .add(ModItems.keyOfItem("spell_gem_potion"));
+
         builder(ModTags.WAND_ENCHANTABLE)
                 .add(ModItems.keyOfItem("wand"))
                 .add(ModItems.keyOfItem("astral_bow"));

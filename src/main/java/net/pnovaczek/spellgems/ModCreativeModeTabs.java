@@ -36,6 +36,7 @@ public class ModCreativeModeTabs {
                             output.accept(ModItems.SPELL_GEM_PROJECTILE);
                             output.accept(ModItems.SPELL_GEM_NOVA);
                             output.accept(ModItems.SPELL_GEM_VORTEX);
+                            output.accept(ModItems.SPELL_GEM_POTION);
                         })
                         .build()
         );

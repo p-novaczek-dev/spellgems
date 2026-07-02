@@ -1,0 +1,18 @@
+{
+  "type": "spellgems:spell_enchanting",
+  "catalyst": {
+    "any_potion": true,
+    "item": "minecraft:potion"
+  },
+  "category": "utility",
+  "description": "recipe.spellgems.potion_spell_enchant.description",
+  "input": {
+    "spell": "spellgems:potion",
+    "tag": "spellgems:utility_spell_gems"
+  },
+  "level_requirement": 10,
+  "result": {
+    "potion": true
+  },
+  "xp_cost": 27
+}

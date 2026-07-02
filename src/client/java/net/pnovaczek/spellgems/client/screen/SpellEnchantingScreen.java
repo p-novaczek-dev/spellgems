@@ -20,6 +20,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
+import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantments;
 
 import com.google.common.collect.Lists;
 import java.util.List;
@@ -217,14 +218,21 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
                     .withStyle(ChatFormatting.GRAY));
         }
 
-        int catalystItemId = this.menu.getCatalystItemId(recipeIndex);
         int catalystCount = this.menu.getCatalystCount(recipeIndex);
-        Item catalystItem = Item.byId(catalystItemId);
-        MutableComponent catalystLabel = Component.translatable(
-                "container.spellgems.spell_enchanting.catalyst",
-                catalystCount,
-                catalystItem.getName(new ItemStack(catalystItem))
-        );
+        MutableComponent catalystLabel;
+        if (this.menu.getCatalystKind(recipeIndex) == SpellEnchantingMenu.CATALYST_KIND_ANY_POTION) {
+            catalystLabel = Component.translatable(
+                    "container.spellgems.spell_enchanting.catalyst.any_potion",
+                    catalystCount
+            );
+        } else {
+            Item catalystItem = Item.byId(this.menu.getCatalystItemId(recipeIndex));
+            catalystLabel = Component.translatable(
+                    "container.spellgems.spell_enchanting.catalyst",
+                    catalystCount,
+                    catalystItem.getName(new ItemStack(catalystItem))
+            );
+        }
         texts.add(meetsCatalystRequirement(recipeIndex)
                 ? catalystLabel.withStyle(ChatFormatting.GRAY)
                 : catalystLabel.withStyle(ChatFormatting.RED));
@@ -248,11 +256,15 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
 
     private boolean meetsCatalystRequirement(int recipeIndex) {
         ItemStack catalystStack = this.menu.getSlot(1).getItem();
-        Item catalystItem = Item.byId(this.menu.getCatalystItemId(recipeIndex));
         int catalystCount = this.menu.getCatalystCount(recipeIndex);
-        return !catalystStack.isEmpty()
-                && catalystStack.is(catalystItem)
-                && catalystStack.getCount() >= catalystCount;
+        if (catalystStack.isEmpty() || catalystStack.getCount() < catalystCount) {
+            return false;
+        }
+        if (this.menu.getCatalystKind(recipeIndex) == SpellEnchantingMenu.CATALYST_KIND_ANY_POTION) {
+            return PotionEnchantments.isValidCatalyst(catalystStack);
+        }
+        Item catalystItem = Item.byId(this.menu.getCatalystItemId(recipeIndex));
+        return catalystStack.is(catalystItem);
     }
 
     private boolean isHoveringRecipeButton(int visibleIndex, int mouseX, int mouseY) {

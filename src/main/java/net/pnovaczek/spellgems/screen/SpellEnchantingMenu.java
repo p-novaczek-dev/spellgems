@@ -32,6 +32,8 @@ import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantments;
+import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
+import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantment;
 
 import java.util.ArrayList;
@@ -40,6 +42,9 @@ import java.util.Optional;
 import java.util.Random;
 
 public class SpellEnchantingMenu extends AbstractContainerMenu {
+
+    public static final int CATALYST_KIND_ITEM = 0;
+    public static final int CATALYST_KIND_ANY_POTION = 1;
 
     private static final int DATA_RECIPE_COUNT = 0;
     private static final int DATA_RECIPE_START = 1;
@@ -150,6 +155,7 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
                 this.recipeData.set(base + 1, recipe.getXpCost());
                 this.recipeData.set(base + 2, catalystItemId(recipe));
                 this.recipeData.set(base + 3, recipe.getCatalystDef().count());
+                this.recipeData.set(base + 4, catalystKind(recipe));
                 descriptions.add(recipe.getDescription());
             }
 
@@ -230,7 +236,10 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
                 if (currentData.isEnchanted()) {
                     return;
                 }
-                SpellGemData newData = applySpellGemRecipe(currentData, recipe);
+                SpellGemData newData = applySpellGemRecipe(currentData, recipe, catalystStack);
+                if (newData == null) {
+                    return;
+                }
                 targetStack.set(ModComponents.SPELL_GEM_DATA, newData);
             }
 
@@ -267,6 +276,10 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
         return item.map(Item::getId).orElse(0);
     }
 
+    private static int catalystKind(SpellEnchantingRecipe recipe) {
+        return recipe.getCatalystDef().anyPotion() ? CATALYST_KIND_ANY_POTION : CATALYST_KIND_ITEM;
+    }
+
     public int getRecipeCount() {
         return this.recipeData.get(DATA_RECIPE_COUNT);
     }
@@ -285,6 +298,10 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
 
     public int getCatalystCount(int recipeIndex) {
         return getRecipeField(recipeIndex, 3);
+    }
+
+    public int getCatalystKind(int recipeIndex) {
+        return getRecipeField(recipeIndex, 4);
     }
 
     private int getRecipeField(int recipeIndex, int fieldOffset) {
@@ -318,12 +335,13 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
         return data;
     }
 
-    private SpellGemData applySpellGemRecipe(SpellGemData data, SpellEnchantingRecipe recipe) {
+    private SpellGemData applySpellGemRecipe(SpellGemData data, SpellEnchantingRecipe recipe, ItemStack catalystStack) {
         var result = recipe.getResult();
 
         List<ModifierEnchantment> newModifiers = new ArrayList<>(data.modifierEffects());
         List<StrikeEnchantment> newStrikes = new ArrayList<>(data.strikeEffects());
         List<UtilityEnchantment> newUtilities = new ArrayList<>(data.utilityEffects());
+        List<PotionEnchantment> newPotions = new ArrayList<>(data.potionEffects());
 
         result.modifiers().ifPresent(count -> {
             List<Identifier> compatible = ModifierEnchantments.getCompatible(data.spellId());
@@ -344,7 +362,11 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
         result.utility().ifPresent(enchantId -> newUtilities.add(new UtilityEnchantment(enchantId)));
 
         if (result.potion()) {
-            // TODO: apply potion-based effect (depends on catalyst potion)
+            PotionEnchantment potionEnchantment = PotionEnchantments.fromCatalyst(catalystStack);
+            if (potionEnchantment == null) {
+                return null;
+            }
+            newPotions.add(potionEnchantment);
         }
 
         return new SpellGemData(
@@ -352,7 +374,7 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
                 newModifiers,
                 newStrikes,
                 newUtilities,
-                data.potionEffects()
+                newPotions
         );
     }
 
@@ -363,7 +385,7 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
     }
 
     private static boolean isCatalystItem(ItemStack stack) {
-        return stack.is(Items.LAPIS_LAZULI);
+        return stack.is(Items.LAPIS_LAZULI) || PotionEnchantments.isValidCatalyst(stack);
     }
 
     @Override

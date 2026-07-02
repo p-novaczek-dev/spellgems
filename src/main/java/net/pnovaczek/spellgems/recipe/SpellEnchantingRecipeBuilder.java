@@ -8,6 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.crafting.Recipe;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.spell.Spells;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -54,6 +55,22 @@ public class SpellEnchantingRecipeBuilder implements RecipeBuilder {
         return new SpellEnchantingRecipeBuilder("utility", input, catalyst, levelRequirement, xpCost, description,
                 new SpellEnchantingRecipe.SpellEnchantResult(Optional.empty(), Optional.empty(),
                         Optional.of(Identifier.parse(utilityEnchant)), false));
+    }
+
+    public static SpellEnchantingRecipeBuilder potionEnchant(int levelRequirement, int xpCost, String description) {
+        return new SpellEnchantingRecipeBuilder(
+                "utility",
+                new SpellEnchantingRecipe.SpellEnchantInput(
+                        Optional.empty(),
+                        Optional.of(Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "utility_spell_gems")),
+                        Optional.of(Spells.POTION)
+                ),
+                SpellEnchantingRecipe.CatalystDefinition.anyPotion(1),
+                levelRequirement,
+                xpCost,
+                description,
+                new SpellEnchantingRecipe.SpellEnchantResult(Optional.empty(), Optional.empty(), Optional.empty(), true)
+        );
     }
 
     @Override

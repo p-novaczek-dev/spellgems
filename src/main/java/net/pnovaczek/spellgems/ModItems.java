@@ -75,6 +75,14 @@ public class ModItems {
                     .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.VORTEX))
     );
 
+    public static final SpellGemItem SPELL_GEM_POTION = register(
+            "spell_gem_potion",
+            SpellGemItem::new,
+            new Item.Properties()
+                    .stacksTo(1)
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.POTION))
+    );
+
     public static final SpellTomeItem SPELL_TOME = register(
             "spell_tome",
             SpellTomeItem::new,

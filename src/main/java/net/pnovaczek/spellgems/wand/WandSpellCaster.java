@@ -148,6 +148,9 @@ public final class WandSpellCaster {
         if (spellId.equals(Spells.VORTEX)) {
             return spells.vortex.wandBaseDurabilityCost;
         }
+        if (spellId.equals(Spells.POTION)) {
+            return spells.potion.wandBaseDurabilityCost;
+        }
         return 1;
     }
 }

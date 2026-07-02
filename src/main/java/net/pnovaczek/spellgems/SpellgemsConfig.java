@@ -20,6 +20,7 @@ public class SpellgemsConfig {
         public SpellCombatConfig projectile = new SpellCombatConfig();
         public NovaSpellConfig nova = new NovaSpellConfig();
         public VortexSpellConfig vortex = new VortexSpellConfig();
+        public SpellConfig potion = new SpellConfig();
         // Add additional spell entries here as they are implemented (e.g. blink, magnet, harvest, etc.)
     }
 

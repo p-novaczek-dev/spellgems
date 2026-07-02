@@ -5,6 +5,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.pnovaczek.spellgems.client.SpellgemsKeyMappings;
 import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModItems;
@@ -12,6 +13,8 @@ import net.pnovaczek.spellgems.ModSpells;
 import net.pnovaczek.spellgems.item.SpellGemItem;
 import net.pnovaczek.spellgems.item.SpellTomeItem;
 import net.pnovaczek.spellgems.spell.Spell;
+import net.pnovaczek.spellgems.spell.Spells;
+import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
 
 public class SpellgemsTooltips {
     public static void register() {
@@ -84,36 +87,56 @@ public class SpellgemsTooltips {
                     Spell spell = ModSpells.get(data.spellId());
 
                     if (spell != null) {
+                        boolean shiftDown = Minecraft.getInstance().hasShiftDown();
+                        boolean enchantedPotionGem = Spells.POTION.equals(data.spellId())
+                                && !data.potionEffects().isEmpty();
+
                         tooltip.addLineHighlight(spell.tooltipNameKey());
-                        if (Minecraft.getInstance().hasShiftDown()) {
-                            tooltip.addLineDetail(spell.tooltipDescriptionKey());
+
+                        if (enchantedPotionGem && shiftDown) {
+                            for (PotionEnchantment enchantment : data.potionEffects()) {
+                                lines.add(enchantment.displayName());
+                                PotionContents.addPotionTooltip(
+                                        enchantment.contents().getAllEffects(),
+                                        lines::add,
+                                        enchantment.durationScale(),
+                                        tooltipContext.tickRate()
+                                );
+                            }
                         } else {
-                            tooltip.addLineHoldShift();
-                        }
-
-                        for (var effect : data.modifierEffects()) {
-                            tooltip.addLineAttribute(effect.tooltipNameKey());
-                            if (Minecraft.getInstance().hasShiftDown()) {
-                                tooltip.addLineDetail(effect.tooltipDescriptionKey());
+                            if (shiftDown) {
+                                tooltip.addLineDetail(spell.tooltipDescriptionKey());
+                            } else {
+                                tooltip.addLineHoldShift();
                             }
-                        }
 
-                        for (var effect : data.strikeEffects()) {
-                            tooltip.addLineAttribute(effect.tooltipNameKey());
-                            if (Minecraft.getInstance().hasShiftDown()) {
-                                tooltip.addLineDetail(effect.tooltipDescriptionKey());
+                            for (var effect : data.modifierEffects()) {
+                                tooltip.addLineAttribute(effect.tooltipNameKey());
+                                if (shiftDown) {
+                                    tooltip.addLineDetail(effect.tooltipDescriptionKey());
+                                }
                             }
-                        }
 
-                        for (var effect : data.utilityEffects()) {
-                            tooltip.addLineAttribute(effect.tooltipNameKey());
-                            if (Minecraft.getInstance().hasShiftDown()) {
-                                tooltip.addLineDetail(effect.tooltipDescriptionKey());
+                            for (var effect : data.strikeEffects()) {
+                                tooltip.addLineAttribute(effect.tooltipNameKey());
+                                if (shiftDown) {
+                                    tooltip.addLineDetail(effect.tooltipDescriptionKey());
+                                }
                             }
-                        }
 
-                        for (var effect : data.potionEffects()) {
-                            tooltip.addLineAttribute(effect.potion().value().name());
+                            for (var effect : data.utilityEffects()) {
+                                tooltip.addLineAttribute(effect.tooltipNameKey());
+                                if (shiftDown) {
+                                    tooltip.addLineDetail(effect.tooltipDescriptionKey());
+                                }
+                            }
+
+                            if (!enchantedPotionGem) {
+                                for (var effect : data.potionEffects()) {
+                                    lines.add(Component.literal(" ")
+                                            .append(effect.displayName().copy().withStyle(ChatFormatting.GRAY)));
+                                }
+                            }
                         }
                     }
                 }

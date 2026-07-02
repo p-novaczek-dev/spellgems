@@ -1,6 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "building",
+  "category": "misc",
   "key": {
     "B": "minecraft:book",
     "O": "minecraft:obsidian",
@@ -12,7 +12,6 @@
     "OOO"
   ],
   "result": {
-    "count": 1,
     "id": "spellgems:spell_enchanting_table"
   }
 }

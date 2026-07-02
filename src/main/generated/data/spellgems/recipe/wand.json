@@ -2,15 +2,14 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "|": "minecraft:stick",
-    "S": "spellgems:shimmersteel_ingot"
+    "S": "spellgems:shimmersteel_ingot",
+    "|": "minecraft:stick"
   },
   "pattern": [
     "S",
     "|"
   ],
   "result": {
-    "count": 1,
     "id": "spellgems:wand"
   }
 }

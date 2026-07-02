@@ -58,8 +58,7 @@ public final class WandSpellLabels {
                 enchantments.add(Component.translatable(effect.tooltipNameKey())));
         data.utilityEffects().forEach(effect ->
                 enchantments.add(Component.translatable(effect.tooltipNameKey())));
-        data.potionEffects().forEach(effect ->
-                enchantments.add(Component.translatable(effect.potion().value().name())));
+        data.potionEffects().forEach(effect -> enchantments.add(effect.displayName()));
 
         return enchantments;
     }

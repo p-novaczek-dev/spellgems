@@ -14,7 +14,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.pnovaczek.spellgems.ModBlocks;
 import net.pnovaczek.spellgems.ModItems;
-import net.pnovaczek.spellgems.ModTags;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipeBuilder;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
@@ -94,6 +93,12 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
                         .save(exporter);
 
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_POTION)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.GLASS_BOTTLE)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter, "spell_gem_potion");
+
                 // Wand: 1 stick + 1 shimmersteel (shimmersteel above stick)
                 shaped(RecipeCategory.TOOLS, ModItems.WAND)
                         .pattern("S")
@@ -159,6 +164,12 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         0,
                         1)
                         .save(exporter, "combat_tome_strike");
+
+                SpellEnchantingRecipeBuilder.potionEnchant(
+                        10,
+                        27,
+                        "recipe.spellgems.potion_spell_enchant.description"
+                ).save(exporter, "potion_spell");
             }
         };
     }
