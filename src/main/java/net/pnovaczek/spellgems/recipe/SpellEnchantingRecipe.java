@@ -30,7 +30,7 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
             CatalystDefinition.CODEC.fieldOf("catalyst").forGetter(SpellEnchantingRecipe::getCatalystDef),
             Codec.INT.fieldOf("level_requirement").forGetter(SpellEnchantingRecipe::getLevelRequirement),
             Codec.INT.fieldOf("xp_cost").forGetter(SpellEnchantingRecipe::getXpCost),
-            Codec.STRING.fieldOf("description").forGetter(SpellEnchantingRecipe::getDescription),
+            Codec.STRING.fieldOf("description_key").forGetter(SpellEnchantingRecipe::getDescriptionKey),
             SpellEnchantResult.CODEC.fieldOf("result").forGetter(SpellEnchantingRecipe::getResult)
     ).apply(instance, SpellEnchantingRecipe::new));
 
@@ -40,7 +40,7 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
             CatalystDefinition.STREAM_CODEC, SpellEnchantingRecipe::getCatalystDef,
             ByteBufCodecs.INT, SpellEnchantingRecipe::getLevelRequirement,
             ByteBufCodecs.INT, SpellEnchantingRecipe::getXpCost,
-            ByteBufCodecs.STRING_UTF8, SpellEnchantingRecipe::getDescription,
+            ByteBufCodecs.STRING_UTF8, SpellEnchantingRecipe::getDescriptionKey,
             SpellEnchantResult.STREAM_CODEC, SpellEnchantingRecipe::getResult,
             SpellEnchantingRecipe::new);
 
@@ -57,17 +57,17 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
     private final CatalystDefinition catalystDef;
     private final int levelRequirement;
     private final int xpCost;
-    private final String description;
+    private final String descriptionKey;
     private final SpellEnchantResult result;
 
     public SpellEnchantingRecipe(String category, SpellEnchantInput input, CatalystDefinition catalystDef,
-                                 int levelRequirement, int xpCost, String description, SpellEnchantResult result) {
+                                 int levelRequirement, int xpCost, String descriptionKey, SpellEnchantResult result) {
         this.category = category;
         this.input = input;
         this.catalystDef = catalystDef;
         this.levelRequirement = levelRequirement;
         this.xpCost = xpCost;
-        this.description = description;
+        this.descriptionKey = descriptionKey;
         this.result = result;
     }
 
@@ -120,7 +120,7 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
     public CatalystDefinition getCatalystDef() { return catalystDef; }
     public int getLevelRequirement() { return levelRequirement; }
     public int getXpCost() { return xpCost; }
-    public String getDescription() { return description; }
+    public String getDescriptionKey() { return descriptionKey; }
     public SpellEnchantResult getResult() { return result; }
 
     // Sub-records (exact JSON mapping)

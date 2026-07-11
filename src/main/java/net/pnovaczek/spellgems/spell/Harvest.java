@@ -9,18 +9,22 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class Harvest extends AbstractSpell {
 
-    private static final int COOLDOWN_TICKS = 10;
     private static final int AREA_RADIUS = 4;
 
     @Override
     public Identifier id() {
-        return Spells.HARVEST;
+        return SpellIds.HARVEST;
     }
 
     @Override
-    public void cast(SpellContext context) {
+    protected int getCooldownTicks() {
+        return 10;
+    }
+
+    @Override
+    protected boolean performCast(SpellContext context) {
         if (!(context.caster() instanceof Player player) || context.level().isClientSide()) {
-            return;
+            return false;
         }
 
         var level = context.level();
@@ -36,9 +40,7 @@ public class Harvest extends AbstractSpell {
             }
         }
 
-        if (harvestedAny) {
-            applyCastCooldown(context, COOLDOWN_TICKS);
-        }
+        return harvestedAny;
     }
 
     private static boolean tryHarvestCrop(Level level, BlockPos pos, Player player) {

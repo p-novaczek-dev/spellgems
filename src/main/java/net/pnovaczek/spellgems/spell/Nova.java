@@ -25,14 +25,19 @@ public class Nova extends AbstractSpell {
 
     @Override
     public Identifier id() {
-        return Spells.NOVA;
+        return SpellIds.NOVA;
     }
 
     @Override
-    public void cast(SpellContext context) {
+    public int defaultDurabilityCost() {
+        return 4;
+    }
+
+    @Override
+    protected boolean performCast(SpellContext context) {
         var level = context.level();
         var caster = context.caster();
-        if (!caster.isAlive()) return;
+        // alive handled by base
 
         boolean hasPower = false;
         boolean hasExpand = false;
@@ -60,23 +65,12 @@ public class Nova extends AbstractSpell {
         };
 
         if (isBurst) {
-            for (int i = 0; i < BURST_PULSE_COUNT; i++) {
-                if (i == 0) {
-                    pulse.run();
-                } else {
-                    int delayTicks = i * BURST_TICK_SPACING;
-                    if (level.isClientSide()) {
-                        SpellBurstScheduler.scheduleClient(level.getGameTime(), delayTicks, pulse);
-                    } else {
-                        SpellBurstScheduler.scheduleServer(level.getServer().getTickCount(), delayTicks, pulse);
-                    }
-                }
-            }
+            scheduleBurst(context, BURST_PULSE_COUNT, BURST_TICK_SPACING, pulse);
         } else {
             pulse.run();
         }
 
-        applyCastCooldown(context, 20);
+        return true;
     }
 
     private void applyNovaDamage(SpellContext context, ServerLevel level, boolean hasPower, boolean hasExpand) {

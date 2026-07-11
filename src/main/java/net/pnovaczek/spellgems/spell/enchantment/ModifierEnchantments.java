@@ -2,7 +2,7 @@ package net.pnovaczek.spellgems.spell.enchantment;
 
 import net.minecraft.resources.Identifier;
 import net.pnovaczek.spellgems.Spellgems;
-import net.pnovaczek.spellgems.spell.Spells;
+import net.pnovaczek.spellgems.spell.SpellIds;
 
 import java.util.List;
 
@@ -21,11 +21,11 @@ public class ModifierEnchantments {
     }
 
     public static List<Identifier> getCompatible(Identifier spellId) {
-        if (spellId.equals(Spells.PROJECTILE)) {
+        if (spellId.equals(SpellIds.PROJECTILE)) {
             return List.of(CHAINING, MULTISHOT, PIERCING, POWER, BURST);
-        } else if (spellId.equals(Spells.NOVA)) {
+        } else if (spellId.equals(SpellIds.NOVA)) {
             return List.of(CHAINING, POWER, BURST, EXPAND);
-        } else if (spellId.equals(Spells.VORTEX)) {
+        } else if (spellId.equals(SpellIds.VORTEX)) {
             return List.of(BURST, EXPAND);
         }
         return List.of();

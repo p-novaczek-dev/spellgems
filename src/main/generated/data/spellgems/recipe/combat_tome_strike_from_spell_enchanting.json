@@ -4,7 +4,7 @@
     "item": "minecraft:lapis_lazuli"
   },
   "category": "combat",
-  "description": "recipe.spellgems.combat_tome_strike.description",
+  "description_key": "recipe.spellgems.combat_tome_strike.description",
   "input": {
     "item": "minecraft:book"
   },

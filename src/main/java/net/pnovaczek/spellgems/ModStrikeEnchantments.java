@@ -12,11 +12,11 @@ public class ModStrikeEnchantments {
 
     private ModStrikeEnchantments() {}
 
-    public static void register(Identifier id, StrikeEnchantment modifier) {
+    public static void register(Identifier id, StrikeEnchantment strike) {
         if (REGISTRY.containsKey(id)) {
             throw new IllegalArgumentException("Strike already registered: " + id);
         }
-        REGISTRY.put(id, modifier);
+        REGISTRY.put(id, strike);
     }
 
     public static StrikeEnchantment get(Identifier id) {

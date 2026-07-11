@@ -14,12 +14,11 @@ import org.jspecify.annotations.Nullable;
 
 public class Grow extends AbstractSpell {
 
-    private static final int COOLDOWN_TICKS = 10;
     private static final int AREA_RADIUS = 4;
 
     @Override
     public Identifier id() {
-        return Spells.GROW;
+        return SpellIds.GROW;
     }
 
     @Override
@@ -36,13 +35,18 @@ public class Grow extends AbstractSpell {
             return true;
         }
 
-        return HotbarBoneMeal.hasBoneMeal(player);
+        return HotbarUtils.hasItem(player, HotbarUtils::isBoneMeal);
     }
 
     @Override
-    public void cast(SpellContext context) {
+    protected int getCooldownTicks() {
+        return 10;
+    }
+
+    @Override
+    protected boolean performCast(SpellContext context) {
         if (!(context.caster() instanceof Player player) || context.level().isClientSide()) {
-            return;
+            return false;
         }
 
         var level = context.level();
@@ -62,14 +66,14 @@ public class Grow extends AbstractSpell {
         }
 
         if (!grewAny) {
-            return;
+            return false;
         }
 
         if (requireBoneMeal && player instanceof ServerPlayer serverPlayer) {
             serverPlayer.inventoryMenu.sendAllDataToRemote();
         }
 
-        applyCastCooldown(context, COOLDOWN_TICKS);
+        return true;
     }
 
     private static boolean hasGrowableCrop(SpellContext context, Player player) {
@@ -93,7 +97,7 @@ public class Grow extends AbstractSpell {
             return false;
         }
 
-        ItemStack boneMeal = requireBoneMeal ? HotbarBoneMeal.pickWeightedBoneMeal(player, level.getRandom()) : null;
+        ItemStack boneMeal = requireBoneMeal ? HotbarUtils.pickWeighted(player, level.getRandom(), HotbarUtils::isBoneMeal) : null;
         if (requireBoneMeal && boneMeal == null) {
             return false;
         }

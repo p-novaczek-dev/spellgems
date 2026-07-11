@@ -23,7 +23,7 @@ import net.pnovaczek.spellgems.item.data.AstralBowData;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.WandData;
 import net.pnovaczek.spellgems.spell.Spell;
-import net.pnovaczek.spellgems.spell.Spells;
+import net.pnovaczek.spellgems.spell.SpellIds;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
 import net.pnovaczek.spellgems.wand.WandDepletion;
 import net.pnovaczek.spellgems.wand.WandSpellLabels;
@@ -132,7 +132,7 @@ public class SpellgemsTooltips {
                         tooltip.addLineHighlight(spell.tooltipNameKey());
 
                         if (shiftDown) {
-                            if (spell.id().equals(Spells.POTION)) {
+                            if (spell.id().equals(SpellIds.POTION)) {
                                 if (data.potionEffects().isEmpty()) {
                                     tooltip.addLineDetail(spell.tooltipDescriptionKey());
                                 }

@@ -13,11 +13,11 @@ public class ModUtilityEnchantments {
 
     private ModUtilityEnchantments() {}
 
-    public static void register(Identifier id, UtilityEnchantment modifier) {
+    public static void register(Identifier id, UtilityEnchantment utility) {
         if (REGISTRY.containsKey(id)) {
-            throw new IllegalArgumentException("Strike already registered: " + id);
+            throw new IllegalArgumentException("Utility already registered: " + id);
         }
-        REGISTRY.put(id, modifier);
+        REGISTRY.put(id, utility);
     }
 
     public static UtilityEnchantment get(Identifier id) {

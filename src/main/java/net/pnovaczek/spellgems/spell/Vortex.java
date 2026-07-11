@@ -27,14 +27,19 @@ public class Vortex extends AbstractSpell {
 
     @Override
     public Identifier id() {
-        return Spells.VORTEX;
+        return SpellIds.VORTEX;
     }
 
     @Override
-    public void cast(SpellContext context) {
+    public int defaultDurabilityCost() {
+        return 4;
+    }
+
+    @Override
+    protected boolean performCast(SpellContext context) {
         var level = context.level();
         var caster = context.caster();
-        if (!caster.isAlive()) return;
+        // alive handled by base
 
         var config = Spellgems.CONFIG.spells.vortex;
         Vec3 center = SpellTargeting.resolveCastCenter(caster, config.maxDistance);
@@ -55,23 +60,12 @@ public class Vortex extends AbstractSpell {
         Runnable pulse = () -> executePulse(context, finalCenter, finalHasExpand);
 
         if (isBurst) {
-            for (int i = 0; i < BURST_PULSE_COUNT; i++) {
-                if (i == 0) {
-                    pulse.run();
-                } else {
-                    int delayTicks = i * BURST_TICK_SPACING;
-                    if (level.isClientSide()) {
-                        SpellBurstScheduler.scheduleClient(level.getGameTime(), delayTicks, pulse);
-                    } else {
-                        SpellBurstScheduler.scheduleServer(level.getServer().getTickCount(), delayTicks, pulse);
-                    }
-                }
-            }
+            scheduleBurst(context, BURST_PULSE_COUNT, BURST_TICK_SPACING, pulse);
         } else {
             pulse.run();
         }
 
-        applyCastCooldown(context, 20);
+        return true;
     }
 
     private void executePulse(SpellContext context, Vec3 center, boolean hasExpand) {

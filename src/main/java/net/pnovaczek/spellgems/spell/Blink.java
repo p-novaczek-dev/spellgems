@@ -18,43 +18,50 @@ import java.util.Optional;
 
 public class Blink extends AbstractSpell {
 
-    private static final int COOLDOWN_TICKS = 20;
     private static final int PARTICLE_COUNT = 32;
 
     @Override
     public Identifier id() {
-        return Spells.BLINK;
+        return SpellIds.BLINK;
     }
 
     @Override
-    public void cast(SpellContext context) {
+    public int defaultDurabilityCost() {
+        return 32;
+    }
+
+    @Override
+    protected int getCooldownTicks() {
+        return 20;
+    }
+
+    @Override
+    protected boolean performCast(SpellContext context) {
         var caster = context.caster();
-        if (!caster.isAlive()) {
-            return;
-        }
+        // alive handled by base
 
         double maxDistance = Spellgems.CONFIG.spells.blink.maxDistance;
         Vec3 target = SpellTargeting.resolveCastCenter(caster, maxDistance);
 
         if (context.level().isClientSide()) {
             spawnParticles(context.level(), caster.position(), target);
-            return;
+            return false;  // client effects only; cooldown will be no-op
         }
 
         if (!(context.level() instanceof ServerLevel serverLevel)) {
-            return;
+            return false;
         }
 
         Optional<Vec3> safePosition = resolveSafeTeleportPosition(serverLevel, caster, target);
         if (safePosition.isEmpty()) {
-            return;
+            return false;
         }
 
         Vec3 destination = safePosition.get();
         Vec3 origin = caster.position();
 
         if (!teleportCaster(serverLevel, caster, destination)) {
-            return;
+            return false;
         }
 
         serverLevel.playSound(
@@ -74,7 +81,7 @@ public class Blink extends AbstractSpell {
                 1.0F
         );
 
-        applyCastCooldown(context, COOLDOWN_TICKS);
+        return true;
     }
 
     private static boolean teleportCaster(ServerLevel level, LivingEntity caster, Vec3 destination) {

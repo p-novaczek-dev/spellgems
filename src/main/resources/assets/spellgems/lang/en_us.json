@@ -66,8 +66,6 @@
   "tooltip.spellgems.spell.wind_charge.description": "Casts a wind charge exactly like the vanilla mechanic",
   "tooltip.spellgems.spell.magnet.name": "Magnet",
   "tooltip.spellgems.spell.magnet.description": "Pulls loose items in the area toward the player",
-  "tooltip.spellgems.spell.scaffold.name": "Scaffold",
-  "tooltip.spellgems.spell.scaffold.description": "Places a temporary scaffolding block that lasts for 30 seconds",
   "tooltip.spellgems.spell.place_block.name": "Place Block",
   "tooltip.spellgems.spell.place_block.description": "Places a single random block from the player's hotbar onto the targeted face",
   "tooltip.spellgems.spell.break_block.name": "Break Block",
@@ -142,7 +140,8 @@
   "container.spellgems.astral_bow": "Astral Bow",
   "container.spellgems.spell_enchanting_table": "Spells",
   "container.spellgems.spell_enchanting.level_requirement": "Requires level %s",
-  "container.spellgems.spell_enchanting.xp_cost": "%s levels",
+  "container.spellgems.spell_enchanting.level_cost": "%s levels",
+  "container.spellgems.spell_enchanting.xp_cost": "%s XP",
   "container.spellgems.spell_enchanting.catalyst": "%s %s",
   "container.spellgems.spell_enchanting.catalyst.any_potion": "%s Potion"
 }

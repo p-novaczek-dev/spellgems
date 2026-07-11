@@ -14,23 +14,27 @@ import net.minecraft.world.level.gameevent.GameEvent;
 
 public class Plant extends AbstractSpell {
 
-    private static final int COOLDOWN_TICKS = 10;
     private static final int AREA_RADIUS = 4;
 
     @Override
     public Identifier id() {
-        return Spells.PLANT;
+        return SpellIds.PLANT;
     }
 
     @Override
     public boolean canCast(SpellContext context) {
-        return context.caster() instanceof Player player && HotbarSeeds.hasPlantableSeed(player);
+        return context.caster() instanceof Player player && HotbarUtils.hasItem(player, HotbarUtils::isPlantableSeed);
     }
 
     @Override
-    public void cast(SpellContext context) {
+    protected int getCooldownTicks() {
+        return 10;
+    }
+
+    @Override
+    protected boolean performCast(SpellContext context) {
         if (!(context.caster() instanceof Player player) || context.level().isClientSide()) {
-            return;
+            return false;
         }
 
         var level = context.level();
@@ -50,7 +54,7 @@ public class Plant extends AbstractSpell {
                         continue;
                     }
 
-                    ItemStack seedStack = HotbarSeeds.pickWeightedPlantableSeed(player, level.getRandom());
+                    ItemStack seedStack = HotbarUtils.pickWeighted(player, level.getRandom(), HotbarUtils::isPlantableSeed);
                     if (seedStack == null || !(seedStack.getItem() instanceof BlockItem blockItem)) {
                         break;
                     }
@@ -75,13 +79,13 @@ public class Plant extends AbstractSpell {
         }
 
         if (!plantedAny) {
-            return;
+            return false;
         }
 
         if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.inventoryMenu.sendAllDataToRemote();
         }
 
-        applyCastCooldown(context, COOLDOWN_TICKS);
+        return true;
     }
 }

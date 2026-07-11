@@ -3,7 +3,7 @@
   "category": "misc",
   "ingredients": [
     "spellgems:raw_spell_gem",
-    "minecraft:slime_ball"
+    "minecraft:redstone"
   ],
   "result": {
     "id": "spellgems:spell_gem_magnet"

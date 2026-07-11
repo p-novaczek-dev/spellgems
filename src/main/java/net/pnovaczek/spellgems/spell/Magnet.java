@@ -15,32 +15,34 @@ import java.util.List;
 
 public class Magnet extends AbstractSpell {
 
-    private static final int COOLDOWN_TICKS = 10;
     private static final float PULL_SPEED = 0.65F;
     private static final int PARTICLE_COUNT = 12;
 
     @Override
     public Identifier id() {
-        return Spells.MAGNET;
+        return SpellIds.MAGNET;
     }
 
     @Override
-    public void cast(SpellContext context) {
+    protected int getCooldownTicks() {
+        return 10;
+    }
+
+    @Override
+    protected boolean performCast(SpellContext context) {
         var level = context.level();
         var caster = context.caster();
-        if (!caster.isAlive()) {
-            return;
-        }
+        // alive handled by base
 
         float range = Spellgems.CONFIG.spells.magnet.range;
 
         if (level.isClientSide()) {
             spawnParticles(level, caster.position());
-            return;
+            return false;
         }
 
         if (!(level instanceof ServerLevel serverLevel)) {
-            return;
+            return false;
         }
 
         AABB searchBox = caster.getBoundingBox().inflate(range);
@@ -82,7 +84,7 @@ public class Magnet extends AbstractSpell {
             );
         }
 
-        applyCastCooldown(context, COOLDOWN_TICKS);
+        return true;
     }
 
     private static void spawnParticles(net.minecraft.world.level.Level level, Vec3 center) {

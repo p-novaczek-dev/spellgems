@@ -17,7 +17,6 @@ import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.WandData;
 import net.pnovaczek.spellgems.spell.Spell;
 import net.pnovaczek.spellgems.spell.SpellContext;
-import net.pnovaczek.spellgems.spell.Spells;
 import org.jspecify.annotations.Nullable;
 
 public final class WandSpellCaster {
@@ -161,47 +160,7 @@ public final class WandSpellCaster {
     }
 
     private static int getBaseDurabilityCost(Identifier spellId) {
-        WandConfig.WandSpellDurabilityCosts costs = Spellgems.CONFIG.wand.spells;
-        if (spellId.equals(Spells.PROJECTILE)) {
-            return costs.projectile;
-        }
-        if (spellId.equals(Spells.NOVA)) {
-            return costs.nova;
-        }
-        if (spellId.equals(Spells.VORTEX)) {
-            return costs.vortex;
-        }
-        if (spellId.equals(Spells.BLINK)) {
-            return costs.blink;
-        }
-        if (spellId.equals(Spells.WIND_CHARGE)) {
-            return costs.windCharge;
-        }
-        if (spellId.equals(Spells.MAGNET)) {
-            return costs.magnet;
-        }
-        if (spellId.equals(Spells.PLACE_BLOCK)) {
-            return costs.placeBlock;
-        }
-        if (spellId.equals(Spells.BREAK_BLOCK)) {
-            return costs.breakBlock;
-        }
-        if (spellId.equals(Spells.PLANT)) {
-            return costs.plant;
-        }
-        if (spellId.equals(Spells.HARVEST)) {
-            return costs.harvest;
-        }
-        if (spellId.equals(Spells.FEED)) {
-            return costs.feed;
-        }
-        if (spellId.equals(Spells.GROW)) {
-            return costs.grow;
-        }
-        if (spellId.equals(Spells.POTION)) {
-            return costs.potion;
-        }
-        return 1;
+        return Spellgems.CONFIG.wand.getSpellCost(spellId);
     }
 
     private static InteractionHand getWandHand(Player player) {

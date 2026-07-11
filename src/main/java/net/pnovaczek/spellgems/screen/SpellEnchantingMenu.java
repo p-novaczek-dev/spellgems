@@ -27,7 +27,7 @@ import net.pnovaczek.spellgems.item.data.TomeData;
 import net.pnovaczek.spellgems.network.ModNetworking;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipeLookup;
-import net.pnovaczek.spellgems.spell.Spells;
+import net.pnovaczek.spellgems.spell.SpellIds;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
@@ -78,15 +78,8 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
         this.recipeData = recipeData;
         this.viewer = inventory.player;
 
-        this.addSlot(new Slot(this.enchantSlots, 0, 15, 47) {
-            @Override public int getMaxStackSize() { return 1; }
-            @Override public boolean mayPlace(ItemStack stack) { return isEnchantableTarget(stack); }
-        });
-
-        this.addSlot(new Slot(this.enchantSlots, 1, 35, 47) {
-            @Override public int getMaxStackSize() { return 64; }
-            @Override public boolean mayPlace(ItemStack stack) { return isCatalystItem(stack); }
-        });
+        this.addSlot(new EnchantTargetSlot(this.enchantSlots, 0, 15, 47));
+        this.addSlot(new CatalystSlot(this.enchantSlots, 1, 35, 47));
 
         this.addStandardInventorySlots(inventory, 8, 84);
         this.addDataSlots(this.recipeData);
@@ -156,7 +149,7 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
                 this.recipeData.set(base + 2, catalystItemId(recipe));
                 this.recipeData.set(base + 3, recipe.getCatalystDef().count());
                 this.recipeData.set(base + 4, catalystKind(recipe));
-                descriptions.add(recipe.getDescription());
+                descriptions.add(recipe.getDescriptionKey());
             }
 
             syncRecipeDescriptions(descriptions);
@@ -174,7 +167,7 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
         this.recipeDescriptions = descriptions.toArray(String[]::new);
     }
 
-    public String getRecipeDescription(int recipeIndex) {
+    public String getRecipeDescriptionKey(int recipeIndex) {
         if (recipeIndex < 0 || recipeIndex >= this.recipeDescriptions.length) {
             return "";
         }
@@ -231,7 +224,7 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
             } else {
                 SpellGemData currentData = targetStack.getOrDefault(
                         ModComponents.SPELL_GEM_DATA,
-                        SpellGemData.create(Spells.PROJECTILE)
+                        SpellGemData.create(SpellIds.PROJECTILE)
                 );
                 if (currentData.isEnchanted()) {
                     return;
@@ -438,5 +431,37 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
     public void removed(Player player) {
         super.removed(player);
         this.access.execute((level, pos) -> this.clearContainer(player, this.enchantSlots));
+    }
+
+    private static class EnchantTargetSlot extends Slot {
+        EnchantTargetSlot(Container container, int slot, int x, int y) {
+            super(container, slot, x, y);
+        }
+
+        @Override
+        public int getMaxStackSize() {
+            return 1;
+        }
+
+        @Override
+        public boolean mayPlace(ItemStack stack) {
+            return isEnchantableTarget(stack);
+        }
+    }
+
+    private static class CatalystSlot extends Slot {
+        CatalystSlot(Container container, int slot, int x, int y) {
+            super(container, slot, x, y);
+        }
+
+        @Override
+        public int getMaxStackSize() {
+            return 64;
+        }
+
+        @Override
+        public boolean mayPlace(ItemStack stack) {
+            return isCatalystItem(stack);
+        }
     }
 }

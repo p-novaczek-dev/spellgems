@@ -8,11 +8,9 @@ import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
 
 public class PotionSpell extends AbstractSpell {
 
-    private static final int COOLDOWN_TICKS = 20;
-
     @Override
     public Identifier id() {
-        return Spells.POTION;
+        return SpellIds.POTION;
     }
 
     @Override
@@ -21,26 +19,26 @@ public class PotionSpell extends AbstractSpell {
     }
 
     @Override
-    public void cast(SpellContext context) {
+    protected boolean performCast(SpellContext context) {
         if (!context.caster().isAlive() || context.data().potionEffects().isEmpty()) {
-            return;
+            return false;
         }
 
         if (context.level().isClientSide()) {
             for (PotionEnchantment enchantment : context.data().potionEffects()) {
                 PotionDelivery.playClientEffects(context.level(), context.caster(), enchantment);
             }
-            return;
+            return false;
         }
 
         if (!(context.level() instanceof ServerLevel serverLevel)) {
-            return;
+            return false;
         }
 
         for (PotionEnchantment enchantment : context.data().potionEffects()) {
             PotionDelivery.apply(serverLevel, context.caster(), enchantment);
         }
 
-        applyCastCooldown(context, COOLDOWN_TICKS);
+        return true;
     }
 }

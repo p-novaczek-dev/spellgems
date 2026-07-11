@@ -25,6 +25,10 @@ public class Spellgems implements ModInitializer {
 		ModEntityDataSerializers.register();
 
 		ModSpells.initialize();
+		// Seed wand spell costs from the spells' own defaultDurabilityCost() declarations
+		// so the config contains useful entries for all spells.
+		CONFIG.wand.seedDefaultsFromRegisteredSpells();
+
 		ModModifierEnchantments.initialize();
 		ModStrikeEnchantments.initialize();
 		ModUtilityEnchantments.initialize();

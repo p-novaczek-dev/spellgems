@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": "minecraft:stick",
+    "S": "spellgems:shimmersteel_ingot",
+    "X": "minecraft:string"
+  },
+  "pattern": [
+    " #X",
+    "S X",
+    " #X"
+  ],
+  "result": {
+    "id": "spellgems:astral_bow"
+  }
+}

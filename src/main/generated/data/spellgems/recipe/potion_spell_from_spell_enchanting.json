@@ -5,10 +5,10 @@
     "item": "minecraft:potion"
   },
   "category": "utility",
-  "description": "recipe.spellgems.potion_spell_enchant.description",
+  "description_key": "recipe.spellgems.potion_spell_enchant.description",
   "input": {
-    "spell": "spellgems:potion",
-    "tag": "spellgems:utility_spell_gems"
+    "item": "spellgems:spell_gem_potion",
+    "spell": "spellgems:potion"
   },
   "level_requirement": 10,
   "result": {

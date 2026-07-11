@@ -8,34 +8,37 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class BreakBlock extends AbstractSpell {
 
-    private static final int COOLDOWN_TICKS = 10;
-
     @Override
     public Identifier id() {
-        return Spells.BREAK_BLOCK;
+        return SpellIds.BREAK_BLOCK;
     }
 
     @Override
-    public void cast(SpellContext context) {
+    protected int getCooldownTicks() {
+        return 10;
+    }
+
+    @Override
+    protected boolean performCast(SpellContext context) {
         if (context.level().isClientSide()) {
-            return;
+            return false;
         }
 
         var caster = context.caster();
         double reach = caster instanceof Player player ? player.blockInteractionRange() : 5.0;
         BlockHitResult hit = SpellTargeting.resolveBlockHit(caster, reach);
         if (hit == null) {
-            return;
+            return false;
         }
 
         var pos = hit.getBlockPos();
         if (caster instanceof Player player && !player.isWithinBlockInteractionRange(pos, 0.0)) {
-            return;
+            return false;
         }
 
         BlockState state = context.level().getBlockState(pos);
         if (state.isAir()) {
-            return;
+            return false;
         }
 
         if (caster instanceof ServerPlayer serverPlayer) {
@@ -44,6 +47,6 @@ public class BreakBlock extends AbstractSpell {
             context.level().destroyBlock(pos, true, caster);
         }
 
-        applyCastCooldown(context, COOLDOWN_TICKS);
+        return true;
     }
 }

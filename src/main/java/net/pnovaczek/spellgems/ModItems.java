@@ -15,7 +15,7 @@ import net.pnovaczek.spellgems.item.SpellTomeItem;
 import net.pnovaczek.spellgems.item.WandItem;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.TomeData;
-import net.pnovaczek.spellgems.spell.Spells;
+import net.pnovaczek.spellgems.spell.SpellIds;
 
 import java.util.function.Function;
 
@@ -70,7 +70,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.PROJECTILE))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.PROJECTILE))
     );
 
     public static final SpellGemItem SPELL_GEM_NOVA = register(
@@ -78,7 +78,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.NOVA))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.NOVA))
     );
 
     public static final SpellGemItem SPELL_GEM_VORTEX = register(
@@ -86,7 +86,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.VORTEX))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.VORTEX))
     );
 
     public static final SpellGemItem SPELL_GEM_BLINK = register(
@@ -94,7 +94,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.BLINK))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.BLINK))
     );
 
     public static final SpellGemItem SPELL_GEM_WIND_CHARGE = register(
@@ -102,7 +102,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.WIND_CHARGE))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.WIND_CHARGE))
     );
 
     public static final SpellGemItem SPELL_GEM_MAGNET = register(
@@ -110,7 +110,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.MAGNET))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.MAGNET))
     );
 
     public static final SpellGemItem SPELL_GEM_PLACE_BLOCK = register(
@@ -118,7 +118,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.PLACE_BLOCK))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.PLACE_BLOCK))
     );
 
     public static final SpellGemItem SPELL_GEM_BREAK_BLOCK = register(
@@ -126,7 +126,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.BREAK_BLOCK))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.BREAK_BLOCK))
     );
 
     public static final SpellGemItem SPELL_GEM_PLANT = register(
@@ -134,7 +134,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.PLANT))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.PLANT))
     );
 
     public static final SpellGemItem SPELL_GEM_HARVEST = register(
@@ -142,7 +142,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.HARVEST))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.HARVEST))
     );
 
     public static final SpellGemItem SPELL_GEM_FEED = register(
@@ -150,7 +150,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.FEED))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.FEED))
     );
 
     public static final SpellGemItem SPELL_GEM_GROW = register(
@@ -158,7 +158,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.GROW))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.GROW))
     );
 
     public static final SpellGemItem SPELL_GEM_POTION = register(
@@ -166,7 +166,7 @@ public class ModItems {
             SpellGemItem::new,
             new Item.Properties()
                     .stacksTo(1)
-                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.POTION))
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(SpellIds.POTION))
     );
 
     public static final SpellTomeItem SPELL_TOME = register(

@@ -194,7 +194,7 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
     private List<Component> buildRecipeTooltip(int recipeIndex) {
         List<Component> texts = Lists.newArrayList();
 
-        String descriptionKey = this.menu.getRecipeDescription(recipeIndex);
+        String descriptionKey = this.menu.getRecipeDescriptionKey(recipeIndex);
         if (!descriptionKey.isEmpty()) {
             texts.add(Component.translatable(descriptionKey).withStyle(ChatFormatting.WHITE));
             texts.add(CommonComponents.EMPTY);
@@ -211,10 +211,10 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
 
         String relativeLevelCost = formatRelativeLevelCost(this.menu.getXpCost(recipeIndex));
         if (!meetsXpRequirement(recipeIndex)) {
-            texts.add(Component.translatable("container.spellgems.spell_enchanting.xp_cost", relativeLevelCost)
+            texts.add(Component.translatable("container.spellgems.spell_enchanting.level_cost", relativeLevelCost)
                     .withStyle(ChatFormatting.RED));
         } else {
-            texts.add(Component.translatable("container.spellgems.spell_enchanting.xp_cost", relativeLevelCost)
+            texts.add(Component.translatable("container.spellgems.spell_enchanting.level_cost", relativeLevelCost)
                     .withStyle(ChatFormatting.GRAY));
         }
 

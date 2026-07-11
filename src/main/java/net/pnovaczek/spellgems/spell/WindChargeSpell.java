@@ -11,20 +11,26 @@ import net.minecraft.world.item.WindChargeItem;
 
 public class WindChargeSpell extends AbstractSpell {
 
-    private static final int COOLDOWN_TICKS = 10;
-
     @Override
     public Identifier id() {
-        return Spells.WIND_CHARGE;
+        return SpellIds.WIND_CHARGE;
     }
 
     @Override
-    public void cast(SpellContext context) {
+    public int defaultDurabilityCost() {
+        return 2;
+    }
+
+    @Override
+    protected int getCooldownTicks() {
+        return 10;
+    }
+
+    @Override
+    protected boolean performCast(SpellContext context) {
         var level = context.level();
         var caster = context.caster();
-        if (!caster.isAlive()) {
-            return;
-        }
+        // alive check is handled in AbstractSpell
 
         if (level instanceof ServerLevel serverLevel) {
             Projectile.spawnProjectileFromRotation(
@@ -49,7 +55,7 @@ public class WindChargeSpell extends AbstractSpell {
                 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F)
         );
 
-        applyCastCooldown(context, COOLDOWN_TICKS);
+        return true;
     }
 
     private static WindCharge createWindCharge(ServerLevel level, net.minecraft.world.entity.LivingEntity source) {

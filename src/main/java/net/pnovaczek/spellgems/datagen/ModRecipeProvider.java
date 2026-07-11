@@ -57,13 +57,13 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 
                 ManaInfuserRecipeBuilder.create(
                         Ingredient.of(Items.IRON_INGOT),
-                        Ingredient.of(Items.COAL),
+                        Ingredient.of(Items.DIAMOND),
                         ModItems.SHIMMERSTEEL_INGOT,
                         1,
                         2,
                         100)
                     .unlockedBy("has_iron_ingot", has(net.minecraft.world.item.Items.IRON_INGOT))
-                    .save(exporter, "schimmersteel_ingot");
+                    .save(exporter, "shimmersteel_ingot");
 
                 // Raw Spellgem: amethyst_shard (infused) + lapis (infusing) + 8 mana essence
                 ManaInfuserRecipeBuilder.create(
@@ -107,7 +107,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 
                 shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_MAGNET)
                         .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.SLIME_BALL)
+                        .requires(Items.REDSTONE)
                         .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
                         .save(exporter);
 
@@ -119,7 +119,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 
                 shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_BREAK_BLOCK)
                         .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.GUNPOWDER)
+                        .requires(Items.OBSIDIAN)
                         .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
                         .save(exporter);
 
@@ -159,6 +159,18 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .pattern("|")
                         .define('S', ModItems.SHIMMERSTEEL_INGOT)
                         .define('|', Items.STICK)
+                        .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
+                        .save(exporter);
+
+                // Astral Bow: like vanilla bow but with shimmersteel instead of the middle stick
+                // Pattern: 2 sticks + 1 shimmersteel + 3 string
+                shaped(RecipeCategory.COMBAT, ModItems.ASTRAL_BOW)
+                        .pattern(" #X")
+                        .pattern("S X")
+                        .pattern(" #X")
+                        .define('#', Items.STICK)
+                        .define('S', ModItems.SHIMMERSTEEL_INGOT)
+                        .define('X', Items.STRING)
                         .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
                         .save(exporter);
 

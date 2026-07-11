@@ -1,7 +1,7 @@
 {
   "type": "spellgems:mana_infusing",
   "infused_item": "minecraft:iron_ingot",
-  "infusing_item": "minecraft:coal",
+  "infusing_item": "minecraft:diamond",
   "mana_cost": 2,
   "processing_time": 100,
   "result": {

@@ -15,12 +15,11 @@ import java.util.List;
 
 public class Feed extends AbstractSpell {
 
-    private static final int COOLDOWN_TICKS = 10;
     private static final int AREA_RADIUS = 8;
 
     @Override
     public Identifier id() {
-        return Spells.FEED;
+        return SpellIds.FEED;
     }
 
     @Override
@@ -43,7 +42,7 @@ public class Feed extends AbstractSpell {
     private static boolean hasFeedableAnimalWithFood(SpellContext context, Player player) {
         var level = context.level();
         for (Animal animal : findFeedableAnimals(context, player)) {
-            if (HotbarFeeds.pickWeightedFoodFor(player, animal, level.getRandom()) != null) {
+            if (HotbarUtils.pickWeighted(player, level.getRandom(), stack -> animal.isFood(stack)) != null) {
                 return true;
             }
         }
@@ -70,9 +69,14 @@ public class Feed extends AbstractSpell {
     }
 
     @Override
-    public void cast(SpellContext context) {
+    protected int getCooldownTicks() {
+        return 10;
+    }
+
+    @Override
+    protected boolean performCast(SpellContext context) {
         if (!(context.caster() instanceof Player player) || context.level().isClientSide()) {
-            return;
+            return false;
         }
 
         var level = context.level();
@@ -83,7 +87,7 @@ public class Feed extends AbstractSpell {
 
         for (Animal animal : animals) {
             ItemStack food = requireFeedItems
-                    ? HotbarFeeds.pickWeightedFoodFor(player, animal, level.getRandom())
+                    ? HotbarUtils.pickWeighted(player, level.getRandom(), stack -> animal.isFood(stack))
                     : null;
 
             if (tryFeed(animal, player, food, requireFeedItems)) {
@@ -92,14 +96,14 @@ public class Feed extends AbstractSpell {
         }
 
         if (!fedAny) {
-            return;
+            return false;
         }
 
         if (requireFeedItems && player instanceof ServerPlayer serverPlayer) {
             serverPlayer.inventoryMenu.sendAllDataToRemote();
         }
 
-        applyCastCooldown(context, COOLDOWN_TICKS);
+        return true;
     }
 
     private static boolean tryFeed(Animal animal, Player player, @Nullable ItemStack food, boolean consumeItem) {

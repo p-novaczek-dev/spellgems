@@ -33,9 +33,7 @@ public class ManaInfuserMenu extends AbstractContainerMenu {
         this.addSlot(new FuelSlot(container, 0, 26, 35));      // fuel
         this.addSlot(new Slot(container, 1, 56, 17));          // infusing ingredient
         this.addSlot(new Slot(container, 2, 56, 53));          // item to infuse
-        this.addSlot(new Slot(container, 3, 116, 35) {         // output
-            @Override public boolean mayPlace(ItemStack stack) { return false; }
-        });
+        this.addSlot(new OutputSlot(container, 3, 116, 35));
 
         // Player inventory + hotbar
         for (int i = 0; i < 3; ++i)
@@ -116,6 +114,17 @@ public class ManaInfuserMenu extends AbstractContainerMenu {
         @Override
         public Identifier getNoItemIcon() {
             return EMPTY_SLOT_FUEL;
+        }
+    }
+
+    private static class OutputSlot extends Slot {
+        OutputSlot(Container container, int slot, int x, int y) {
+            super(container, slot, x, y);
+        }
+
+        @Override
+        public boolean mayPlace(ItemStack stack) {
+            return false;
         }
     }
 }

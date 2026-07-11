@@ -21,11 +21,16 @@ public class Projectile extends AbstractSpell {
 
     @Override
     public Identifier id() {
-        return Spells.PROJECTILE;
+        return SpellIds.PROJECTILE;
     }
 
     @Override
-    public void cast(SpellContext context) {
+    public int defaultDurabilityCost() {
+        return 4;
+    }
+
+    @Override
+    protected boolean performCast(SpellContext context) {
         var level = context.level();
         var caster = context.caster();
         var data = context.data();
@@ -90,8 +95,9 @@ public class Projectile extends AbstractSpell {
                 }
             }
 
-            applyCastCooldown(context, 20);
+            return true;
         }
+        return false;
     }
 
     private void spawnShot(SpellContext context, Vec3 direction, ProjectileHitHandler handler,
