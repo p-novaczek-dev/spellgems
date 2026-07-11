@@ -27,6 +27,15 @@ public final class ModSpells {
         register(Spells.PROJECTILE, new Projectile());
         register(Spells.NOVA, new Nova());
         register(Spells.VORTEX, new Vortex());
+        register(Spells.BLINK, new Blink());
+        register(Spells.WIND_CHARGE, new WindChargeSpell());
+        register(Spells.MAGNET, new Magnet());
+        register(Spells.PLACE_BLOCK, new PlaceBlock());
+        register(Spells.BREAK_BLOCK, new BreakBlock());
+        register(Spells.PLANT, new Plant());
+        register(Spells.HARVEST, new Harvest());
+        register(Spells.FEED, new Feed());
+        register(Spells.GROW, new Grow());
         register(Spells.POTION, new PotionSpell());
     }
 }

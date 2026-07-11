@@ -28,7 +28,6 @@ public class Projectile extends AbstractSpell {
     public void cast(SpellContext context) {
         var level = context.level();
         var caster = context.caster();
-        var castingItem = context.castingItem();
         var data = context.data();
         var modifiers = data.modifierEffects();
         var strikes = data.strikeEffects();
@@ -91,7 +90,7 @@ public class Projectile extends AbstractSpell {
                 }
             }
 
-            player.getCooldowns().addCooldown(castingItem, 20);
+            applyCastCooldown(context, 20);
         }
     }
 

@@ -18,8 +18,9 @@ public final class SelectedGemSlotIndicator {
     public static final int GEM_SLOT_STEP = 18;
     public static final int GEM_SLOT_COUNT = 9;
 
-    private static final int INDICATOR_COLOR = 0xFFAAAAAA;
-    private static final int INDICATOR_Y_OFFSET = -9;
+    private static final int SLOT_NUMBER_COLOR = 0xFFAAAAAA;
+    private static final int SELECTED_SLOT_NUMBER_COLOR = 0xFF000000;
+    private static final int SLOT_NUMBER_Y_OFFSET = -11;
 
     private SelectedGemSlotIndicator() {
     }
@@ -50,10 +51,14 @@ public final class SelectedGemSlotIndicator {
     }
 
     public static void render(GuiGraphicsExtractor graphics, Font font, int selectedSlot) {
-        int slotX = GEM_SLOT_X + selectedSlot * GEM_SLOT_STEP;
-        int centerX = slotX + 8;
-        int indicatorY = GEM_SLOT_Y + INDICATOR_Y_OFFSET;
-        graphics.centeredText(font, "\u25bc", centerX, indicatorY, INDICATOR_COLOR);
+        int numberY = GEM_SLOT_Y + SLOT_NUMBER_Y_OFFSET;
+        for (int slot = 0; slot < GEM_SLOT_COUNT; slot++) {
+            int slotX = GEM_SLOT_X + slot * GEM_SLOT_STEP;
+            int centerX = slotX + 8;
+            int color = slot == selectedSlot ? SELECTED_SLOT_NUMBER_COLOR : SLOT_NUMBER_COLOR;
+            String number = String.valueOf(slot + 1);
+            graphics.text(font, number, centerX - font.width(number) / 2, numberY, color, false);
+        }
     }
 
     @FunctionalInterface

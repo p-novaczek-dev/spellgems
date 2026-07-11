@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "spellgems:raw_spell_gem",
+    "minecraft:wheat_seeds"
+  ],
+  "result": {
+    "id": "spellgems:spell_gem_plant"
+  }
+}

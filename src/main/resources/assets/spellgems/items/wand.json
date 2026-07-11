@@ -1,6 +1,14 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "spellgems:item/wand"
+    "type": "minecraft:condition",
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "spellgems:item/wand"
+    },
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "spellgems:item/wand_broken"
+    },
+    "property": "minecraft:broken"
   }
 }

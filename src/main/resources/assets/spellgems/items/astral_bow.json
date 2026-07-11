@@ -27,8 +27,7 @@
         "type": "minecraft:model",
         "model": "spellgems:item/astral_bow_pulling_0"
       },
-      "property": "minecraft:use_duration",
-      "scale": 0.05
+      "property": "spellgems:astral_bow/pull"
     },
     "property": "minecraft:using_item"
   }

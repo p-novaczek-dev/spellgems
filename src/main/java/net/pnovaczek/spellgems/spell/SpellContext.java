@@ -5,6 +5,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 
 public record SpellContext(
@@ -15,5 +16,9 @@ public record SpellContext(
 ) {
     public Vec3 lookAngle() {
         return caster.getLookAngle().normalize();
+    }
+
+    public boolean isWandCast() {
+        return castingItem.is(ModItems.WAND);
     }
 }

@@ -22,7 +22,7 @@ import java.util.List;
 public class Vortex extends AbstractSpell {
 
     private static final int BURST_PULSE_COUNT = 5;
-    private static final int BURST_TICK_SPACING = 3;
+    private static final int BURST_TICK_SPACING = 20;
     private static final int DEFAULT_DUST_COLOR = 0x888888;
 
     @Override
@@ -71,9 +71,7 @@ public class Vortex extends AbstractSpell {
             pulse.run();
         }
 
-        if (!level.isClientSide() && caster instanceof Player player) {
-            player.getCooldowns().addCooldown(context.castingItem(), 20);
-        }
+        applyCastCooldown(context, 20);
     }
 
     private void executePulse(SpellContext context, Vec3 center, boolean hasExpand) {

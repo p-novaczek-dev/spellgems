@@ -3,7 +3,7 @@ package net.pnovaczek.spellgems.entity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.arrow.Arrow;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -12,30 +12,43 @@ import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.ModEntities;
 import net.pnovaczek.spellgems.spell.PotionDelivery;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public class AstralArrow extends Arrow {
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+public class AstralArrow extends AbstractArrow {
 
     private @Nullable PotionEnchantment potionEnchantment;
-    private boolean potionApplied;
+    private final Set<UUID> potionAppliedEntities = new HashSet<>();
+    private boolean potionAppliedOnBlock;
 
-    public AstralArrow(EntityType<? extends Arrow> entityType, Level level) {
+    public AstralArrow(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level);
     }
 
     public AstralArrow(Level level, LivingEntity shooter) {
-        super(ModEntities.ASTRAL_ARROW, level);
-        this.setOwner(shooter);
-        this.setPos(shooter.getX(), shooter.getEyeY() - 0.1D, shooter.getZ());
+        super(ModEntities.ASTRAL_ARROW, shooter, level, ItemStack.EMPTY, null);
+    }
+
+    public AstralArrow(Level level, LivingEntity shooter, ItemStack firedFromWeapon) {
+        super(ModEntities.ASTRAL_ARROW, shooter, level, ItemStack.EMPTY, firedFromWeapon);
     }
 
     public void setPotionEnchantment(@Nullable PotionEnchantment potionEnchantment) {
         this.potionEnchantment = potionEnchantment;
+        if (potionEnchantment != null) {
+            this.setPickupItemStack(potionEnchantment.toItemStack());
+        }
     }
 
     @Override
-    protected @NonNull ItemStack getPickupItem() {
+    protected void doPostHurtEffects(LivingEntity mob) {
+    }
+
+    @Override
+    protected ItemStack getDefaultPickupItem() {
         return ItemStack.EMPTY;
     }
 
@@ -52,9 +65,7 @@ public class AstralArrow extends Arrow {
     }
 
     private void applyPotionOnHit(Vec3 hitPos, @Nullable LivingEntity hitEntity) {
-        if (this.potionApplied
-                || this.potionEnchantment == null
-                || !(this.level() instanceof ServerLevel serverLevel)) {
+        if (this.potionEnchantment == null || !(this.level() instanceof ServerLevel serverLevel)) {
             return;
         }
 
@@ -63,11 +74,16 @@ public class AstralArrow extends Arrow {
             return;
         }
 
-        this.potionApplied = true;
-
         if (hitEntity != null) {
+            if (!this.potionAppliedEntities.add(hitEntity.getUUID())) {
+                return;
+            }
             PotionDelivery.applyOnEntityHit(serverLevel, shooter, hitEntity, hitPos, this.potionEnchantment);
         } else {
+            if (this.potionAppliedOnBlock) {
+                return;
+            }
+            this.potionAppliedOnBlock = true;
             PotionDelivery.applyOnBlockHit(serverLevel, shooter, hitPos, this.potionEnchantment);
         }
     }

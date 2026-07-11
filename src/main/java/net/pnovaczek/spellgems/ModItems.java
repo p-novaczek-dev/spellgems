@@ -50,6 +50,7 @@ public class ModItems {
             new Item.Properties()
                     .durability(384)
                     .stacksTo(1)
+                    .enchantable(15)
                     .repairable(ModItems.SHIMMERSTEEL_INGOT)
                     .component(DataComponents.TOOLTIP_DISPLAY, HIDE_CONTAINER_TOOLTIP)
     );
@@ -58,7 +59,8 @@ public class ModItems {
             "astral_bow",
             AstralBowItem::new,
             new Item.Properties()
-                    .durability(384)
+                    .durability(1561)
+                    .enchantable(15)
                     .repairable(ModItems.SHIMMERSTEEL_INGOT)
                     .component(DataComponents.TOOLTIP_DISPLAY, HIDE_CONTAINER_TOOLTIP)
     );
@@ -85,6 +87,78 @@ public class ModItems {
             new Item.Properties()
                     .stacksTo(1)
                     .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.VORTEX))
+    );
+
+    public static final SpellGemItem SPELL_GEM_BLINK = register(
+            "spell_gem_blink",
+            SpellGemItem::new,
+            new Item.Properties()
+                    .stacksTo(1)
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.BLINK))
+    );
+
+    public static final SpellGemItem SPELL_GEM_WIND_CHARGE = register(
+            "spell_gem_wind_charge",
+            SpellGemItem::new,
+            new Item.Properties()
+                    .stacksTo(1)
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.WIND_CHARGE))
+    );
+
+    public static final SpellGemItem SPELL_GEM_MAGNET = register(
+            "spell_gem_magnet",
+            SpellGemItem::new,
+            new Item.Properties()
+                    .stacksTo(1)
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.MAGNET))
+    );
+
+    public static final SpellGemItem SPELL_GEM_PLACE_BLOCK = register(
+            "spell_gem_place_block",
+            SpellGemItem::new,
+            new Item.Properties()
+                    .stacksTo(1)
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.PLACE_BLOCK))
+    );
+
+    public static final SpellGemItem SPELL_GEM_BREAK_BLOCK = register(
+            "spell_gem_break_block",
+            SpellGemItem::new,
+            new Item.Properties()
+                    .stacksTo(1)
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.BREAK_BLOCK))
+    );
+
+    public static final SpellGemItem SPELL_GEM_PLANT = register(
+            "spell_gem_plant",
+            SpellGemItem::new,
+            new Item.Properties()
+                    .stacksTo(1)
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.PLANT))
+    );
+
+    public static final SpellGemItem SPELL_GEM_HARVEST = register(
+            "spell_gem_harvest",
+            SpellGemItem::new,
+            new Item.Properties()
+                    .stacksTo(1)
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.HARVEST))
+    );
+
+    public static final SpellGemItem SPELL_GEM_FEED = register(
+            "spell_gem_feed",
+            SpellGemItem::new,
+            new Item.Properties()
+                    .stacksTo(1)
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.FEED))
+    );
+
+    public static final SpellGemItem SPELL_GEM_GROW = register(
+            "spell_gem_grow",
+            SpellGemItem::new,
+            new Item.Properties()
+                    .stacksTo(1)
+                    .component(ModComponents.SPELL_GEM_DATA, SpellGemData.create(Spells.GROW))
     );
 
     public static final SpellGemItem SPELL_GEM_POTION = register(

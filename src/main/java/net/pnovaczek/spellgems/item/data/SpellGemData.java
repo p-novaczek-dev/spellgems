@@ -35,11 +35,14 @@ public record SpellGemData(
     }
 
     public boolean isEnchanted() {
-        return
-                !modifierEffects.isEmpty() ||
-                !strikeEffects.isEmpty() ||
-                !utilityEffects.isEmpty() ||
-                !potionEffects.isEmpty();
+        return enchantmentCount() > 0;
+    }
+
+    public int enchantmentCount() {
+        return modifierEffects.size()
+                + strikeEffects.size()
+                + utilityEffects.size()
+                + potionEffects.size();
     }
 
     public CompoundTag save(CompoundTag tag) {

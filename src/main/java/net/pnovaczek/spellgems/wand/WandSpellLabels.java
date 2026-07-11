@@ -26,13 +26,23 @@ public final class WandSpellLabels {
     }
 
     public static Component formatSelection(SpellGemData data) {
+        return formatSelection(data, -1);
+    }
+
+    public static Component formatSelection(SpellGemData data, int slotIndex) {
         Spell spell = ModSpells.get(data.spellId());
         if (spell == null) {
             return Component.empty();
         }
 
-        MutableComponent line = Component.translatable(spell.tooltipNameKey())
-                .withStyle(data.isEnchanted() ? ChatFormatting.AQUA : ChatFormatting.YELLOW);
+        MutableComponent line = Component.empty();
+        if (slotIndex >= 0) {
+            line.append(Component.literal(String.valueOf(slotIndex + 1) + " ")
+                    .withStyle(ChatFormatting.GRAY));
+        }
+
+        line.append(Component.translatable(spell.tooltipNameKey())
+                .withStyle(data.isEnchanted() ? ChatFormatting.AQUA : ChatFormatting.YELLOW));
 
         List<Component> enchantments = collectEnchantmentNames(data);
         if (!enchantments.isEmpty()) {
@@ -73,7 +83,7 @@ public final class WandSpellLabels {
 
     private static @Nullable SpellGemData getGemDataInSlot(Player player, int direction) {
         ItemStack wand = player.getMainHandItem();
-        if (!wand.is(ModItems.WAND) || wand.isBroken()) {
+        if (!wand.is(ModItems.WAND)) {
             return null;
         }
 

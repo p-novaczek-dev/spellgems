@@ -41,8 +41,6 @@ public class PotionSpell extends AbstractSpell {
             PotionDelivery.apply(serverLevel, context.caster(), enchantment);
         }
 
-        if (context.caster() instanceof Player player) {
-            player.getCooldowns().addCooldown(context.castingItem(), COOLDOWN_TICKS);
-        }
+        applyCastCooldown(context, COOLDOWN_TICKS);
     }
 }

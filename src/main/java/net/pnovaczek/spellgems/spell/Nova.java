@@ -53,7 +53,7 @@ public class Nova extends AbstractSpell {
         Runnable pulse = () -> {
             if (!caster.isAlive()) return;
             if (level.isClientSide()) {
-                spawnRingParticles(context, finalHasExpand);
+                spawnNovaParticles(context, finalHasExpand);
             } else if (level instanceof ServerLevel serverLevel) {
                 applyNovaDamage(context, serverLevel, finalHasPower, finalHasExpand);
             }
@@ -76,9 +76,7 @@ public class Nova extends AbstractSpell {
             pulse.run();
         }
 
-        if (!level.isClientSide() && caster instanceof Player player) {
-            player.getCooldowns().addCooldown(context.castingItem(), 20);
-        }
+        applyCastCooldown(context, 20);
     }
 
     private void applyNovaDamage(SpellContext context, ServerLevel level, boolean hasPower, boolean hasExpand) {
@@ -121,7 +119,7 @@ public class Nova extends AbstractSpell {
         );
     }
 
-    private void spawnRingParticles(SpellContext context, boolean hasExpand) {
+    private void spawnNovaParticles(SpellContext context, boolean hasExpand) {
         var caster = context.caster();
         var level = context.level();
         var config = Spellgems.CONFIG.spells.nova;
@@ -133,18 +131,27 @@ public class Nova extends AbstractSpell {
         int particleCount = Mth.clamp(24 + (int) (radius * 4), 24, 64);
 
         for (int i = 0; i < particleCount; i++) {
-            double angle = (Math.PI * 2 * i) / particleCount + (random.nextDouble() - 0.5) * 0.15;
-            double px = center.x + Mth.cos((float) angle) * radius;
-            double pz = center.z + Mth.sin((float) angle) * radius;
-            double py = center.y;
-            double dx = Mth.cos((float) angle) * 0.05;
-            double dz = Mth.sin((float) angle) * 0.05;
+            double angle = (Math.PI * 2 * i) / particleCount + (random.nextDouble() - 0.5) * 0.2;
+            double dirX = Mth.cos((float) angle);
+            double dirZ = Mth.sin((float) angle);
+
+            // Spawn near the center with small random offset
+            double startJitter = (random.nextDouble() - 0.5) * 0.3;
+            double px = center.x + dirX * startJitter * 0.4 + (random.nextDouble() - 0.5) * 0.2;
+            double py = center.y + (random.nextDouble() - 0.5) * 0.15;
+            double pz = center.z + dirZ * startJitter * 0.4 + (random.nextDouble() - 0.5) * 0.2;
+
+            // Outward velocity so particles travel from center toward (and past) the radius edge
+            double speed = 0.8 + random.nextDouble() * 0.1;
+            double dx = dirX * speed;
+            double dz = dirZ * speed;
+            double dy = (random.nextDouble() - 0.1) * 0.1;
 
             if (strikes.isEmpty()) {
-                level.addParticle(ParticleTypes.POOF, px, py, pz, dx, 0.0, dz);
+                level.addParticle(ParticleTypes.POOF, px, py, pz, dx, dy, dz);
             } else {
                 for (StrikeEnchantment strike : strikes) {
-                    strike.addParticle(level, px, py, pz, random, dx, 0.0, dz);
+                    strike.addParticle(level, px, py, pz, random, dx, dy, dz);
                 }
             }
         }

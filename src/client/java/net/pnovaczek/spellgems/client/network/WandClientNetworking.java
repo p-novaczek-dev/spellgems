@@ -3,6 +3,7 @@ package net.pnovaczek.spellgems.client.network;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.pnovaczek.spellgems.network.WandCastPayload;
 import net.pnovaczek.spellgems.network.WandCycleSpellPayload;
+import net.pnovaczek.spellgems.network.WandQuickCastPayload;
 
 public final class WandClientNetworking {
 
@@ -18,6 +19,12 @@ public final class WandClientNetworking {
     public static void sendCycle(int direction) {
         if (direction != 0 && ClientPlayNetworking.canSend(WandCycleSpellPayload.TYPE)) {
             ClientPlayNetworking.send(new WandCycleSpellPayload(direction));
+        }
+    }
+
+    public static void sendQuickCast(int slot) {
+        if (ClientPlayNetworking.canSend(WandQuickCastPayload.TYPE)) {
+            ClientPlayNetworking.send(new WandQuickCastPayload(slot));
         }
     }
 }

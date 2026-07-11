@@ -20,9 +20,8 @@ public record RechargeEffect() implements EnchantmentEntityEffect {
             return;
         }
 
-        // Passively repair 1 durability every 20 ticks (1 second) while the enchanted item is active.
-        // Logic inlined from the previous RechargeHelper implementation.
-        if (serverLevel.getGameTime() % 20 == 0) {
+        // Repair 1 durability every 2 ticks
+        if (serverLevel.getGameTime() % 2 == 0) {
             int currentDamage = stack.getDamageValue();
             if (currentDamage > 0) {
                 stack.setDamageValue(Math.max(0, currentDamage - 1));

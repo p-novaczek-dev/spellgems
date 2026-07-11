@@ -13,7 +13,10 @@ public final class SpellgemsKeyMappings {
             Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "spellgems")
     );
 
+    public static final int WAND_QUICK_CAST_SLOT_COUNT = 9;
+
     public static KeyMapping CYCLE_SPELL_KEY;
+    public static final KeyMapping[] WAND_QUICK_CAST_KEYS = new KeyMapping[WAND_QUICK_CAST_SLOT_COUNT];
 
     private SpellgemsKeyMappings() {
     }
@@ -27,5 +30,17 @@ public final class SpellgemsKeyMappings {
                         CATEGORY
                 )
         );
+
+        for (int slot = 0; slot < WAND_QUICK_CAST_SLOT_COUNT; slot++) {
+            WAND_QUICK_CAST_KEYS[slot] = KeyMappingHelper.registerKeyMapping(
+                    new KeyMapping(
+                            "key.spellgems.wand_quick_cast." + (slot + 1),
+                            InputConstants.Type.KEYSYM,
+                            InputConstants.UNKNOWN.getValue(),
+                            CATEGORY,
+                            slot + 1
+                    )
+            );
+        }
     }
 }

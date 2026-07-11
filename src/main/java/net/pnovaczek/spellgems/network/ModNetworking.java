@@ -23,6 +23,7 @@ public final class ModNetworking {
         );
         PayloadTypeRegistry.serverboundPlay().register(WandCastPayload.TYPE, WandCastPayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(WandCycleSpellPayload.TYPE, WandCycleSpellPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(WandQuickCastPayload.TYPE, WandQuickCastPayload.CODEC);
     }
 
     public static void registerServerReceivers() {
@@ -38,6 +39,9 @@ public final class ModNetworking {
                         AstralBowCaster.cycleSelectedGem(context.player(), payload.direction());
                     }
                 }));
+
+        ServerPlayNetworking.registerGlobalReceiver(WandQuickCastPayload.TYPE, (payload, context) ->
+                context.server().execute(() -> WandSpellCaster.tryCastFromSlot(context.player(), payload.slot())));
     }
 
     public static void sendRecipeDescriptions(ServerPlayer player, SpellEnchantingMenu menu, List<String> descriptions) {

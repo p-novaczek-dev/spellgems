@@ -18,7 +18,7 @@ public class ModEntities {
     public static final EntityType<AstralArrow> ASTRAL_ARROW = register(
             "astral_arrow",
             EntityType.Builder.<AstralArrow>of(
-                (entityType, level) -> new AstralArrow((EntityType<? extends net.minecraft.world.entity.projectile.arrow.Arrow>) entityType, level), MobCategory.MISC)
+                (entityType, level) -> new AstralArrow((EntityType<? extends net.minecraft.world.entity.projectile.arrow.AbstractArrow>) entityType, level), MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .eyeHeight(0.13F)
                     .clientTrackingRange(4)

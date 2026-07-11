@@ -10,7 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.Spellgems;
-import net.pnovaczek.spellgems.SpellgemsConfig;
+import net.pnovaczek.spellgems.WandConfig;
 import net.pnovaczek.spellgems.inventory.WandContainer;
 import net.pnovaczek.spellgems.item.SpellGemItem;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
@@ -22,60 +22,66 @@ import org.jspecify.annotations.Nullable;
 
 public final class WandSpellCaster {
 
-    private record CastRequest(Spell spell, SpellContext context) {
+    private record CastRequest(Spell spell, SpellContext context, int effectiveDurabilityCost) {
     }
 
     private WandSpellCaster() {
     }
 
+    public static boolean canCast(Player player) {
+        return prepareCast(player, null) != null;
+    }
+
+    public static boolean canCastFromSlot(Player player, int slot) {
+        return prepareCast(player, slot) != null;
+    }
+
     public static boolean tryCast(ServerPlayer player) {
-        CastRequest request = prepareCast(player);
+        return tryCastFromSlot(player, null);
+    }
+
+    public static boolean tryCastFromSlot(ServerPlayer player, @Nullable Integer slot) {
+        CastRequest request = prepareCast(player, slot);
         if (request == null) {
             return false;
         }
 
-        if (player.getCooldowns().isOnCooldown(request.context().castingItem())) {
-            return false;
-        }
-
         request.spell().cast(request.context());
-        request.context().castingItem().hurtAndBreak(
-                getDurabilityCost(request.spell().id()),
-                player,
-                InteractionHand.MAIN_HAND
-        );
-        player.swing(InteractionHand.MAIN_HAND);
+        InteractionHand hand = getWandHand(player);
+        WandDepletion.applyDurabilityCost(request.context().castingItem(), request.effectiveDurabilityCost(), player);
+        player.swing(hand);
         return true;
     }
 
     public static void tryCastVisuals(Player player) {
+        tryCastVisualsFromSlot(player, null);
+    }
+
+    public static void tryCastVisualsFromSlot(Player player, @Nullable Integer slot) {
         if (!player.level().isClientSide()) {
             return;
         }
 
-        CastRequest request = prepareCast(player);
+        CastRequest request = prepareCast(player, slot);
         if (request == null) {
-            return;
-        }
-
-        if (player.getCooldowns().isOnCooldown(request.context().castingItem())) {
             return;
         }
 
         request.spell().cast(request.context());
     }
 
-    private static @Nullable CastRequest prepareCast(Player player) {
+    private static @Nullable CastRequest prepareCast(Player player, @Nullable Integer slotOverride) {
         ItemStack wand = player.getMainHandItem();
-        if (!wand.is(ModItems.WAND) || wand.isBroken()) {
+        if (!wand.is(ModItems.WAND) || WandDepletion.isDepleted(wand)) {
             return null;
         }
 
-        WandData wandData = wand.getOrDefault(ModComponents.WAND_DATA, WandData.DEFAULT);
         SimpleContainer slots = new SimpleContainer(WandContainer.SIZE);
         WandContainer.loadInto(slots, wand);
 
-        int slot = Mth.clamp(wandData.selectedSlot(), 0, WandContainer.SIZE - 1);
+        int slot = slotOverride != null
+                ? Mth.clamp(slotOverride, 0, WandContainer.SIZE - 1)
+                : Mth.clamp(wand.getOrDefault(ModComponents.WAND_DATA, WandData.DEFAULT).selectedSlot(), 0, WandContainer.SIZE - 1);
         ItemStack gemStack = slots.getItem(slot);
         if (gemStack.isEmpty()) {
             return null;
@@ -87,12 +93,18 @@ public final class WandSpellCaster {
             return null;
         }
 
+        int nominalCost = getDurabilityCost(spell.id(), gemData);
+        int effectiveCost = WandDepletion.resolveEffectiveDurabilityCost(player, wand, nominalCost);
+        if (!WandDepletion.canAffordDurabilityCost(wand, effectiveCost)) {
+            return null;
+        }
+
         SpellContext context = new SpellContext(player.level(), player, wand, gemData);
         if (!spell.canCast(context)) {
             return null;
         }
 
-        return new CastRequest(spell, context);
+        return new CastRequest(spell, context, effectiveCost);
     }
 
     public static boolean cycleSelectedSpell(ServerPlayer player, int direction) {
@@ -109,7 +121,7 @@ public final class WandSpellCaster {
         }
 
         ItemStack wand = player.getMainHandItem();
-        if (!wand.is(ModItems.WAND) || wand.isBroken()) {
+        if (!wand.is(ModItems.WAND)) {
             return false;
         }
 
@@ -137,20 +149,64 @@ public final class WandSpellCaster {
         return current;
     }
 
-    public static int getDurabilityCost(Identifier spellId) {
-        SpellgemsConfig.SpellConfigs spells = Spellgems.CONFIG.spells;
+    public static int getDurabilityCost(Identifier spellId, SpellGemData gemData) {
+        float cost = getBaseDurabilityCost(spellId);
+        if (gemData != null) {
+            float multiplier = Spellgems.CONFIG.wand.spellEnchantmentDurabilityCostMultiplier;
+            for (int i = 0; i < gemData.enchantmentCount(); i++) {
+                cost *= multiplier;
+            }
+        }
+        return Math.max(1, Math.round(cost));
+    }
+
+    private static int getBaseDurabilityCost(Identifier spellId) {
+        WandConfig.WandSpellDurabilityCosts costs = Spellgems.CONFIG.wand.spells;
         if (spellId.equals(Spells.PROJECTILE)) {
-            return spells.projectile.wandBaseDurabilityCost;
+            return costs.projectile;
         }
         if (spellId.equals(Spells.NOVA)) {
-            return spells.nova.wandBaseDurabilityCost;
+            return costs.nova;
         }
         if (spellId.equals(Spells.VORTEX)) {
-            return spells.vortex.wandBaseDurabilityCost;
+            return costs.vortex;
+        }
+        if (spellId.equals(Spells.BLINK)) {
+            return costs.blink;
+        }
+        if (spellId.equals(Spells.WIND_CHARGE)) {
+            return costs.windCharge;
+        }
+        if (spellId.equals(Spells.MAGNET)) {
+            return costs.magnet;
+        }
+        if (spellId.equals(Spells.PLACE_BLOCK)) {
+            return costs.placeBlock;
+        }
+        if (spellId.equals(Spells.BREAK_BLOCK)) {
+            return costs.breakBlock;
+        }
+        if (spellId.equals(Spells.PLANT)) {
+            return costs.plant;
+        }
+        if (spellId.equals(Spells.HARVEST)) {
+            return costs.harvest;
+        }
+        if (spellId.equals(Spells.FEED)) {
+            return costs.feed;
+        }
+        if (spellId.equals(Spells.GROW)) {
+            return costs.grow;
         }
         if (spellId.equals(Spells.POTION)) {
-            return spells.potion.wandBaseDurabilityCost;
+            return costs.potion;
         }
         return 1;
+    }
+
+    private static InteractionHand getWandHand(Player player) {
+        return player.getMainHandItem().is(ModItems.WAND)
+                ? InteractionHand.MAIN_HAND
+                : InteractionHand.OFF_HAND;
     }
 }

@@ -9,11 +9,17 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
+import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.astralbow.AstralBowCaster;
+import net.pnovaczek.spellgems.inventory.AstralBowContainer;
+import net.pnovaczek.spellgems.inventory.WandContainer;
+import net.pnovaczek.spellgems.item.data.AstralBowData;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
+import net.pnovaczek.spellgems.item.data.WandData;
 import net.pnovaczek.spellgems.wand.WandSpellCaster;
 import net.pnovaczek.spellgems.wand.WandSpellLabels;
 
@@ -68,7 +74,10 @@ public final class WandSpellHighlight {
             return;
         }
 
-        showSelection(WandSpellLabels.formatSelection(data), client);
+        int selectedSlot = held.is(ModItems.WAND)
+                ? Mth.clamp(held.getOrDefault(ModComponents.WAND_DATA, WandData.DEFAULT).selectedSlot(), 0, WandContainer.SIZE - 1)
+                : Mth.clamp(held.getOrDefault(ModComponents.ASTRAL_BOW_DATA, AstralBowData.DEFAULT).selectedSlot(), 0, AstralBowContainer.SIZE - 1);
+        showSelection(WandSpellLabels.formatSelection(data, selectedSlot), client);
     }
 
     private static void showSelection(Component text, Minecraft client) {

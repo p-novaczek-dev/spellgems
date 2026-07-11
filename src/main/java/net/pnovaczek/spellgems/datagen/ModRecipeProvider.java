@@ -93,6 +93,60 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
                         .save(exporter);
 
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_BLINK)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.ENDER_PEARL)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_WIND_CHARGE)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.WIND_CHARGE)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_MAGNET)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.SLIME_BALL)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_PLACE_BLOCK)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.COBBLESTONE)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_BREAK_BLOCK)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.GUNPOWDER)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_PLANT)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.WHEAT_SEEDS)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_HARVEST)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.WHEAT)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_FEED)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.HAY_BLOCK)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_GROW)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.BONE_MEAL)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
                 shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_POTION)
                         .requires(ModItems.RAW_SPELL_GEM)
                         .requires(Items.GLASS_BOTTLE)

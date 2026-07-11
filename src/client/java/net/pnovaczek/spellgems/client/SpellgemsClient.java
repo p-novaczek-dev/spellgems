@@ -4,8 +4,12 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.*;
+import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperties;
+import net.pnovaczek.spellgems.client.renderer.item.properties.numeric.AstralBowPull;
+import net.minecraft.resources.Identifier;
 import net.pnovaczek.spellgems.ModEntities;
 import net.pnovaczek.spellgems.ModMenuTypes;
+import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.client.network.ModClientNetworking;
 import net.pnovaczek.spellgems.spell.SpellBurstScheduler;
 import net.pnovaczek.spellgems.client.render.AstralArrowRenderer;
@@ -18,6 +22,11 @@ import net.pnovaczek.spellgems.client.screen.WandScreen;
 public class SpellgemsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
+		RangeSelectItemModelProperties.ID_MAPPER.put(
+				Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "astral_bow/pull"),
+				AstralBowPull.MAP_CODEC
+		);
+
 		EntityRenderers.register(ModEntities.ASTRAL_ARROW, AstralArrowRenderer::new);
 		EntityRenderers.register(ModEntities.SPELL_PROJECTILE, SpellProjectileRenderer::new);
 		EntityRenderers.register(ModEntities.INFERNO_CLOUD, NoopRenderer::new);

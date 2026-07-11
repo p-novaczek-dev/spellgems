@@ -11,21 +11,29 @@ public class SpellgemsConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public final SpellConfigs spells = new SpellConfigs();
+    public final WandConfig wand = new WandConfig();
+    public final AstralBowConfig astralBow = new AstralBowConfig();
     public int strikeEffectDuration = 100;
     public float strikeCloudDamage = 2.0F;
     public float drainHealPerTarget = 2.0F;
-    public float spellEnchantmentDurabilityCostMultiplier = 2.0F;
 
     public static class SpellConfigs {
         public SpellCombatConfig projectile = new SpellCombatConfig();
         public NovaSpellConfig nova = new NovaSpellConfig();
         public VortexSpellConfig vortex = new VortexSpellConfig();
+        public BlinkSpellConfig blink = new BlinkSpellConfig();
+        public MagnetSpellConfig magnet = new MagnetSpellConfig();
+        public FeedSpellConfig feed = new FeedSpellConfig();
+        public GrowSpellConfig grow = new GrowSpellConfig();
         public SpellConfig potion = new SpellConfig();
-        // Add additional spell entries here as they are implemented (e.g. blink, magnet, harvest, etc.)
+    }
+
+    public static class AstralBowConfig {
+        public int normalShotDurabilityCost = 1;
+        public int potionShotDurabilityCost = 4;
     }
 
     public static class SpellConfig {
-        public int wandBaseDurabilityCost = 1;
     }
 
     public static class SpellCombatConfig extends SpellConfig {
@@ -38,6 +46,22 @@ public class SpellgemsConfig {
         public float knockbackStrength = 0.3F;
         public float powerDamageMultiplier = 2.0F;
         public float expandRadiusMultiplier = 1.5F;
+    }
+
+    public static class BlinkSpellConfig extends SpellConfig {
+        public double maxDistance = 16.0;
+    }
+
+    public static class MagnetSpellConfig extends SpellConfig {
+        public float range = 5.0F;
+    }
+
+    public static class FeedSpellConfig extends SpellConfig {
+        public boolean requireFeedItems = true;
+    }
+
+    public static class GrowSpellConfig extends SpellConfig {
+        public boolean requireBoneMeal = true;
     }
 
     public static class VortexSpellConfig extends SpellCombatConfig {

@@ -1,5 +1,14 @@
 {
   "values": [
+    "spellgems:spell_gem_blink",
+    "spellgems:spell_gem_wind_charge",
+    "spellgems:spell_gem_magnet",
+    "spellgems:spell_gem_place_block",
+    "spellgems:spell_gem_break_block",
+    "spellgems:spell_gem_plant",
+    "spellgems:spell_gem_harvest",
+    "spellgems:spell_gem_feed",
+    "spellgems:spell_gem_grow",
     "spellgems:spell_gem_potion"
   ]
 }

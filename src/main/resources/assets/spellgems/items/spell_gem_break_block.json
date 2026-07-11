@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "spellgems:item/spell_gem_break_block"
+  }
+}

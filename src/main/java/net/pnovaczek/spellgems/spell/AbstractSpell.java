@@ -1,10 +1,18 @@
 package net.pnovaczek.spellgems.spell;
 
 import net.minecraft.resources.Identifier;
-import net.pnovaczek.spellgems.Spellgems;
-import net.pnovaczek.spellgems.SpellgemsConfig;
+import net.minecraft.world.entity.player.Player;
 
 public abstract class AbstractSpell implements Spell {
+
+    protected static void applyCastCooldown(SpellContext context, int ticks) {
+        if (context.isWandCast()) {
+            return;
+        }
+        if (!context.level().isClientSide() && context.caster() instanceof Player player) {
+            player.getCooldowns().addCooldown(context.castingItem(), ticks);
+        }
+    }
 
     @Override
     public abstract Identifier id();
