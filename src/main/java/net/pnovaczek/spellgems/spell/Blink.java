@@ -27,7 +27,7 @@ public class Blink extends AbstractSpell {
 
     @Override
     public int defaultDurabilityCost() {
-        return 64;
+        return 128;
     }
 
     @Override

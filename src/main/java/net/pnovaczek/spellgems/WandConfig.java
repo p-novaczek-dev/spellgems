@@ -10,7 +10,7 @@ import java.util.Map;
  */
 public class WandConfig {
 
-    public float spellEnchantmentDurabilityCostMultiplier = 4.0F;
+    public float spellEnchantmentDurabilityCostMultiplier = 3.0F;
 
     /**
      * User overrides for wand spell durability costs.

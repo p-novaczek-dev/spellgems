@@ -2,17 +2,22 @@ package net.pnovaczek.spellgems.wand;
 
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.item.enchantment.LevelBasedValue;
 import net.minecraft.world.item.enchantment.effects.RemoveBinomial;
 import net.pnovaczek.spellgems.ModItems;
+import net.pnovaczek.spellgems.Spellgems;
 
 public final class WandDepletion {
 
@@ -84,5 +89,44 @@ public final class WandDepletion {
         }
 
         return 0;
+    }
+
+    /** Resource key for the Recharge enchantment (data-driven). */
+    public static final ResourceKey<Enchantment> RECHARGE =
+            ResourceKey.create(Registries.ENCHANTMENT,
+                    Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "recharge"));
+
+    public static boolean hasRecharge(ItemStack stack) {
+        if (!stack.is(ModItems.WAND)) {
+            return false;
+        }
+        ItemEnchantments enchantments = stack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+        for (var entry : enchantments.entrySet()) {
+            if (entry.getKey().is(RECHARGE)) {
+                return entry.getIntValue() > 0;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Repairs 1 durability (if damaged) on a Recharge-enchanted wand.
+     * Matches the original rate: once every 2 server ticks.
+     * Safe to call every tick; throttles internally.
+     */
+    public static void tryRecharge(ItemStack stack, ServerLevel level) {
+        if (!hasRecharge(stack)) {
+            return;
+        }
+        if (!stack.isDamageableItem()) {
+            return;
+        }
+        if (level.getGameTime() % 2 != 0) {
+            return;
+        }
+        int currentDamage = stack.getDamageValue();
+        if (currentDamage > 0) {
+            stack.setDamageValue(Math.max(0, currentDamage - 1));
+        }
     }
 }

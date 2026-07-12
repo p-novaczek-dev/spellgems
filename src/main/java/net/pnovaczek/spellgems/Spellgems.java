@@ -40,7 +40,6 @@ public class Spellgems implements ModInitializer {
 		ModStrikeEnchantments.initialize();
 		ModUtilityEnchantments.initialize();
 
-		ModEnchantmentEffects.register();
 		ModNetworking.registerPayloadTypes();
 		ModNetworking.registerServerReceivers();
 

@@ -109,7 +109,7 @@ public class SpellgemsConfig {
     }
 
     public static class BlinkSpellConfig extends SpellConfig {
-        public double maxDistance = 16.0;
+        public double maxDistance = 12.0;
 
         @Override
         public void validate() {
