@@ -1,0 +1,16 @@
+{
+  "type": "spellgems:spell_enchanting",
+  "catalyst": {
+    "item": "minecraft:lapis_lazuli"
+  },
+  "category": "utility",
+  "description_key": "recipe.spellgems.blink_expand.description",
+  "input": {
+    "item": "spellgems:spell_gem_blink"
+  },
+  "level_requirement": 10,
+  "result": {
+    "utility": "spellgems:expand"
+  },
+  "xp_cost": 27
+}

@@ -263,6 +263,19 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         "recipe.spellgems.smelt.description",
                         "spellgems:smelt")
                         .save(exporter, "smelt");
+
+                // Blink + lapis -> expand (utility expand increases blink max distance)
+                SpellEnchantingRecipeBuilder.utility(
+                        new SpellEnchantingRecipe.SpellEnchantInput(
+                                Optional.of(BuiltInRegistries.ITEM.getKey(ModItems.SPELL_GEM_BLINK)),
+                                Optional.empty(),
+                                Optional.empty()),
+                        lapisCatalyst,
+                        10,
+                        27,
+                        "recipe.spellgems.blink_expand.description",
+                        "spellgems:expand")
+                        .save(exporter, "blink_expand");
             }
         };
     }

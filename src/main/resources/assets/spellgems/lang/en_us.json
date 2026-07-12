@@ -137,6 +137,7 @@
   "recipe.spellgems.potion_spell_enchant.description": "Imbue with potion effect",
   "recipe.spellgems.break_block_silk_touch.description": "Silk touch",
   "recipe.spellgems.smelt.description": "Smelt",
+  "recipe.spellgems.blink_expand.description": "Expand",
 
   "container.spellgems.wand": "Wand",
   "container.spellgems.astral_bow": "Astral Bow",

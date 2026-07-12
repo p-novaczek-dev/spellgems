@@ -90,7 +90,8 @@ public final class SpellTomeAnvilHandler {
 
     private static boolean isUtilityEnchantment(Identifier enchantmentId) {
         return enchantmentId.equals(UtilityEnchantments.SMELT)
-                || enchantmentId.equals(UtilityEnchantments.SILK_TOUCH);
+                || enchantmentId.equals(UtilityEnchantments.SILK_TOUCH)
+                || enchantmentId.equals(UtilityEnchantments.EXPAND);
     }
 
     private static boolean canApply(

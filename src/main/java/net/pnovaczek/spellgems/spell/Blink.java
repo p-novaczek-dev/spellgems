@@ -13,7 +13,10 @@ import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantment;
+import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantments;
 
+import java.util.List;
 import java.util.Optional;
 
 public class Blink extends AbstractSpell {
@@ -27,7 +30,7 @@ public class Blink extends AbstractSpell {
 
     @Override
     public int defaultDurabilityCost() {
-        return 128;
+        return 64;
     }
 
     @Override
@@ -40,7 +43,12 @@ public class Blink extends AbstractSpell {
         var caster = context.caster();
         // alive handled by base
 
-        double maxDistance = Spellgems.CONFIG.spells.blink.maxDistance;
+        double baseMaxDistance = Spellgems.CONFIG.spells.blink.maxDistance;
+        List<UtilityEnchantment> utilities = (context.data() != null) ? context.data().utilityEffects() : List.of();
+        boolean hasExpand = utilities.stream().anyMatch(u -> u.is(UtilityEnchantments.EXPAND));
+        double maxDistance = hasExpand
+                ? baseMaxDistance * Spellgems.CONFIG.spells.blink.expandMultiplier
+                : baseMaxDistance;
         Vec3 target = SpellTargeting.resolveCastCenter(caster, maxDistance);
 
         if (context.level().isClientSide()) {
