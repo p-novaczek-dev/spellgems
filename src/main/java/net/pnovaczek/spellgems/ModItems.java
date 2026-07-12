@@ -48,7 +48,7 @@ public class ModItems {
             "wand",
             WandItem::new,
             new Item.Properties()
-                    .durability(384)
+                    .durability(256)
                     .stacksTo(1)
                     .enchantable(15)
                     .repairable(ModItems.SHIMMERSTEEL_INGOT)

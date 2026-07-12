@@ -1,0 +1,16 @@
+{
+  "type": "spellgems:spell_enchanting",
+  "catalyst": {
+    "item": "minecraft:lapis_lazuli"
+  },
+  "category": "utility",
+  "description_key": "recipe.spellgems.break_block_silk_touch.description",
+  "input": {
+    "item": "spellgems:spell_gem_break_block"
+  },
+  "level_requirement": 10,
+  "result": {
+    "utility": "spellgems:silk_touch"
+  },
+  "xp_cost": 27
+}

@@ -5,8 +5,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EnchantmentNames;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.model.object.book.BookModel;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -15,10 +13,10 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantments;
 
@@ -28,10 +26,13 @@ import java.util.Locale;
 
 public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchantingMenu> {
 
-    private static final Identifier ENCHANTING_TABLE_LOCATION =
-            Identifier.withDefaultNamespace("textures/gui/container/enchanting_table.png");
-    private static final Identifier ENCHANTING_BOOK_LOCATION =
-            Identifier.withDefaultNamespace("textures/entity/enchantment/enchanting_table_book.png");
+    private static final Identifier CONTAINER_TEXTURE =
+            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "textures/gui/container/spell_enchanting_table.png");
+
+    private static final Identifier ACTIVE_SPELL_SPRITE =
+            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "container/spell_enchanting_table/active_spell");
+    private static final Identifier INACTIVE_SPELL_SPRITE =
+            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "container/spell_enchanting_table/inactive_spell");
 
     private static final Identifier ENCHANTMENT_SLOT_DISABLED_SPRITE =
             Identifier.withDefaultNamespace("container/enchanting_table/enchantment_slot_disabled");
@@ -53,14 +54,6 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
     private static final int VISIBLE_BUTTON_COUNT = 3;
     private static final int SCROLLBAR_WIDTH = 6;
 
-    private final RandomSource random = RandomSource.create();
-    private BookModel bookModel;
-    public float flip;
-    public float oFlip;
-    public float flipT;
-    public float flipA;
-    public float open;
-    public float oOpen;
     private ItemStack last = ItemStack.EMPTY;
     private int scrollOffset;
 
@@ -71,22 +64,28 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
     @Override
     protected void init() {
         super.init();
-        this.bookModel = new BookModel(this.minecraft.getEntityModels().bakeLayer(ModelLayers.BOOK));
+        this.titleLabelX = 8;
+        this.titleLabelY = 6;
     }
 
     @Override
     public void containerTick() {
         super.containerTick();
         this.minecraft.player.experienceDisplayStartTick = this.minecraft.player.tickCount;
-        this.tickBook();
+        this.updateTargetItem();
     }
 
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         int left = (this.width - this.imageWidth) / 2;
         int top = (this.height - this.imageHeight) / 2;
 
-        graphics.blit(RenderPipelines.GUI_TEXTURED, ENCHANTING_TABLE_LOCATION, left, top, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
-        this.renderBook(graphics, left, top);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, CONTAINER_TEXTURE, left, top, 0.0F, 0.0F, this.imageWidth, this.imageHeight, 256, 256);
+
+        // Render active/inactive spell sprite instead of book animation.
+        // Active when an item is in the item-to-enchant slot (slot 0).
+        boolean hasTargetItem = !this.menu.getSlot(0).getItem().isEmpty();
+        Identifier spellSprite = hasTargetItem ? ACTIVE_SPELL_SPRITE : INACTIVE_SPELL_SPRITE;
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, spellSprite, left + 25, top + 25, 16, 16);
 
         int recipeCount = this.menu.getRecipeCount();
         boolean scrollable = recipeCount > VISIBLE_BUTTON_COUNT;
@@ -160,16 +159,7 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SCROLLER_SPRITE, scrollbarX, scrollerY, SCROLLBAR_WIDTH, scrollerHeight);
     }
 
-    private void renderBook(GuiGraphicsExtractor graphics, int left, int top) {
-        float partial = this.minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
-        float open = Mth.lerp(partial, this.oOpen, this.open);
-        float flip = Mth.lerp(partial, this.oFlip, this.flip);
-        int x0 = left + 14;
-        int y0 = top + 14;
-        int x1 = x0 + 38;
-        int y1 = y0 + 31;
-        graphics.book(this.bookModel, ENCHANTING_BOOK_LOCATION, 40.0F, open, flip, x0, y0, x1, y1);
-    }
+
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float ignored) {
@@ -318,33 +308,13 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
         return Math.max(0, this.menu.getRecipeCount() - VISIBLE_BUTTON_COUNT);
     }
 
-    public void tickBook() {
+    private void updateTargetItem() {
         this.scrollOffset = Mth.clamp(this.scrollOffset, 0, maxScrollOffset());
 
         ItemStack current = this.menu.getSlot(0).getItem();
         if (!ItemStack.matches(current, this.last)) {
             this.last = current;
             this.scrollOffset = 0;
-
-            do {
-                this.flipT = this.flipT + (this.random.nextInt(4) - this.random.nextInt(4));
-            } while (this.flip <= this.flipT + 1.0F && this.flip >= this.flipT - 1.0F);
         }
-
-        this.oFlip = this.flip;
-        this.oOpen = this.open;
-        boolean shouldBeOpen = this.menu.getRecipeCount() > 0;
-
-        if (shouldBeOpen) {
-            this.open += 0.2F;
-        } else {
-            this.open -= 0.2F;
-        }
-
-        this.open = Mth.clamp(this.open, 0.0F, 1.0F);
-        float diff = (this.flipT - this.flip) * 0.4F;
-        diff = Mth.clamp(diff, -0.2F, 0.2F);
-        this.flipA = this.flipA + (diff - this.flipA) * 0.9F;
-        this.flip = this.flip + this.flipA;
     }
 }

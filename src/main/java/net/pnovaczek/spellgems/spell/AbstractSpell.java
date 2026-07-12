@@ -2,6 +2,7 @@ package net.pnovaczek.spellgems.spell;
 
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
 public abstract class AbstractSpell implements Spell {
 
@@ -85,5 +86,25 @@ public abstract class AbstractSpell implements Spell {
     @Override
     public final  String tooltipDescriptionKey() {
         return "tooltip.spellgems.spell." + name() + ".description";
+    }
+
+    /** Default gray dust color used by sphere-style spell particles when no custom tint is set. */
+    static final int DEFAULT_DUST_COLOR = 0x888888;
+
+    /**
+     * Returns a uniformly random point inside a sphere of the given radius centered at 'center'.
+     * Uses volume-uniform sampling (cube root of radius).
+     */
+    static Vec3 randomPointInSphere(Vec3 center, float radius, net.minecraft.util.RandomSource random) {
+        double theta = Math.PI * 2 * random.nextDouble();
+        double phi = Math.acos(2 * random.nextDouble() - 1);
+        double r = radius * Math.cbrt(random.nextDouble());
+        double sinPhi = Math.sin(phi);
+
+        return center.add(
+                r * sinPhi * Math.cos(theta),
+                r * Math.cos(phi),
+                r * sinPhi * Math.sin(theta)
+        );
     }
 }

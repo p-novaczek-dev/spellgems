@@ -1,0 +1,16 @@
+{
+  "type": "spellgems:spell_enchanting",
+  "catalyst": {
+    "item": "minecraft:lapis_lazuli"
+  },
+  "category": "utility",
+  "description_key": "recipe.spellgems.smelt.description",
+  "input": {
+    "tag": "spellgems:smelt_spell_gems"
+  },
+  "level_requirement": 10,
+  "result": {
+    "utility": "spellgems:smelt"
+  },
+  "xp_cost": 27
+}

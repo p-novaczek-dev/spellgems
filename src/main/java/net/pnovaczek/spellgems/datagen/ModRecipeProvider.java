@@ -236,6 +236,33 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         27,
                         "recipe.spellgems.potion_spell_enchant.description"
                 ).save(exporter, "potion_spell");
+
+                // Utility enchantments via spell enchanting table (lapis catalyst)
+                // Break block + lapis -> silk touch
+                SpellEnchantingRecipeBuilder.utility(
+                        new SpellEnchantingRecipe.SpellEnchantInput(
+                                Optional.of(BuiltInRegistries.ITEM.getKey(ModItems.SPELL_GEM_BREAK_BLOCK)),
+                                Optional.empty(),
+                                Optional.empty()),
+                        lapisCatalyst,
+                        10,
+                        27,
+                        "recipe.spellgems.break_block_silk_touch.description",
+                        "spellgems:silk_touch")
+                        .save(exporter, "break_block_silk_touch");
+
+                // Smelt (for break block and harvest gems, via tag)
+                SpellEnchantingRecipeBuilder.utility(
+                        new SpellEnchantingRecipe.SpellEnchantInput(
+                                Optional.empty(),
+                                Optional.of(Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "smelt_spell_gems")),
+                                Optional.empty()),
+                        lapisCatalyst,
+                        10,
+                        27,
+                        "recipe.spellgems.smelt.description",
+                        "spellgems:smelt")
+                        .save(exporter, "smelt");
             }
         };
     }

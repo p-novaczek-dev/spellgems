@@ -10,6 +10,10 @@ public record UtilityEnchantment(Identifier id) {
             UtilityEnchantment::id
     );
 
+    public boolean is(Identifier utilityId) {
+        return id.equals(utilityId);
+    }
+
     public String tooltipNameKey() {
         return "tooltip.spellgems.spell_enchantment." + id.getPath() + ".name";
     }

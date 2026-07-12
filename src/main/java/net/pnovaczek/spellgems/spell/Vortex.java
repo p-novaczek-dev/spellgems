@@ -32,7 +32,7 @@ public class Vortex extends AbstractSpell {
 
     @Override
     public int defaultDurabilityCost() {
-        return 4;
+        return 12;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class Vortex extends AbstractSpell {
         level.playSound(
                 null,
                 center.x, center.y, center.z,
-                SoundEvents.SLIME_ATTACK,
+                SoundEvents.ENDERMAN_TELEPORT,
                 SoundSource.PLAYERS,
                 0.6F,
                 0.8F
@@ -123,7 +123,7 @@ public class Vortex extends AbstractSpell {
         var strikes = context.data().strikeEffects();
         var random = level.getRandom();
         float radius = getEffectiveRadius(config, hasExpand);
-        int particleCount = config.particleCount;
+        int particleCount = getEffectiveParticleCount(config, hasExpand);
         float particleSpeed = config.particleSpeed;
 
         int dustColor = context.data().getTintColor();
@@ -135,11 +135,11 @@ public class Vortex extends AbstractSpell {
         for (int i = 0; i < particleCount; i++) {
             Vec3 pos = randomPointInSphere(center, radius, random);
             Vec3 velocity = center.subtract(pos);
-            double speed = velocity.length();
-            if (speed < 1.0E-8) {
+            double len = velocity.length();
+            if (len < 1.0E-8) {
                 continue;
             }
-            velocity = velocity.scale(particleSpeed / speed);
+            velocity = velocity.scale(particleSpeed / len);
 
             if (strikes.isEmpty()) {
                 level.addParticle(
@@ -173,21 +173,14 @@ public class Vortex extends AbstractSpell {
         }
     }
 
-    private static Vec3 randomPointInSphere(Vec3 center, float radius, net.minecraft.util.RandomSource random) {
-        double theta = Math.PI * 2 * random.nextDouble();
-        double phi = Math.acos(2 * random.nextDouble() - 1);
-        double r = radius * Math.cbrt(random.nextDouble());
-        double sinPhi = Math.sin(phi);
-
-        return center.add(
-                r * sinPhi * Math.cos(theta),
-                r * Math.cos(phi),
-                r * sinPhi * Math.sin(theta)
-        );
-    }
-
     private static float getEffectiveRadius(SpellgemsConfig.VortexSpellConfig config, boolean hasExpand) {
         return hasExpand ? config.radius * config.expandRadiusMultiplier : config.radius;
+    }
+
+    private static int getEffectiveParticleCount(SpellgemsConfig.VortexSpellConfig config, boolean hasExpand) {
+        return hasExpand
+                ? Math.max(1, (int) (config.particleCount * config.expandRadiusMultiplier))
+                : config.particleCount;
     }
 
     private static boolean isVortexTarget(Entity entity, LivingEntity caster) {

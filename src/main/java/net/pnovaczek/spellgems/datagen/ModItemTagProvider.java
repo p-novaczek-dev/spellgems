@@ -40,6 +40,10 @@ public class ModItemTagProvider extends FabricTagsProvider.ItemTagsProvider {
                 .add(ModItems.keyOfItem("spell_gem_grow"))
                 .add(ModItems.keyOfItem("spell_gem_potion"));
 
+        builder(ModTags.SMELT_SPELL_GEMS)
+                .add(ModItems.keyOfItem("spell_gem_break_block"))
+                .add(ModItems.keyOfItem("spell_gem_harvest"));
+
         builder(ModTags.WAND_ENCHANTABLE)
                 .add(ModItems.keyOfItem("wand"));
 

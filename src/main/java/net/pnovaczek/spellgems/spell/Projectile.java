@@ -26,7 +26,7 @@ public class Projectile extends AbstractSpell {
 
     @Override
     public int defaultDurabilityCost() {
-        return 4;
+        return 8;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class Projectile extends AbstractSpell {
         SpellProjectile projectile = new SpellProjectile(context, direction, handler);
         level.addFreshEntity(projectile);
 
-        var sound = SoundEvents.BLAZE_SHOOT;
+        var sound = SoundEvents.ENDER_DRAGON_SHOOT; // BLAZE_SHOOT
         float pitch = 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F);
 
         if (!strikes.isEmpty() && strikes.stream().anyMatch(s -> s.is(StrikeEnchantments.FROST))) {

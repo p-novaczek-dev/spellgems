@@ -27,7 +27,7 @@ public class Blink extends AbstractSpell {
 
     @Override
     public int defaultDurabilityCost() {
-        return 32;
+        return 64;
     }
 
     @Override
@@ -86,14 +86,16 @@ public class Blink extends AbstractSpell {
 
     private static boolean teleportCaster(ServerLevel level, LivingEntity caster, Vec3 destination) {
         if (caster instanceof ServerPlayer serverPlayer) {
+            // Use relative rotation deltas of 0 to preserve the player's current orientation.
+            // This matches the approach used by vanilla's ServerPlayer.teleportTo(x, y, z).
             ServerPlayer teleported = serverPlayer.teleport(
                     new TeleportTransition(
                             level,
                             destination,
                             Vec3.ZERO,
-                            serverPlayer.getYRot(),
-                            serverPlayer.getXRot(),
-                            Relative.union(Relative.ROTATION, Relative.DELTA),
+                            0.0F,
+                            0.0F,
+                            Relative.union(Relative.DELTA, Relative.ROTATION),
                             TeleportTransition.DO_NOTHING
                     )
             );

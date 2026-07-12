@@ -1,11 +1,10 @@
 package net.pnovaczek.spellgems.spell;
 
-import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -30,7 +29,7 @@ public class Nova extends AbstractSpell {
 
     @Override
     public int defaultDurabilityCost() {
-        return 4;
+        return 16;
     }
 
     @Override
@@ -106,7 +105,7 @@ public class Nova extends AbstractSpell {
         level.playSound(
                 null,
                 center.x, center.y, center.z,
-                SoundEvents.GENERIC_EXPLODE,
+                SoundEvents.DRAGON_FIREBALL_EXPLODE,
                 SoundSource.PLAYERS,
                 0.5F,
                 1.0F
@@ -122,30 +121,33 @@ public class Nova extends AbstractSpell {
 
         Vec3 center = getEffectCenter(caster, config);
         float radius = getEffectiveRadius(config, hasExpand);
-        int particleCount = Mth.clamp(24 + (int) (radius * 4), 24, 64);
+        int particleCount = getEffectiveParticleCount(config, hasExpand);
+        float particleSpeed = config.particleSpeed;
+
+        int dustColor = context.data().getTintColor();
+        if (dustColor == 0xFFFFFF) {
+            dustColor = DEFAULT_DUST_COLOR;
+        }
+        var dustOptions = new DustParticleOptions(dustColor, 1.0F);
 
         for (int i = 0; i < particleCount; i++) {
-            double angle = (Math.PI * 2 * i) / particleCount + (random.nextDouble() - 0.5) * 0.2;
-            double dirX = Mth.cos((float) angle);
-            double dirZ = Mth.sin((float) angle);
-
-            // Spawn near the center with small random offset
-            double startJitter = (random.nextDouble() - 0.5) * 0.3;
-            double px = center.x + dirX * startJitter * 0.4 + (random.nextDouble() - 0.5) * 0.2;
-            double py = center.y + (random.nextDouble() - 0.5) * 0.15;
-            double pz = center.z + dirZ * startJitter * 0.4 + (random.nextDouble() - 0.5) * 0.2;
-
-            // Outward velocity so particles travel from center toward (and past) the radius edge
-            double speed = 0.8 + random.nextDouble() * 0.1;
-            double dx = dirX * speed;
-            double dz = dirZ * speed;
-            double dy = (random.nextDouble() - 0.1) * 0.1;
+            Vec3 pos = randomPointInSphere(center, radius, random);
+            Vec3 velocity = pos.subtract(center);
+            double len = velocity.length();
+            if (len < 1.0E-8) {
+                continue;
+            }
+            velocity = velocity.scale(particleSpeed / len);
 
             if (strikes.isEmpty()) {
-                level.addParticle(ParticleTypes.POOF, px, py, pz, dx, dy, dz);
+                level.addParticle(
+                        dustOptions,
+                        pos.x, pos.y, pos.z,
+                        velocity.x, velocity.y, velocity.z
+                );
             } else {
                 for (StrikeEnchantment strike : strikes) {
-                    strike.addParticle(level, px, py, pz, random, dx, dy, dz);
+                    strike.addParticle(level, pos.x, pos.y, pos.z, random, velocity.x, velocity.y, velocity.z);
                 }
             }
         }
@@ -157,6 +159,12 @@ public class Nova extends AbstractSpell {
 
     private static float getEffectiveRadius(SpellgemsConfig.NovaSpellConfig config, boolean hasExpand) {
         return hasExpand ? config.radius * config.expandRadiusMultiplier : config.radius;
+    }
+
+    private static int getEffectiveParticleCount(SpellgemsConfig.NovaSpellConfig config, boolean hasExpand) {
+        return hasExpand
+                ? Math.max(1, (int) (config.particleCount * config.expandRadiusMultiplier))
+                : config.particleCount;
     }
 
     private static float getEffectiveDamage(SpellgemsConfig.NovaSpellConfig config, boolean hasPower) {

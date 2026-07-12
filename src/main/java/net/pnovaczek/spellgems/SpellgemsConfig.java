@@ -92,6 +92,8 @@ public class SpellgemsConfig {
         public float knockbackStrength = 0.3F;
         public float powerDamageMultiplier = 2.0F;
         public float expandRadiusMultiplier = 1.5F;
+        public int particleCount = 90;
+        public float particleSpeed = 0.1F;
 
         @Override
         public void validate() {
@@ -101,6 +103,8 @@ public class SpellgemsConfig {
             knockbackStrength = Math.max(0f, knockbackStrength);
             powerDamageMultiplier = Math.max(1f, powerDamageMultiplier);
             expandRadiusMultiplier = Math.max(1f, expandRadiusMultiplier);
+            particleCount = Math.max(1, particleCount);
+            particleSpeed = Math.max(0f, particleSpeed);
         }
     }
 
@@ -141,13 +145,13 @@ public class SpellgemsConfig {
     }
 
     public static class VortexSpellConfig extends SpellCombatConfig {
-        public float radius = 3.0F;
+        public float radius = 4.0F;
         public float maxDistance = 16.0F;
-        public float pullDistance = 2.5F;
-        public float pullStrength = 1.5F;
+        public float pullDistance = 0.5F;
+        public float pullStrength = 0.5F;
         public float expandRadiusMultiplier = 1.5F;
-        public int particleCount = 48;
-        public float particleSpeed = 0.12F;
+        public int particleCount = 30;
+        public float particleSpeed = 0.3F;
 
         public VortexSpellConfig() {
             damage = 0.0F;

@@ -88,11 +88,11 @@ public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHold
         // Target (input gem/book or generic via ingredient) - left side
         var targetIngredient = recipe.getInput().getIngredient();
         if (targetIngredient != null) {
-            builder.addSlot(RecipeIngredientRole.INPUT, 5, 5)
+            builder.addSlot(RecipeIngredientRole.INPUT, 5, 20)
                     .add(targetIngredient);
         } else {
             // Fallback representative for "any combat/utility"
-            builder.addSlot(RecipeIngredientRole.INPUT, 5, 5)
+            builder.addSlot(RecipeIngredientRole.INPUT, 5, 20)
                     .add(new ItemStack(net.minecraft.world.item.Items.BOOK));
         }
 
@@ -100,7 +100,7 @@ public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHold
         var catalystDef = recipe.getCatalystDef();
         if (catalystDef.anyPotion()) {
             // Cycle through all valid potions (drinkable, splash, lingering with effects)
-            var potionSlot = builder.addSlot(RecipeIngredientRole.INPUT, 25, 5);
+            var potionSlot = builder.addSlot(RecipeIngredientRole.INPUT, 25, 20);
             if (!potionCatalysts.isEmpty()) {
                 for (ItemStack potion : potionCatalysts) {
                     potionSlot.add(potion);
@@ -120,7 +120,7 @@ public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHold
                 potionSlot.add(linger);
             }
         } else {
-            builder.addSlot(RecipeIngredientRole.INPUT, 25, 5)
+            builder.addSlot(RecipeIngredientRole.INPUT, 25, 20)
                     .add(catalystDef.asIngredient());
         }
     }
@@ -133,17 +133,17 @@ public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHold
 
         SpellEnchantingRecipe recipe = recipeHolder.value();
 
-        Component levelReq = Component.translatable("container.spellgems.spell_enchanting.level_requirement", recipe.getLevelRequirement());
-        guiGraphics.text(Minecraft.getInstance().font, levelReq, 5, 25, 0xFFAAAAAA, false);
-
-        Component xpCost = Component.translatable("container.spellgems.spell_enchanting.xp_cost", recipe.getXpCost());
-        guiGraphics.text(Minecraft.getInstance().font, xpCost, 5, 35, 0xFFAAAAAA, false);
-
         // Description text from the recipe (instead of an item result)
         String key = recipe.getDescriptionKey();
         if (key != null && !key.isEmpty()) {
             Component desc = Component.translatable(key);
-            guiGraphics.text(Minecraft.getInstance().font, desc, 5, 50, 0xFFFFFFFF, true);
+            guiGraphics.text(Minecraft.getInstance().font, desc, 5, 5, 0xFFFFFFFF, true);
         }
+
+        Component levelReq = Component.translatable("container.spellgems.spell_enchanting.level_requirement", recipe.getLevelRequirement());
+        guiGraphics.text(Minecraft.getInstance().font, levelReq, 5, 40, 0xFFAAAAAA, false);
+
+        Component xpCost = Component.translatable("container.spellgems.spell_enchanting.xp_cost", recipe.getXpCost());
+        guiGraphics.text(Minecraft.getInstance().font, xpCost, 5, 50, 0xFFAAAAAA, false);
     }
 }

@@ -135,6 +135,8 @@
   "recipe.spellgems.combat_tome_modifier.description": "Random combat modifier",
   "recipe.spellgems.combat_tome_strike.description": "Random combat on-hit",
   "recipe.spellgems.potion_spell_enchant.description": "Imbue with potion effect",
+  "recipe.spellgems.break_block_silk_touch.description": "Silk touch",
+  "recipe.spellgems.smelt.description": "Smelt",
 
   "container.spellgems.wand": "Wand",
   "container.spellgems.astral_bow": "Astral Bow",

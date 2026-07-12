@@ -1,6 +1,7 @@
 package net.pnovaczek.spellgems.spell.enchantment;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.Identifier;
@@ -199,7 +200,8 @@ public record StrikeEnchantment(Identifier id) {
 
     public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
         var randomSpread = 0.1D;
-        SimpleParticleType particleType = ParticleTypes.CRIT;
+        ParticleOptions particleType = ParticleTypes.DUST_PLUME;
+        // Alternative for default CRIT: ParticleTypes.ENCHANTED_HIT
 
         if (is(StrikeEnchantments.FROST)) {
             particleType = ParticleTypes.SNOWFLAKE;
@@ -214,15 +216,15 @@ public record StrikeEnchantment(Identifier id) {
             randomSpread = 0.6D;
         }
         else if (is(StrikeEnchantments.INFERNO)) {
-            particleType = ParticleTypes.LARGE_SMOKE;
+            particleType = ParticleTypes.FLAME;
             randomSpread = 0.6D;
         }
         else if (is(StrikeEnchantments.POISON)) {
-            particleType = ParticleTypes.WITCH;
+            particleType = ParticleTypes.GLOW_SQUID_INK;
             randomSpread = 0.35D;
         }
         else if (is(StrikeEnchantments.PLAGUE)) {
-            particleType = ParticleTypes.WITCH;
+            particleType = ParticleTypes.GLOW_SQUID_INK;
             randomSpread = 0.35D;
         }
         else if (is(StrikeEnchantments.LEVITATE)) {
@@ -234,30 +236,30 @@ public record StrikeEnchantment(Identifier id) {
             randomSpread = 0.2D;
         }
         else if (is(StrikeEnchantments.EXPLOSION)) {
-            particleType = ParticleTypes.EXPLOSION;
+            particleType = ParticleTypes.WHITE_SMOKE;
             randomSpread = 0.5D;
         }
         else if (is(StrikeEnchantments.VENGEANCE)) {
-            particleType = ParticleTypes.DAMAGE_INDICATOR;
+            particleType = ParticleTypes.CLOUD;
         }
         else if (is(StrikeEnchantments.PURIFY)) {
-            particleType = ParticleTypes.HAPPY_VILLAGER;
+            particleType = ParticleTypes.SOUL_FIRE_FLAME;
             randomSpread = 0.3D;
         }
         else if (is(StrikeEnchantments.VOLLEY)) {
-            particleType = ParticleTypes.ENCHANTED_HIT;
+            particleType = ParticleTypes.CRIT;
             randomSpread = 0.3D;
         }
         else if (is(StrikeEnchantments.DRAIN)) {
-            particleType = ParticleTypes.ANGRY_VILLAGER;
+            particleType = ParticleTypes.SCULK_SOUL;
             randomSpread = 0.3D;
         }
         else if (is(StrikeEnchantments.SLOW)) {
-            particleType = ParticleTypes.BUBBLE;
+            particleType = ParticleTypes.SCULK_CHARGE_POP;
             randomSpread = 0.3D;
         }
         else if (is(StrikeEnchantments.THERMAL_INVERSION)) {
-            particleType = ParticleTypes.POOF;
+            particleType = ParticleTypes.SMOKE;
             randomSpread = 0.3D;
         }
 
