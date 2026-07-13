@@ -9,6 +9,9 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.pnovaczek.spellgems.wand.WandDepletion;
 
 public class ModCreativeModeTabs {
 
@@ -32,6 +35,17 @@ public class ModCreativeModeTabs {
                             output.accept(ModItems.SHIMMERSTEEL_INGOT);
                             output.accept(ModItems.RAW_SPELL_GEM);
                             output.accept(ModItems.WAND);
+                            // Pre-enchanted book for the Recharge enchantment.
+                            // Only available in creative mode / via cheats; intentionally no crafting recipe
+                            // or spell enchanting table recipe.
+                            parameters.holders()
+                                    .lookup(Registries.ENCHANTMENT)
+                                    .flatMap(lookup -> lookup.get(WandDepletion.RECHARGE))
+                                    .ifPresent(recharge -> {
+                                        ItemStack rechargeBook = EnchantmentHelper.createBook(
+                                                new EnchantmentInstance(recharge, 1));
+                                        output.accept(rechargeBook);
+                                    });
                             output.accept(ModItems.ASTRAL_BOW);
                             output.accept(ModItems.SPELL_GEM_PROJECTILE);
                             output.accept(ModItems.SPELL_GEM_NOVA);
