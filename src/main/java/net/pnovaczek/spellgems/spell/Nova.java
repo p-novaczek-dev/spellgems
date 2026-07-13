@@ -28,11 +28,6 @@ public class Nova extends AbstractSpell {
     }
 
     @Override
-    public int defaultDurabilityCost() {
-        return 16;
-    }
-
-    @Override
     protected boolean performCast(SpellContext context) {
         var level = context.level();
         var caster = context.caster();

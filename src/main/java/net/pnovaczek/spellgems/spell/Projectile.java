@@ -25,11 +25,6 @@ public class Projectile extends AbstractSpell {
     }
 
     @Override
-    public int defaultDurabilityCost() {
-        return 8;
-    }
-
-    @Override
     protected boolean performCast(SpellContext context) {
         var level = context.level();
         var caster = context.caster();

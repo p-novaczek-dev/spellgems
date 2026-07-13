@@ -17,11 +17,6 @@ public class WindChargeSpell extends AbstractSpell {
     }
 
     @Override
-    public int defaultDurabilityCost() {
-        return 2;
-    }
-
-    @Override
     protected int getCooldownTicks() {
         return 10;
     }

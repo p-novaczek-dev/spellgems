@@ -10,7 +10,6 @@ import net.minecraft.world.item.ItemStack;
 import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.Spellgems;
-import net.pnovaczek.spellgems.WandConfig;
 import net.pnovaczek.spellgems.inventory.WandContainer;
 import net.pnovaczek.spellgems.item.SpellGemItem;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
@@ -160,7 +159,7 @@ public final class WandSpellCaster {
     }
 
     private static int getBaseDurabilityCost(Identifier spellId) {
-        return Spellgems.CONFIG.wand.getSpellCost(spellId);
+        return Spellgems.CONFIG.getWandDurabilityCost(spellId);
     }
 
     private static InteractionHand getWandHand(Player player) {

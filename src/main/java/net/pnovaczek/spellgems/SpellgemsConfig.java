@@ -8,8 +8,6 @@ import net.pnovaczek.spellgems.spell.SpellIds;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SpellgemsConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -24,6 +22,18 @@ public class SpellgemsConfig {
     public float strikeCloudDamage = 2.0F;
     public float drainHealPerTarget = 2.0F;
 
+    public static class WandConfig {
+        /** Multiplier applied to base durability cost for each spell enchantment on a gem. */
+        public float spellEnchantmentDurabilityCostMultiplier = 3.0F;
+
+        public WandConfig() {
+        }
+
+        public void validate() {
+            spellEnchantmentDurabilityCostMultiplier = Math.max(1f, spellEnchantmentDurabilityCostMultiplier);
+        }
+    }
+
     public static class SpellConfigs {
         public SpellCombatConfig projectile = new SpellCombatConfig();
         public NovaSpellConfig nova = new NovaSpellConfig();
@@ -33,6 +43,25 @@ public class SpellgemsConfig {
         public FeedSpellConfig feed = new FeedSpellConfig();
         public GrowSpellConfig grow = new GrowSpellConfig();
         public SpellConfig potion = new SpellConfig();
+
+        // Additional spell configs (for uniform access and to host wandDurabilityCost etc.)
+        public SpellConfig windCharge = new SpellConfig();
+        public SpellConfig placeBlock = new SpellConfig();
+        public SpellConfig breakBlock = new SpellConfig();
+        public SpellConfig harvest = new SpellConfig();
+        public SpellConfig plant = new SpellConfig();
+
+        public SpellConfigs() {
+            // Provide the canonical default wand durability costs here.
+            // These are used for new configs and when keys are absent from spellgems.json.
+            // (Previously these lived in each Spell subclass via defaultDurabilityCost().)
+            projectile.wandDurabilityCost = 8;
+            nova.wandDurabilityCost = 16;
+            vortex.wandDurabilityCost = 12;
+            blink.wandDurabilityCost = 64;
+            windCharge.wandDurabilityCost = 2;
+            // All others (magnet, feed, grow, potion, placeBlock, breakBlock, harvest, plant) default to 1 via SpellConfig.
+        }
 
         /** Returns a spell-specific config by ID (for more uniform access). */
         public SpellConfig get(Identifier spellId) {
@@ -44,8 +73,13 @@ public class SpellgemsConfig {
             if (spellId.equals(SpellIds.FEED)) return feed;
             if (spellId.equals(SpellIds.GROW)) return grow;
             if (spellId.equals(SpellIds.POTION)) return potion;
+            if (spellId.equals(SpellIds.WIND_CHARGE)) return windCharge;
+            if (spellId.equals(SpellIds.PLACE_BLOCK)) return placeBlock;
+            if (spellId.equals(SpellIds.BREAK_BLOCK)) return breakBlock;
+            if (spellId.equals(SpellIds.HARVEST)) return harvest;
+            if (spellId.equals(SpellIds.PLANT)) return plant;
 
-            // Other spells currently have no dedicated tunable config
+            // Unknown spell: return a fresh default (cost=1)
             return new SpellConfig();
         }
 
@@ -57,7 +91,12 @@ public class SpellgemsConfig {
             if (magnet != null) magnet.validate();
             if (feed != null) feed.validate();
             if (grow != null) grow.validate();
-            // potion is empty
+            if (potion != null) potion.validate();
+            if (windCharge != null) windCharge.validate();
+            if (placeBlock != null) placeBlock.validate();
+            if (breakBlock != null) breakBlock.validate();
+            if (harvest != null) harvest.validate();
+            if (plant != null) plant.validate();
         }
     }
 
@@ -72,8 +111,11 @@ public class SpellgemsConfig {
     }
 
     public static class SpellConfig {
+        /** Durability cost when casting this spell from a wand. Always >= 1. */
+        public int wandDurabilityCost = 1;
+
         public void validate() {
-            // base does nothing
+            wandDurabilityCost = Math.max(1, wandDurabilityCost);
         }
     }
 
@@ -186,16 +228,11 @@ public class SpellgemsConfig {
 
         if (config == null) {
             config = new SpellgemsConfig();
-            // Seed and validate even for brand new configs (seeding may be partial until ModSpells is ready)
-            config.wand.seedDefaultsFromRegisteredSpells();
             config.validate();
             config.save();
         } else {
             config.migrate();
             config.validate();
-            // Make sure any spells added after the user's last save have entries
-            // (will use the spell's declared defaultDurabilityCost).
-            config.wand.seedDefaultsFromRegisteredSpells();
         }
         return config;
     }
@@ -216,6 +253,7 @@ public class SpellgemsConfig {
             // Example: if future versions change field names or structure,
             // copy values from legacy locations here.
         }
+
         // Ensure sub-configs are not null after deserialization from very old files
         if (spells == null) {
             // This shouldn't normally happen, but defensive
@@ -239,5 +277,10 @@ public class SpellgemsConfig {
      */
     public SpellConfig getSpellConfig(Identifier spellId) {
         return spells != null ? spells.get(spellId) : new SpellConfig();
+    }
+
+    /** Returns the wand durability cost for the given spell (from its spell config). */
+    public int getWandDurabilityCost(Identifier spellId) {
+        return getSpellConfig(spellId).wandDurabilityCost;
     }
 }

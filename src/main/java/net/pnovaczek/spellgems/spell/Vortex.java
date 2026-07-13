@@ -31,11 +31,6 @@ public class Vortex extends AbstractSpell {
     }
 
     @Override
-    public int defaultDurabilityCost() {
-        return 12;
-    }
-
-    @Override
     protected boolean performCast(SpellContext context) {
         var level = context.level();
         var caster = context.caster();
