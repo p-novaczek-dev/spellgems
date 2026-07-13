@@ -25,6 +25,7 @@ public class ManaInfuserMenu extends AbstractContainerMenu {
     private static final Identifier EMPTY_SLOT_FUEL = Identifier.withDefaultNamespace("container/slot/brewing_fuel");
 
     // Server constructor
+    @SuppressWarnings("this-escape")
     public ManaInfuserMenu(int syncId, Inventory playerInventory, Container container, ContainerData manaInfuserData) {
         super(ModMenuTypes.MANA_INFUSER, syncId);
         this.container = container;

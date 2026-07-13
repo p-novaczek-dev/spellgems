@@ -22,6 +22,7 @@ public class ManaInfuserBlock extends BaseEntityBlock {
 
     public static final MapCodec<ManaInfuserBlock> CODEC = simpleCodec(ManaInfuserBlock::new);
 
+    @SuppressWarnings("this-escape")
     public ManaInfuserBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any()

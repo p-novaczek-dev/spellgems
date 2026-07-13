@@ -13,6 +13,7 @@ public class PlagueCloud extends SpellAreaEffectCloud {
     /**
      * Required for entity registration in ModEntities.
      */
+    @SuppressWarnings("this-escape")
     public PlagueCloud(EntityType<? extends PlagueCloud> entityType, Level level) {
         super(entityType, level);
         this.setRadius(CLOUD_RADIUS);
@@ -23,6 +24,7 @@ public class PlagueCloud extends SpellAreaEffectCloud {
     /**
      * Convenience constructor used when spawning from strike logic.
      */
+    @SuppressWarnings("this-escape")
     public PlagueCloud(Level level, double x, double y, double z, LivingEntity owner) {
         this(ModEntities.PLAGUE_CLOUD, level);
         this.setPos(x, y, z);

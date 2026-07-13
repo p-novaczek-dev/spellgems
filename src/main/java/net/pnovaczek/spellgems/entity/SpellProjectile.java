@@ -42,6 +42,7 @@ public class SpellProjectile extends AbstractHurtingProjectile {
         this.hitHandler = null;
     }
 
+    @SuppressWarnings("this-escape")
     public SpellProjectile(SpellContext spellContext, Vec3 direction, ProjectileHitHandler hitHandler) {
         this.spellContext = spellContext;
         this.hitHandler = hitHandler;
@@ -58,6 +59,7 @@ public class SpellProjectile extends AbstractHurtingProjectile {
         setImpulse(direction, sourcePos);
     }
 
+    @SuppressWarnings("this-escape")
     public SpellProjectile(SpellContext spellContext, Vec3 direction, Vec3 sourcePos, ProjectileHitHandler hitHandler) {
         this.spellContext = spellContext;
         this.hitHandler = hitHandler;
@@ -72,6 +74,7 @@ public class SpellProjectile extends AbstractHurtingProjectile {
 
     }
 
+    @SuppressWarnings("this-escape")
     private void setImpulse(Vec3 direction, Vec3 sourcePos) {
         var caster = spellContext.caster();
         this.setOwner(caster);

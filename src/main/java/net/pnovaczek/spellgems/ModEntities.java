@@ -28,14 +28,14 @@ public class ModEntities {
     public static final EntityType<SpellProjectile> SPELL_PROJECTILE = register(
             "spell_projectile",
             EntityType.Builder.<SpellProjectile>of(
-                (entityType, level) -> new SpellProjectile((EntityType<SpellProjectile>) entityType, level), MobCategory.MISC)
+                (entityType, level) -> new SpellProjectile(entityType, level), MobCategory.MISC)
                     .sized(0.25F, 0.25F)
                     .clientTrackingRange(4));
 
     public static final EntityType<InfernoCloud> INFERNO_CLOUD = register(
             "inferno_cloud",
             EntityType.Builder.<InfernoCloud>of(
-                (entityType, level) -> new InfernoCloud((EntityType<InfernoCloud>) entityType, level), MobCategory.MISC)
+                (entityType, level) -> new InfernoCloud(entityType, level), MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .clientTrackingRange(10)
                     .updateInterval(20));
@@ -43,7 +43,7 @@ public class ModEntities {
     public static final EntityType<FrostbiteCloud> FROSTBITE_CLOUD = register(
             "frostbite_cloud",
             EntityType.Builder.<FrostbiteCloud>of(
-                (entityType, level) -> new FrostbiteCloud((EntityType<FrostbiteCloud>) entityType, level), MobCategory.MISC)
+                (entityType, level) -> new FrostbiteCloud(entityType, level), MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .clientTrackingRange(10)
                     .updateInterval(20));
@@ -51,7 +51,7 @@ public class ModEntities {
     public static final EntityType<PlagueCloud> PLAGUE_CLOUD = register(
             "plague_cloud",
             EntityType.Builder.<PlagueCloud>of(
-                (entityType, level) -> new PlagueCloud((EntityType<PlagueCloud>) entityType, level), MobCategory.MISC)
+                (entityType, level) -> new PlagueCloud(entityType, level), MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .clientTrackingRange(10)
                     .updateInterval(20));

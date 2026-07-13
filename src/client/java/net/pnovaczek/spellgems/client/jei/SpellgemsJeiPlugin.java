@@ -58,6 +58,7 @@ public class SpellgemsJeiPlugin implements IModPlugin {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void registerRecipes(IRecipeRegistration registration) {
         IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
         if (server == null) {
@@ -66,6 +67,7 @@ public class SpellgemsJeiPlugin implements IModPlugin {
         RecipeManager recipeManager = server.getRecipeManager();
 
         // Mana infuser recipes (use same iteration as SpellEnchantingRecipeLookup since no getAllRecipesFor in this MC version)
+        @SuppressWarnings("unchecked")
         List<RecipeHolder<ManaInfuserRecipe>> manaRecipes = new ArrayList<>();
         for (RecipeHolder<?> holder : recipeManager.getRecipes()) {
             if (holder.value().getType() == ManaInfuserRecipe.TYPE) {
@@ -75,6 +77,7 @@ public class SpellgemsJeiPlugin implements IModPlugin {
         registration.addRecipes(ManaInfuserRecipeCategory.TYPE, manaRecipes);
 
         // Spell enchanting recipes (combat, utility, potion variants)
+        @SuppressWarnings("unchecked")
         List<RecipeHolder<SpellEnchantingRecipe>> enchantingRecipes = new ArrayList<>();
         for (RecipeHolder<?> holder : recipeManager.getRecipes()) {
             if (holder.value().getType() == SpellEnchantingRecipe.TYPE) {

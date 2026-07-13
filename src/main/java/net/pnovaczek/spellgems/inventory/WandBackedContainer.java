@@ -11,6 +11,7 @@ public class WandBackedContainer extends SimpleContainer {
     private final Player player;
     private final InteractionHand hand;
 
+    @SuppressWarnings("this-escape")
     public WandBackedContainer(Player player, InteractionHand hand) {
         super(WandContainer.SIZE);
         this.player = player;

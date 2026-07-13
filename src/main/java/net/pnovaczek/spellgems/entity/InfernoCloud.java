@@ -13,6 +13,7 @@ public class InfernoCloud extends SpellAreaEffectCloud {
     /**
      * Required for entity registration in ModEntities.
      */
+    @SuppressWarnings("this-escape")
     public InfernoCloud(EntityType<? extends InfernoCloud> entityType, Level level) {
         super(entityType, level);
         this.setRadius(CLOUD_RADIUS);
@@ -23,6 +24,7 @@ public class InfernoCloud extends SpellAreaEffectCloud {
     /**
      * Convenience constructor used when spawning from spell logic.
      */
+    @SuppressWarnings("this-escape")
     public InfernoCloud(Level level, double x, double y, double z, LivingEntity owner) {
         this(ModEntities.INFERNO_CLOUD, level);
         this.setPos(x, y, z);

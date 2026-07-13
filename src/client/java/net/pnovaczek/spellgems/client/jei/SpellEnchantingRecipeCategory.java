@@ -33,6 +33,7 @@ import java.util.List;
  */
 public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHolder<SpellEnchantingRecipe>> {
 
+    @SuppressWarnings("unchecked")
     public static final IRecipeType<RecipeHolder<SpellEnchantingRecipe>> TYPE =
             IRecipeType.create(Spellgems.MOD_ID, "spell_enchanting", (Class<RecipeHolder<SpellEnchantingRecipe>>)(Class<?>) RecipeHolder.class);
 

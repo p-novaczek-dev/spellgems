@@ -35,6 +35,7 @@ public class AstralBowMenu extends AbstractContainerMenu {
     private final Container bowSlots;
     private final @Nullable InteractionHand bowHand;
 
+    @SuppressWarnings("this-escape")
     public AstralBowMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
         super(ModMenuTypes.ASTRAL_BOW, containerId);
         this.bowHand = hand;
@@ -43,6 +44,7 @@ public class AstralBowMenu extends AbstractContainerMenu {
         addPlayerInventory(playerInventory);
     }
 
+    @SuppressWarnings("this-escape")
     public AstralBowMenu(int containerId, Inventory playerInventory) {
         super(ModMenuTypes.ASTRAL_BOW, containerId);
         this.bowHand = null;
@@ -51,6 +53,7 @@ public class AstralBowMenu extends AbstractContainerMenu {
         addPlayerInventory(playerInventory);
     }
 
+    @SuppressWarnings("this-escape")
     private void addBowSlots() {
         for (int i = 0; i < GEM_SLOT_COUNT; i++) {
             int x = GEM_SLOT_X + i * GEM_SLOT_STEP;

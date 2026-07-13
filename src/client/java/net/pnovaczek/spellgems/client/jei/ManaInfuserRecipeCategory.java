@@ -21,6 +21,7 @@ import org.jspecify.annotations.Nullable;
 
 public class ManaInfuserRecipeCategory implements IRecipeCategory<RecipeHolder<ManaInfuserRecipe>> {
 
+    @SuppressWarnings("unchecked")
     public static final IRecipeType<RecipeHolder<ManaInfuserRecipe>> TYPE =
             IRecipeType.create(Spellgems.MOD_ID, "mana_infusing", (Class<RecipeHolder<ManaInfuserRecipe>>)(Class<?>) RecipeHolder.class);
 

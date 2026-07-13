@@ -11,6 +11,7 @@ public class AstralBowBackedContainer extends SimpleContainer {
     private final Player player;
     private final InteractionHand hand;
 
+    @SuppressWarnings("this-escape")
     public AstralBowBackedContainer(Player player, InteractionHand hand) {
         super(AstralBowContainer.SIZE);
         this.player = player;

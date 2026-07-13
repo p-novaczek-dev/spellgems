@@ -16,6 +16,7 @@ public abstract class SpellAreaEffectCloud extends AreaEffectCloud {
     protected static int EFFECT_DURATION = Spellgems.CONFIG.strikeEffectDuration;
     protected static float CLOUD_DAMAGE = Spellgems.CONFIG.strikeCloudDamage;
 
+    @SuppressWarnings("this-escape")
     public SpellAreaEffectCloud(EntityType<? extends SpellAreaEffectCloud> entityType, Level level) {
         super(entityType, level);
         this.setWaitTime(0);
@@ -25,6 +26,7 @@ public abstract class SpellAreaEffectCloud extends AreaEffectCloud {
     /**
      * Convenience constructor used when spawning from strike/utility spell logic.
      */
+    @SuppressWarnings("this-escape")
     public SpellAreaEffectCloud(EntityType<? extends SpellAreaEffectCloud> entityType, Level level,
                                 double x, double y, double z, LivingEntity owner,
                                 float radius, int durationTicks, ParticleOptions particle) {

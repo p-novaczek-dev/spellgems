@@ -64,14 +64,17 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
     private ItemStack lastTarget = ItemStack.EMPTY;
     private String[] recipeDescriptions = new String[0];
 
+    @SuppressWarnings("this-escape")
     public SpellEnchantingMenu(int containerId, Inventory inventory) {
         this(containerId, inventory, ContainerLevelAccess.NULL, createClientRecipeData());
     }
 
+    @SuppressWarnings("this-escape")
     public SpellEnchantingMenu(int containerId, Inventory inventory, ContainerLevelAccess access) {
         this(containerId, inventory, access, createServerRecipeData());
     }
 
+    @SuppressWarnings("this-escape")
     private SpellEnchantingMenu(int containerId, Inventory inventory, ContainerLevelAccess access, ContainerData recipeData) {
         super(ModMenuTypes.SPELL_ENCHANTING_TABLE, containerId);
         this.access = access;

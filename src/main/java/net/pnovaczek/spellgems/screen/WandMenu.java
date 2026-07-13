@@ -36,6 +36,7 @@ public class WandMenu extends AbstractContainerMenu {
     private final Container wandSlots;
     private final @Nullable InteractionHand wandHand;
 
+    @SuppressWarnings("this-escape")
     public WandMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
         super(ModMenuTypes.WAND, containerId);
         this.wandHand = hand;
@@ -44,6 +45,7 @@ public class WandMenu extends AbstractContainerMenu {
         addPlayerInventory(playerInventory);
     }
 
+    @SuppressWarnings("this-escape")
     public WandMenu(int containerId, Inventory playerInventory) {
         super(ModMenuTypes.WAND, containerId);
         this.wandHand = null;
@@ -52,6 +54,7 @@ public class WandMenu extends AbstractContainerMenu {
         addPlayerInventory(playerInventory);
     }
 
+    @SuppressWarnings("this-escape")
     private void addWandSlots() {
         for (int i = 0; i < GEM_SLOT_COUNT; i++) {
             int x = GEM_SLOT_X + i * GEM_SLOT_STEP;
