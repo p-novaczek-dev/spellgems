@@ -23,6 +23,11 @@ public class ModTags {
             Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "smelt_spell_gems")
     );
 
+    public static final TagKey<Item> EXTEND_SPELL_GEMS = TagKey.create(
+            Registries.ITEM,
+            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "extend_spell_gems")
+    );
+
     public static final TagKey<Item> CATALYST_BOOKS = TagKey.create(
             Registries.ITEM,
             Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "catalyst_books")

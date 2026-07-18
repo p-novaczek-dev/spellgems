@@ -19,8 +19,8 @@ import java.util.List;
 
 public class Nova extends AbstractSpell {
 
-    private static final int BURST_PULSE_COUNT = 5;
-    private static final int BURST_TICK_SPACING = 3;
+    private static final int BURST_PULSE_COUNT = 3;
+    private static final int BURST_TICK_SPACING = 20;
 
     @Override
     public Identifier id() {

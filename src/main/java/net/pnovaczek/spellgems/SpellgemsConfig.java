@@ -21,6 +21,8 @@ public class SpellgemsConfig {
     public int strikeEffectDuration = 100;
     public float strikeCloudDamage = 2.0F;
     public float drainHealPerTarget = 2.0F;
+    public int chainingCount = 5;
+    public int multishotCount = 5;
 
     public static class WandConfig {
         /** Multiplier applied to base durability cost for each spell enchantment on a gem. */
@@ -58,9 +60,11 @@ public class SpellgemsConfig {
             projectile.wandDurabilityCost = 8;
             nova.wandDurabilityCost = 16;
             vortex.wandDurabilityCost = 12;
-            blink.wandDurabilityCost = 64;
+            blink.wandDurabilityCost = 48;
             windCharge.wandDurabilityCost = 2;
-            // All others (magnet, feed, grow, potion, placeBlock, breakBlock, harvest, plant) default to 1 via SpellConfig.
+            placeBlock.wandDurabilityCost = 0;
+            magnet.wandDurabilityCost = 0;
+            // All others default to 1.
         }
 
         /** Returns a spell-specific config by ID (for more uniform access). */
@@ -152,21 +156,23 @@ public class SpellgemsConfig {
 
     public static class BlinkSpellConfig extends SpellConfig {
         public double maxDistance = 12.0;
-        public double expandMultiplier = 2.0;
+        public double extendMultiplier = 2.0;
 
         @Override
         public void validate() {
             maxDistance = Math.max(1.0, maxDistance);
-            expandMultiplier = Math.max(1.0, expandMultiplier);
+            extendMultiplier = Math.max(1.0, extendMultiplier);
         }
     }
 
     public static class MagnetSpellConfig extends SpellConfig {
         public float range = 5.0F;
+        public double extendMultiplier = 2.0;
 
         @Override
         public void validate() {
             range = Math.max(0.5f, range);
+            extendMultiplier = Math.max(1.0, extendMultiplier);
         }
     }
 
@@ -265,6 +271,8 @@ public class SpellgemsConfig {
         strikeEffectDuration = Math.max(1, strikeEffectDuration);
         strikeCloudDamage = Math.max(0f, strikeCloudDamage);
         drainHealPerTarget = Math.max(0f, drainHealPerTarget);
+        chainingCount = Math.max(1, chainingCount);
+        multishotCount = Math.max(1, multishotCount);
 
         if (wand != null) wand.validate();
         if (astralBow != null) astralBow.validate();

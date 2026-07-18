@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +25,7 @@ import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.WandData;
 import net.pnovaczek.spellgems.spell.Spell;
 import net.pnovaczek.spellgems.spell.SpellIds;
+import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
 import net.pnovaczek.spellgems.wand.WandDepletion;
 import net.pnovaczek.spellgems.wand.WandSpellLabels;
@@ -45,9 +47,9 @@ public class SpellgemsTooltips {
                 void addLineHighlight(String key) { addLine(key, ChatFormatting.YELLOW); }
                 void addLineAttribute(String key) { addLine(key, ChatFormatting.GRAY); }
                 void addLineAttribute(MutableComponent component) { addLine(component, ChatFormatting.GRAY); }
-                void addLineDetail(String key) {
+                void addLineDetail(String key, Object... args) {
                     lines.add(Component.literal(" ")
-                            .append(Component.translatable(key).withStyle(ChatFormatting.DARK_GRAY))
+                            .append(Component.translatable(key, args).withStyle(ChatFormatting.DARK_GRAY))
                     );
                 }
                 void addLineHoldShift() { addLine("tooltip.spellgems.shift_hint", ChatFormatting.DARK_GRAY); }
@@ -110,7 +112,10 @@ public class SpellgemsTooltips {
                 if (data != null && data.isEnchanted()) {
                     tooltip.addLineAttribute(data.tooltipNameKey());
                     if (Minecraft.getInstance().hasShiftDown()) {
-                        tooltip.addLineDetail(data.tooltipDescriptionKey());
+                        tooltip.addLineDetail(
+                                data.tooltipDescriptionKey(),
+                                enchantmentDescriptionArgs(data.enchantmentId())
+                        );
                     } else {
                         tooltip.addLineHoldShift();
                     }
@@ -147,7 +152,10 @@ public class SpellgemsTooltips {
                         for (var effect : data.modifierEffects()) {
                             tooltip.addLineAttribute(effect.tooltipNameKey());
                             if (shiftDown) {
-                                tooltip.addLineDetail(effect.tooltipDescriptionKey());
+                                tooltip.addLineDetail(
+                                        effect.tooltipDescriptionKey(),
+                                        enchantmentDescriptionArgs(effect.id())
+                                );
                             }
                         }
 
@@ -180,6 +188,19 @@ public class SpellgemsTooltips {
                 }
             }
         });
+    }
+
+    private static Object[] enchantmentDescriptionArgs(Identifier enchantmentId) {
+        if (enchantmentId == null) {
+            return new Object[0];
+        }
+        if (enchantmentId.equals(ModifierEnchantments.CHAINING)) {
+            return new Object[]{Spellgems.CONFIG.chainingCount};
+        }
+        if (enchantmentId.equals(ModifierEnchantments.MULTISHOT)) {
+            return new Object[]{Spellgems.CONFIG.multishotCount};
+        }
+        return new Object[0];
     }
 
     private static void stripVanillaContainerLines(List<Component> lines) {

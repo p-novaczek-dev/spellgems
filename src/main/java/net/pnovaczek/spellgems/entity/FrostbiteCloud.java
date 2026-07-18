@@ -35,5 +35,6 @@ public class FrostbiteCloud extends SpellAreaEffectCloud {
     protected void applyEffectToTarget(LivingEntity target) {
         target.setTicksFrozen(EFFECT_DURATION);
         target.addEffect(new MobEffectInstance(MobEffects.WITHER, EFFECT_DURATION, 0));
+        target.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, EFFECT_DURATION, 0));
     }
 }

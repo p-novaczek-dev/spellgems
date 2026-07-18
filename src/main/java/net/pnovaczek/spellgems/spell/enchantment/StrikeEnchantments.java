@@ -19,12 +19,11 @@ public class StrikeEnchantments {
     public static final Identifier LIGHTNING = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "lightning");
     public static final Identifier EXPLOSION = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "explosion");
     public static final Identifier DRAIN = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "drain");
-    public static final Identifier THERMAL_INVERSION = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "thermal_inversion");
     public static final Identifier PURIFY = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "purify");
     public static final Identifier VOLLEY = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "volley");
     public static final Identifier VENGEANCE = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "vengeance");
 
     public static List<Identifier> getAll() {
-        return List.of(FLAME, POISON, FROST, SLOW, LEVITATE, INFERNO, FROSTBITE, PLAGUE, LIGHTNING, EXPLOSION, DRAIN, THERMAL_INVERSION, PURIFY, VOLLEY, VENGEANCE);
+        return List.of(FLAME, POISON, FROST, SLOW, LEVITATE, INFERNO, FROSTBITE, PLAGUE, LIGHTNING, EXPLOSION, DRAIN, PURIFY, VOLLEY, VENGEANCE);
     }
 }

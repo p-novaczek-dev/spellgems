@@ -40,9 +40,9 @@ public class Blink extends AbstractSpell {
 
         double baseMaxDistance = Spellgems.CONFIG.spells.blink.maxDistance;
         List<UtilityEnchantment> utilities = (context.data() != null) ? context.data().utilityEffects() : List.of();
-        boolean hasExpand = utilities.stream().anyMatch(u -> u.is(UtilityEnchantments.EXPAND));
-        double maxDistance = hasExpand
-                ? baseMaxDistance * Spellgems.CONFIG.spells.blink.expandMultiplier
+        boolean hasExtend = utilities.stream().anyMatch(u -> u.is(UtilityEnchantments.EXTEND));
+        double maxDistance = hasExtend
+                ? baseMaxDistance * Spellgems.CONFIG.spells.blink.extendMultiplier
                 : baseMaxDistance;
         Vec3 target = SpellTargeting.resolveCastCenter(caster, maxDistance);
 

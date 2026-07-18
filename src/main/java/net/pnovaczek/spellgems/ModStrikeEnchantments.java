@@ -35,7 +35,6 @@ public class ModStrikeEnchantments {
         register(StrikeEnchantments.LIGHTNING, new StrikeEnchantment(StrikeEnchantments.LIGHTNING));
         register(StrikeEnchantments.EXPLOSION, new StrikeEnchantment(StrikeEnchantments.EXPLOSION));
         register(StrikeEnchantments.DRAIN, new StrikeEnchantment(StrikeEnchantments.DRAIN));
-        register(StrikeEnchantments.THERMAL_INVERSION, new StrikeEnchantment(StrikeEnchantments.THERMAL_INVERSION));
         register(StrikeEnchantments.PURIFY, new StrikeEnchantment(StrikeEnchantments.PURIFY));
         register(StrikeEnchantments.VOLLEY, new StrikeEnchantment(StrikeEnchantments.VOLLEY));
         register(StrikeEnchantments.VENGEANCE, new StrikeEnchantment(StrikeEnchantments.VENGEANCE));

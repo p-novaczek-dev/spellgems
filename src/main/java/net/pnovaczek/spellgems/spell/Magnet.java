@@ -10,6 +10,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantment;
+import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantments;
 
 import java.util.List;
 
@@ -34,7 +36,12 @@ public class Magnet extends AbstractSpell {
         var caster = context.caster();
         // alive handled by base
 
-        float range = Spellgems.CONFIG.spells.magnet.range;
+        float baseRange = Spellgems.CONFIG.spells.magnet.range;
+        List<UtilityEnchantment> utilities = (context.data() != null) ? context.data().utilityEffects() : List.of();
+        boolean hasExtend = utilities.stream().anyMatch(u -> u.is(UtilityEnchantments.EXTEND));
+        float range = hasExtend
+                ? (float) (baseRange * Spellgems.CONFIG.spells.magnet.extendMultiplier)
+                : baseRange;
 
         if (level.isClientSide()) {
             spawnParticles(level, caster.position());

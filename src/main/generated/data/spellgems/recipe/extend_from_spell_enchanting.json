@@ -4,13 +4,13 @@
     "item": "minecraft:lapis_lazuli"
   },
   "category": "utility",
-  "description_key": "recipe.spellgems.blink_expand.description",
+  "description_key": "recipe.spellgems.extend.description",
   "input": {
-    "item": "spellgems:spell_gem_blink"
+    "tag": "spellgems:extend_spell_gems"
   },
   "level_requirement": 10,
   "result": {
-    "utility": "spellgems:expand"
+    "utility": "spellgems:extend"
   },
   "xp_cost": 27
 }

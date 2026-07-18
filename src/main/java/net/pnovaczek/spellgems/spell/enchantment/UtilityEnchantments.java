@@ -8,5 +8,5 @@ public class UtilityEnchantments {
 
     public static final Identifier SMELT = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "smelt");
     public static final Identifier SILK_TOUCH = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "silk_touch");
-    public static final Identifier EXPAND = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "expand");
+    public static final Identifier EXTEND = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "extend");
 }

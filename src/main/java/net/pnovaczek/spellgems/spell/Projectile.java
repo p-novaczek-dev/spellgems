@@ -44,12 +44,12 @@ public class Projectile extends AbstractSpell {
             for (var mod : modifiers) {
                 if (mod.is(ModifierEnchantments.MULTISHOT)) {
                     isMultishot = true;
-                    shotCount = 5;
+                    shotCount = Spellgems.CONFIG.multishotCount;
                 } else if (mod.is(ModifierEnchantments.BURST)) {
                     isBurst = true;
                     shotCount = 5;
                 } else if (mod.is(ModifierEnchantments.CHAINING)) {
-                    chainCount = 5;
+                    chainCount = Spellgems.CONFIG.chainingCount;
                 }
             }
 

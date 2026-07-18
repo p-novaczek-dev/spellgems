@@ -49,7 +49,7 @@ public record StrikeEnchantment(Identifier id) {
         } else if (is(StrikeEnchantments.LEVITATE)) {
             living.addEffect(new MobEffectInstance(MobEffects.LEVITATION, duration, 0));
         } else if (is(StrikeEnchantments.INFERNO)) {
-            if (living.getRemainingFireTicks() > 0 && !level.isClientSide()) {
+            if ((living.getRemainingFireTicks() > 0 || living.hasEffect(MobEffects.WITHER)) && !level.isClientSide()) {
                 InfernoCloud cloud = new InfernoCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster);
                 level.addFreshEntity(cloud);
                 level.playSound(
@@ -62,7 +62,7 @@ public record StrikeEnchantment(Identifier id) {
                 );
             }
         } else if (is(StrikeEnchantments.FROSTBITE)) {
-            if (living.getTicksFrozen() > 0 && !level.isClientSide()) {
+            if ((living.getTicksFrozen() > 0 || living.hasEffect(MobEffects.WITHER)) && !level.isClientSide()) {
                 FrostbiteCloud cloud = new FrostbiteCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster);
                 level.addFreshEntity(cloud);
                 level.playSound(
@@ -75,7 +75,7 @@ public record StrikeEnchantment(Identifier id) {
                 );
             }
         } else if (is(StrikeEnchantments.PLAGUE)) {
-            if (living.hasEffect(MobEffects.POISON) && !level.isClientSide()) {
+            if ((living.hasEffect(MobEffects.POISON) || living.hasEffect(MobEffects.WITHER)) && !level.isClientSide()) {
                 PlagueCloud cloud = new PlagueCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster);
                 level.addFreshEntity(cloud);
                 level.playSound(
@@ -88,7 +88,7 @@ public record StrikeEnchantment(Identifier id) {
                 );
             }
         } else if (is(StrikeEnchantments.LIGHTNING)) {
-            if (living.hasEffect(MobEffects.SLOWNESS) && !level.isClientSide()) {
+            if ((living.hasEffect(MobEffects.SLOWNESS) || living.hasEffect(MobEffects.LEVITATION)) && !level.isClientSide()) {
                 LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
                 if (bolt != null) {
                     bolt.snapTo(pos.x, pos.y, pos.z);
@@ -99,27 +99,21 @@ public record StrikeEnchantment(Identifier id) {
                 }
             }
         } else if (is(StrikeEnchantments.EXPLOSION)) {
-            if (living.hasEffect(MobEffects.LEVITATION) && !level.isClientSide()) {
+            if ((living.hasEffect(MobEffects.SLOWNESS) || living.hasEffect(MobEffects.LEVITATION)) && !level.isClientSide()) {
                 level.explode(caster, pos.x, pos.y, pos.z, 2.0F, false, Level.ExplosionInteraction.MOB);
             }
         } else if (is(StrikeEnchantments.DRAIN)) {
             if (!level.isClientSide()) {
                 float amount = Spellgems.CONFIG.drainHealPerTarget;
                 caster.heal(amount);
-                if (living.hasEffect(MobEffects.WITHER) && level instanceof ServerLevel serverLevel) {
-                    living.hurtServer(serverLevel, caster.damageSources().magic(), amount);
-                }
-            }
-        } else if (is(StrikeEnchantments.THERMAL_INVERSION)) {
-            if (living.getRemainingFireTicks() > 0) {
-                living.setTicksFrozen(duration);
-                living.addEffect(new MobEffectInstance(MobEffects.LEVITATION, duration, 0));
             }
         } else if (is(StrikeEnchantments.PURIFY)) {
             if (!level.isClientSide() && level instanceof ServerLevel serverLevel) {
-                living.hurtServer(serverLevel, caster.damageSources().magic(), Spellgems.CONFIG.strikeCloudDamage);
-                if (living.hasEffect(MobEffects.POISON)) {
+                if (living.hasEffect(MobEffects.POISON) || living.hasEffect(MobEffects.WITHER)) {
+                    living.hurtServer(serverLevel, caster.damageSources().magic(), Spellgems.CONFIG.strikeCloudDamage);
                     living.setRemainingFireTicks(duration);
+                    living.setTicksFrozen(duration);
+                    living.addEffect(new MobEffectInstance(MobEffects.LEVITATION, duration, 0));
                 }
             }
         } else if (is(StrikeEnchantments.VOLLEY)) {
@@ -187,7 +181,6 @@ public record StrikeEnchantment(Identifier id) {
         if (is(StrikeEnchantments.LIGHTNING)) return 0xFFEE77;
         if (is(StrikeEnchantments.EXPLOSION)) return 0xFFAA00;
         if (is(StrikeEnchantments.DRAIN)) return 0xCC2222;
-        if (is(StrikeEnchantments.THERMAL_INVERSION)) return 0x55CCFF;
         if (is(StrikeEnchantments.PURIFY)) return 0xEEFFEE;
         if (is(StrikeEnchantments.VOLLEY)) return 0x77AAFF;
         if (is(StrikeEnchantments.VENGEANCE)) return 0xFF4444;
@@ -256,10 +249,6 @@ public record StrikeEnchantment(Identifier id) {
         }
         else if (is(StrikeEnchantments.SLOW)) {
             particleType = ParticleTypes.SCULK_CHARGE_POP;
-            randomSpread = 0.3D;
-        }
-        else if (is(StrikeEnchantments.THERMAL_INVERSION)) {
-            particleType = ParticleTypes.SMOKE;
             randomSpread = 0.3D;
         }
 

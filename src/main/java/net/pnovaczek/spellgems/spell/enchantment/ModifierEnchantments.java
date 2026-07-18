@@ -24,7 +24,7 @@ public class ModifierEnchantments {
         if (spellId.equals(SpellIds.PROJECTILE)) {
             return List.of(CHAINING, MULTISHOT, PIERCING, POWER, BURST);
         } else if (spellId.equals(SpellIds.NOVA)) {
-            return List.of(CHAINING, POWER, BURST, EXPAND);
+            return List.of(POWER, BURST, EXPAND);
         } else if (spellId.equals(SpellIds.VORTEX)) {
             return List.of(BURST, EXPAND);
         }
