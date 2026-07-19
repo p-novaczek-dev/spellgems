@@ -2,6 +2,7 @@ package net.pnovaczek.spellgems.spell;
 
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -14,6 +15,7 @@ import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantments;
 
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 public class Magnet extends AbstractSpell {
 
@@ -44,7 +46,8 @@ public class Magnet extends AbstractSpell {
         Vec3 pullTarget = magnetPullTarget(context);
 
         if (level.isClientSide()) {
-            spawnParticles(level, pullTarget);
+            // Local prediction; server broadcasts for other players.
+            spawnParticles(level, pullTarget, null);
             return false;
         }
 
@@ -52,10 +55,8 @@ public class Magnet extends AbstractSpell {
             return false;
         }
 
-        // Dispenser has no client cast path; broadcast particles from the server.
-        if (context.isDispenserCast()) {
-            spawnParticles(level, pullTarget);
-        }
+        // Always broadcast from server (multiplayer + dispenser). Skip caster if they predicted.
+        spawnParticles(level, pullTarget, SpellParticles.predictionExcept(context.caster()));
 
         AABB searchBox = new AABB(pullTarget, pullTarget).inflate(range);
         double rangeSqr = range * range;
@@ -110,7 +111,11 @@ public class Magnet extends AbstractSpell {
         return context.origin();
     }
 
-    private static void spawnParticles(net.minecraft.world.level.Level level, Vec3 center) {
+    private static void spawnParticles(
+            net.minecraft.world.level.Level level,
+            Vec3 center,
+            @Nullable Entity exceptViewer
+    ) {
         var random = level.getRandom();
         for (int i = 0; i < PARTICLE_COUNT; i++) {
             double x = center.x + (random.nextDouble() - 0.5) * 2.0;
@@ -118,6 +123,7 @@ public class Magnet extends AbstractSpell {
             double z = center.z + (random.nextDouble() - 0.5) * 2.0;
             SpellParticles.add(
                     level,
+                    exceptViewer,
                     ParticleTypes.ENCHANT,
                     x,
                     y,

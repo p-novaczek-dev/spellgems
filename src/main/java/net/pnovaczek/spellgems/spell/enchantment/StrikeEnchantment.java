@@ -3,8 +3,10 @@ package net.pnovaczek.spellgems.spell.enchantment;
 import com.mojang.serialization.Codec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Thin id-holder for strike enchantments stored on spell gems.
@@ -38,11 +40,25 @@ public record StrikeEnchantment(Identifier id) {
     }
 
     public void addParticle(Level level, double x, double y, double z, RandomSource random) {
-        addParticle(level, x, y, z, random, 0.0, 0.0, 0.0);
+        addParticle(level, null, x, y, z, random, 0.0, 0.0, 0.0);
     }
 
     public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-        effect().addParticle(level, x, y, z, random, dx, dy, dz);
+        addParticle(level, null, x, y, z, random, dx, dy, dz);
+    }
+
+    public void addParticle(
+            Level level,
+            @Nullable Entity exceptViewer,
+            double x,
+            double y,
+            double z,
+            RandomSource random,
+            double dx,
+            double dy,
+            double dz
+    ) {
+        effect().addParticle(level, exceptViewer, x, y, z, random, dx, dy, dz);
     }
 
     private StrikeEffect effect() {

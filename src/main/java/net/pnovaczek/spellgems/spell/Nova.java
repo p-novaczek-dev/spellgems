@@ -5,6 +5,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -14,6 +15,7 @@ import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
 
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 public class Nova extends AbstractSpell {
 
@@ -49,14 +51,12 @@ public class Nova extends AbstractSpell {
         Runnable pulse = () -> {
             if (caster != null && !caster.isAlive()) return;
             if (level.isClientSide()) {
-                // Local prediction for hand/wand casts
-                spawnNovaParticles(context, finalHasExpand);
+                // Local prediction (castPredicted); server also broadcasts for other players.
+                spawnNovaParticles(context, finalHasExpand, null);
             } else if (level instanceof ServerLevel serverLevel) {
                 applyNovaDamage(context, serverLevel, finalHasPower, finalHasExpand);
-                // Dispenser has no client cast path; broadcast particles from the server.
-                if (context.isDispenserCast()) {
-                    spawnNovaParticles(context, finalHasExpand);
-                }
+                // Always broadcast from server (multiplayer + dispenser). Skip caster if they predicted.
+                spawnNovaParticles(context, finalHasExpand, SpellParticles.predictionExcept(caster));
             }
         };
 
@@ -112,7 +112,11 @@ public class Nova extends AbstractSpell {
         );
     }
 
-    private void spawnNovaParticles(SpellContext context, boolean hasExpand) {
+    private void spawnNovaParticles(
+            SpellContext context,
+            boolean hasExpand,
+            @Nullable Entity exceptViewer
+    ) {
         var level = context.level();
         var config = Spellgems.CONFIG.spells.nova;
         var strikes = context.data().strikeEffects();
@@ -141,13 +145,17 @@ public class Nova extends AbstractSpell {
             if (strikes.isEmpty()) {
                 SpellParticles.add(
                         level,
+                        exceptViewer,
                         dustOptions,
                         pos.x, pos.y, pos.z,
                         velocity.x, velocity.y, velocity.z
                 );
             } else {
                 for (StrikeEnchantment strike : strikes) {
-                    strike.addParticle(level, pos.x, pos.y, pos.z, random, velocity.x, velocity.y, velocity.z);
+                    strike.addParticle(
+                            level, exceptViewer,
+                            pos.x, pos.y, pos.z, random, velocity.x, velocity.y, velocity.z
+                    );
                 }
             }
         }

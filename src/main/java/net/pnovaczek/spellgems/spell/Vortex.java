@@ -64,13 +64,12 @@ public class Vortex extends AbstractSpell {
         if (caster != null && !caster.isAlive()) return;
 
         if (level.isClientSide()) {
-            spawnSphereParticles(context, center, hasExpand);
+            // Local prediction; server also broadcasts for other players.
+            spawnSphereParticles(context, center, hasExpand, null);
         } else if (level instanceof ServerLevel serverLevel) {
             applyVortexPull(context, serverLevel, center, hasExpand);
-            // Dispenser has no client cast path; broadcast particles from the server.
-            if (context.isDispenserCast()) {
-                spawnSphereParticles(context, center, hasExpand);
-            }
+            // Always broadcast from server. Skip caster if they already predicted.
+            spawnSphereParticles(context, center, hasExpand, SpellParticles.predictionExcept(caster));
         }
     }
 
@@ -112,7 +111,12 @@ public class Vortex extends AbstractSpell {
         );
     }
 
-    private void spawnSphereParticles(SpellContext context, Vec3 center, boolean hasExpand) {
+    private void spawnSphereParticles(
+            SpellContext context,
+            Vec3 center,
+            boolean hasExpand,
+            @Nullable Entity exceptViewer
+    ) {
         var level = context.level();
         var config = Spellgems.CONFIG.spells.vortex;
         var strikes = context.data().strikeEffects();
@@ -139,13 +143,17 @@ public class Vortex extends AbstractSpell {
             if (strikes.isEmpty()) {
                 SpellParticles.add(
                         level,
+                        exceptViewer,
                         dustOptions,
                         pos.x, pos.y, pos.z,
                         velocity.x, velocity.y, velocity.z
                 );
             } else {
                 for (StrikeEnchantment strike : strikes) {
-                    strike.addParticle(level, pos.x, pos.y, pos.z, random, velocity.x, velocity.y, velocity.z);
+                    strike.addParticle(
+                            level, exceptViewer,
+                            pos.x, pos.y, pos.z, random, velocity.x, velocity.y, velocity.z
+                    );
                 }
             }
         }

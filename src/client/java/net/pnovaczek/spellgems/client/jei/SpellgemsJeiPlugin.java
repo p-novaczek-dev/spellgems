@@ -3,27 +3,49 @@ package net.pnovaczek.spellgems.client.jei;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.recipe.IRecipeManager;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.runtime.IJeiRuntime;
+import net.fabricmc.fabric.api.client.recipe.v1.sync.ClientRecipeSynchronizedEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.pnovaczek.spellgems.ModBlocks;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantments;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * JEI plugin for mana infuser and spell enchanting recipes.
+ * <p>
+ * Recipes are resolved from:
+ * <ol>
+ *   <li>Integrated server {@link RecipeManager} (singleplayer / LAN host)</li>
+ *   <li>Fabric {@code SynchronizedRecipes} on the client connection (multiplayer)</li>
+ * </ol>
+ * If JEI initializes before recipes arrive, they are pushed when Fabric's
+ * {@link ClientRecipeSynchronizedEvent} fires or when JEI runtime becomes available.
+ */
 @JeiPlugin
 public class SpellgemsJeiPlugin implements IModPlugin {
+
+    private static @Nullable IJeiRuntime jeiRuntime;
+    private static boolean manaRecipesInJei;
+    private static boolean enchantingRecipesInJei;
+    private static boolean syncListenerRegistered;
 
     @Override
     public Identifier getPluginUid() {
@@ -32,12 +54,12 @@ public class SpellgemsJeiPlugin implements IModPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
+        ensureSyncListener();
+
         var jeiHelpers = registration.getJeiHelpers();
         var guiHelper = jeiHelpers.getGuiHelper();
 
-        // Collect all valid potion catalysts (any potion/splash/lingering that has effects)
-        // so the JEI slot for "any potion" recipes can cycle through real potions instead of
-        // showing the empty "uncraftable potion".
+        // Collect valid potion catalysts so "any potion" slots cycle real potions.
         List<ItemStack> potionCatalysts = new ArrayList<>();
         try {
             Collection<ItemStack> allItems = jeiHelpers.getIngredientManager()
@@ -48,7 +70,7 @@ public class SpellgemsJeiPlugin implements IModPlugin {
                 }
             }
         } catch (Exception ignored) {
-            // If ingredient manager not ready or no potions, fallbacks in category will be used.
+            // Ingredient manager not ready; category falls back to placeholder potions.
         }
 
         registration.addRecipeCategories(
@@ -58,48 +80,108 @@ public class SpellgemsJeiPlugin implements IModPlugin {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void registerRecipes(IRecipeRegistration registration) {
-        IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
-        if (server == null) {
-            return;  // Only register in singleplayer for now; full recipes not available on dedicated client
-        }
-        RecipeManager recipeManager = server.getRecipeManager();
+        ensureSyncListener();
 
-        // Mana infuser recipes (use same iteration as SpellEnchantingRecipeLookup since no getAllRecipesFor in this MC version)
-        @SuppressWarnings("unchecked")
-        List<RecipeHolder<ManaInfuserRecipe>> manaRecipes = new ArrayList<>();
-        for (RecipeHolder<?> holder : recipeManager.getRecipes()) {
-            if (holder.value().getType() == ManaInfuserRecipe.TYPE) {
-                manaRecipes.add((RecipeHolder<ManaInfuserRecipe>) holder);
-            }
+        List<RecipeHolder<ManaInfuserRecipe>> manaRecipes = collectRecipes(ManaInfuserRecipe.TYPE);
+        if (!manaRecipes.isEmpty()) {
+            registration.addRecipes(ManaInfuserRecipeCategory.TYPE, manaRecipes);
+            manaRecipesInJei = true;
         }
-        registration.addRecipes(ManaInfuserRecipeCategory.TYPE, manaRecipes);
 
-        // Spell enchanting recipes (combat, utility, potion variants)
-        @SuppressWarnings("unchecked")
-        List<RecipeHolder<SpellEnchantingRecipe>> enchantingRecipes = new ArrayList<>();
-        for (RecipeHolder<?> holder : recipeManager.getRecipes()) {
-            if (holder.value().getType() == SpellEnchantingRecipe.TYPE) {
-                enchantingRecipes.add((RecipeHolder<SpellEnchantingRecipe>) holder);
-            }
+        List<RecipeHolder<SpellEnchantingRecipe>> enchantingRecipes = collectRecipes(SpellEnchantingRecipe.TYPE);
+        if (!enchantingRecipes.isEmpty()) {
+            registration.addRecipes(SpellEnchantingRecipeCategory.TYPE, enchantingRecipes);
+            enchantingRecipesInJei = true;
         }
-        registration.addRecipes(SpellEnchantingRecipeCategory.TYPE, enchantingRecipes);
     }
 
     @Override
     @SuppressWarnings("removal")
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        // Mana infuser workstation
         registration.addRecipeCatalyst(
                 new ItemStack(ModBlocks.MANA_INFUSER),
                 ManaInfuserRecipeCategory.TYPE
         );
-
-        // Spell enchanting table workstation
         registration.addRecipeCatalyst(
                 new ItemStack(ModBlocks.SPELL_ENCHANTING_TABLE),
                 SpellEnchantingRecipeCategory.TYPE
         );
+    }
+
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime runtime) {
+        jeiRuntime = runtime;
+        pushMissingRecipesToRuntime();
+    }
+
+    @Override
+    public void onRuntimeUnavailable() {
+        jeiRuntime = null;
+        manaRecipesInJei = false;
+        enchantingRecipesInJei = false;
+    }
+
+    private static void ensureSyncListener() {
+        if (syncListenerRegistered) {
+            return;
+        }
+        syncListenerRegistered = true;
+        ClientRecipeSynchronizedEvent.EVENT.register((client, recipes) -> pushMissingRecipesToRuntime());
+    }
+
+    /**
+     * Adds recipes that were not available during {@link #registerRecipes} (common on multiplayer
+     * when Fabric recipe sync completes after JEI plugin init).
+     */
+    private static void pushMissingRecipesToRuntime() {
+        IJeiRuntime runtime = jeiRuntime;
+        if (runtime == null) {
+            return;
+        }
+        IRecipeManager recipeManager = runtime.getRecipeManager();
+
+        if (!manaRecipesInJei) {
+            List<RecipeHolder<ManaInfuserRecipe>> manaRecipes = collectRecipes(ManaInfuserRecipe.TYPE);
+            if (!manaRecipes.isEmpty()) {
+                recipeManager.addRecipes(ManaInfuserRecipeCategory.TYPE, manaRecipes);
+                manaRecipesInJei = true;
+            }
+        }
+
+        if (!enchantingRecipesInJei) {
+            List<RecipeHolder<SpellEnchantingRecipe>> enchantingRecipes = collectRecipes(SpellEnchantingRecipe.TYPE);
+            if (!enchantingRecipes.isEmpty()) {
+                recipeManager.addRecipes(SpellEnchantingRecipeCategory.TYPE, enchantingRecipes);
+                enchantingRecipesInJei = true;
+            }
+        }
+    }
+
+    /**
+     * Resolves custom recipes for JEI from the integrated server (SP) or Fabric-synced client recipes (MP).
+     */
+    @SuppressWarnings("unchecked")
+    private static <I extends net.minecraft.world.item.crafting.RecipeInput, T extends net.minecraft.world.item.crafting.Recipe<I>>
+    List<RecipeHolder<T>> collectRecipes(RecipeType<T> type) {
+        Minecraft client = Minecraft.getInstance();
+
+        // Singleplayer / LAN host: full RecipeManager
+        IntegratedServer integrated = client.getSingleplayerServer();
+        if (integrated != null) {
+            RecipeManager manager = integrated.getRecipeManager();
+            return new ArrayList<>(manager.getAllOfType(type));
+        }
+
+        // Dedicated multiplayer (and other Fabric recipe-sync servers)
+        ClientPacketListener connection = client.getConnection();
+        if (connection != null) {
+            Collection<RecipeHolder<T>> synced = connection.recipes().getSynchronizedRecipes().getAllOfType(type);
+            if (!synced.isEmpty()) {
+                return new ArrayList<>(synced);
+            }
+        }
+
+        return List.of();
     }
 }

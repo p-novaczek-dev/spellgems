@@ -135,6 +135,7 @@
   "tooltip.spellgems.spell_enchantment.extend.description": "Increases range",
 
   "enchantment.spellgems.recharge": "Recharge",
+  "enchantment.spellgems.recharge.desc": "Passively restores wand durability over time.",
 
   "recipe.spellgems.combat_spell_random.description": "Random combat enchantments",
   "recipe.spellgems.combat_tome_modifier.description": "Random combat modifier",

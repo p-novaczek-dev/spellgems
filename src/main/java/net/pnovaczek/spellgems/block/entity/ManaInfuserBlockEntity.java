@@ -88,31 +88,80 @@ public class ManaInfuserBlockEntity extends BlockEntity implements WorldlyContai
         inventory.clear();
     }
 
-    // SidedInventory (hoppers/pipes)
-    private static final int[] TOP_SLOTS = {2};      // item to infuse
-    private static final int[] SIDE_SLOTS = {0};     // fuel
-    private static final int[] BOTTOM_SLOTS = {3};   // output
+    // Hoppers/pipes: all faces see all slots; placement/extraction filtered by item role.
+    // Order prefers fuel → infusing → infused → output so auto-insert picks the right role.
+    private static final int[] AUTOMATION_SLOTS = {0, 1, 2, 3};
+    public static final int SLOT_FUEL = 0;
+    public static final int SLOT_INFUSING = 1;
+    public static final int SLOT_INFUSED = 2;
+    public static final int SLOT_OUTPUT = 3;
 
     @Override
     public int[] getSlotsForFace(Direction side) {
-        return switch (side) {
-            case DOWN -> BOTTOM_SLOTS;
-            case UP -> TOP_SLOTS;
-            default -> SIDE_SLOTS;
-        };
+        return AUTOMATION_SLOTS;
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        if (stack.isEmpty() || slot == SLOT_OUTPUT) {
+            return false;
+        }
+
+        ItemStack existing = getItem(slot);
+        if (!existing.isEmpty() && !ItemStack.isSameItemSameComponents(existing, stack)) {
+            return false;
+        }
+
         return switch (slot) {
-            case 0, 2 -> true;
+            case SLOT_FUEL -> stack.is(ModItems.MANA_ESSENCE);
+            case SLOT_INFUSING -> isValidInfusingIngredient(stack);
+            case SLOT_INFUSED -> isValidInfusedItem(stack);
             default -> false;
         };
     }
 
     @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
+        return canPlaceItem(slot, stack);
+    }
+
+    @Override
     public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
-        return slot == 3;
+        return slot == SLOT_OUTPUT;
+    }
+
+    /**
+     * True if {@code stack} is the infusing ingredient of any mana-infuser recipe.
+     */
+    private boolean isValidInfusingIngredient(ItemStack stack) {
+        return matchesAnyRecipeIngredient(stack, true);
+    }
+
+    /**
+     * True if {@code stack} is the item-to-infuse of any mana-infuser recipe.
+     */
+    private boolean isValidInfusedItem(ItemStack stack) {
+        return matchesAnyRecipeIngredient(stack, false);
+    }
+
+    private boolean matchesAnyRecipeIngredient(ItemStack stack, boolean infusing) {
+        if (!(level instanceof ServerLevel serverLevel)) {
+            // Pipes/hoppers run server-side; fail closed without a level.
+            return false;
+        }
+        if (!(serverLevel.recipeAccess() instanceof RecipeManager recipeManager)) {
+            return false;
+        }
+        for (RecipeHolder<?> holder : recipeManager.getRecipes()) {
+            if (holder.value().getType() != ManaInfuserRecipe.TYPE) {
+                continue;
+            }
+            ManaInfuserRecipe recipe = (ManaInfuserRecipe) holder.value();
+            if (infusing ? recipe.getInfusingItem().test(stack) : recipe.getInfusedItem().test(stack)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // ==================== MENU PROVIDER ====================

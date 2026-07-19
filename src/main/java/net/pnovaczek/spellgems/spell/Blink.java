@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Relative;
 import net.minecraft.world.level.Level;
@@ -18,6 +19,7 @@ import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantments;
 
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 public class Blink extends AbstractSpell {
 
@@ -43,7 +45,8 @@ public class Blink extends AbstractSpell {
         Vec3 origin = context.origin();
         double maxDistance = resolveMaxDistance(context);
         Vec3 target = SpellTargeting.resolveCastCenter(context, maxDistance);
-        spawnParticles(context.level(), origin, target);
+        // Dispenser: no client prediction; full server broadcast.
+        spawnParticles(context.level(), origin, target, null);
         if (!context.level().isClientSide() && context.level() instanceof ServerLevel serverLevel) {
             serverLevel.playSound(
                     null,
@@ -67,8 +70,9 @@ public class Blink extends AbstractSpell {
         Vec3 target = SpellTargeting.resolveCastCenter(context, maxDistance);
 
         if (context.level().isClientSide()) {
-            spawnParticles(context.level(), caster.position(), target);
-            return false;  // client effects only; cooldown will be no-op
+            // Local prediction of origin/aim; server confirms destination particles for others.
+            spawnParticles(context.level(), caster.position(), target, null);
+            return false;
         }
 
         if (!(context.level() instanceof ServerLevel serverLevel)) {
@@ -86,6 +90,9 @@ public class Blink extends AbstractSpell {
         if (!teleportCaster(serverLevel, caster, destination)) {
             return false;
         }
+
+        // Multiplayer-visible FX; skip caster if they already predicted.
+        spawnParticles(serverLevel, origin, destination, SpellParticles.predictionExcept(caster));
 
         serverLevel.playSound(
                 null,
@@ -179,11 +186,17 @@ public class Blink extends AbstractSpell {
         return level.noCollision(entity, box) && !level.containsAnyLiquid(box);
     }
 
-    private static void spawnParticles(Level level, Vec3 origin, Vec3 destination) {
+    private static void spawnParticles(
+            Level level,
+            Vec3 origin,
+            Vec3 destination,
+            @Nullable Entity exceptViewer
+    ) {
         var random = level.getRandom();
         for (int i = 0; i < PARTICLE_COUNT; i++) {
             SpellParticles.add(
                     level,
+                    exceptViewer,
                     ParticleTypes.PORTAL,
                     origin.x + (random.nextDouble() - 0.5) * entityWidthEstimate(),
                     origin.y + random.nextDouble() * 2.0,
@@ -194,6 +207,7 @@ public class Blink extends AbstractSpell {
             );
             SpellParticles.add(
                     level,
+                    exceptViewer,
                     ParticleTypes.PORTAL,
                     destination.x + (random.nextDouble() - 0.5) * entityWidthEstimate(),
                     destination.y + random.nextDouble() * 2.0,

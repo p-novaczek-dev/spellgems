@@ -11,6 +11,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
@@ -27,6 +28,7 @@ import net.pnovaczek.spellgems.spell.SpellParticles;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiPredicate;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Registry of {@link StrikeEffect} strategies keyed by strike id.
@@ -97,8 +99,8 @@ public final class StrikeEffects {
             }
 
             @Override
-            public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, ParticleTypes.ELECTRIC_SPARK, 0.2D, x, y, z, random, dx, dy, dz);
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, ParticleTypes.ELECTRIC_SPARK, 0.2D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -122,8 +124,8 @@ public final class StrikeEffects {
             }
 
             @Override
-            public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, ParticleTypes.WHITE_SMOKE, 0.5D, x, y, z, random, dx, dy, dz);
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, ParticleTypes.WHITE_SMOKE, 0.5D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -142,8 +144,8 @@ public final class StrikeEffects {
             }
 
             @Override
-            public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, ParticleTypes.SCULK_SOUL, 0.3D, x, y, z, random, dx, dy, dz);
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, ParticleTypes.SCULK_SOUL, 0.3D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -170,8 +172,8 @@ public final class StrikeEffects {
             }
 
             @Override
-            public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, ParticleTypes.SOUL_FIRE_FLAME, 0.3D, x, y, z, random, dx, dy, dz);
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, ParticleTypes.SOUL_FIRE_FLAME, 0.3D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -222,8 +224,8 @@ public final class StrikeEffects {
             }
 
             @Override
-            public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, ParticleTypes.CRIT, 0.3D, x, y, z, random, dx, dy, dz);
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, ParticleTypes.CRIT, 0.3D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -246,8 +248,8 @@ public final class StrikeEffects {
             }
 
             @Override
-            public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, ParticleTypes.CLOUD, 0.1D, x, y, z, random, dx, dy, dz);
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, ParticleTypes.CLOUD, 0.1D, x, y, z, random, dx, dy, dz);
             }
         });
     }
@@ -274,8 +276,8 @@ public final class StrikeEffects {
         }
 
         @Override
-        public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-            particles(level, ParticleTypes.DUST_PLUME, 0.1D, x, y, z, random, dx, dy, dz);
+        public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, ParticleTypes.DUST_PLUME, 0.1D, x, y, z, random, dx, dy, dz);
         }
     };
 
@@ -297,8 +299,8 @@ public final class StrikeEffects {
             }
 
             @Override
-            public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, particle, spread, x, y, z, random, dx, dy, dz);
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, particle, spread, x, y, z, random, dx, dy, dz);
             }
         };
     }
@@ -316,8 +318,8 @@ public final class StrikeEffects {
             }
 
             @Override
-            public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, particle, spread, x, y, z, random, dx, dy, dz);
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, particle, spread, x, y, z, random, dx, dy, dz);
             }
         };
     }
@@ -335,8 +337,8 @@ public final class StrikeEffects {
             }
 
             @Override
-            public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, particle, spread, x, y, z, random, dx, dy, dz);
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, particle, spread, x, y, z, random, dx, dy, dz);
             }
         };
     }
@@ -379,14 +381,15 @@ public final class StrikeEffects {
             }
 
             @Override
-            public void addParticle(Level level, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, particle, spread, x, y, z, random, dx, dy, dz);
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, particle, spread, x, y, z, random, dx, dy, dz);
             }
         };
     }
 
     private static void particles(
             Level level,
+            @Nullable Entity exceptViewer,
             ParticleOptions particle,
             double spread,
             double x,
@@ -399,6 +402,7 @@ public final class StrikeEffects {
     ) {
         SpellParticles.add(
                 level,
+                exceptViewer,
                 particle,
                 x + (random.nextDouble() - 0.5) * spread,
                 y + (random.nextDouble() - 0.5) * spread,
