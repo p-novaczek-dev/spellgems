@@ -252,7 +252,8 @@ public record StrikeEnchantment(Identifier id) {
             randomSpread = 0.3D;
         }
 
-        level.addParticle(
+        net.pnovaczek.spellgems.spell.SpellParticles.add(
+                level,
                 particleType,
                 x + (random.nextDouble() - 0.5) * randomSpread,
                 y + (random.nextDouble() - 0.5) * randomSpread,

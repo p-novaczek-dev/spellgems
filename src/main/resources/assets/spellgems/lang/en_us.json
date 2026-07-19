@@ -25,7 +25,12 @@
 
   "block.spellgems.mana_infuser": "Mana Infuser",
   "block.spellgems.spell_enchanting_table": "Spell Enchanting Table",
+  "block.spellgems.spell_dispenser": "Spell Dispenser",
   "block.spellgems.mana_root": "Mana Root",
+
+  "tooltip.spellgems.spell_dispenser.cooldown": "Cooldown: %s",
+  "tooltip.spellgems.spell_dispenser.burnout": "Disabled: %s",
+  "tooltip.spellgems.spell_dispenser.ready": "Ready",
 
   "key.spellgems.cycle_spell": "Cycle Spell",
   "key.spellgems.wand_quick_cast.1": "Wand Quick Cast 1",

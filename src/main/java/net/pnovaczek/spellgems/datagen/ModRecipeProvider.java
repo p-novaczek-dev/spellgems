@@ -44,6 +44,17 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .unlockedBy("has_mana_essence", has(ModItems.MANA_ESSENCE))
                         .save(exporter);
 
+                // 7 Cobblestone + 1 Redstone + 1 Shimmersteel → Spell Dispenser
+                shaped(RecipeCategory.REDSTONE, ModBlocks.SPELL_DISPENSER)
+                        .pattern("###")
+                        .pattern("#R#")
+                        .pattern("#S#")
+                        .define('#', Blocks.COBBLESTONE)
+                        .define('R', Items.REDSTONE)
+                        .define('S', ModItems.SHIMMERSTEEL_INGOT)
+                        .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
+                        .save(exporter);
+
                 // Mana Root → Mana Essence (furnace smelting)
                 oreSmelting(
                         List.of(ModItems.MANA_ROOT),

@@ -5,7 +5,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.FarmlandBlock;
@@ -23,7 +22,7 @@ public class Plant extends AbstractSpell {
 
     @Override
     public boolean canCast(SpellContext context) {
-        return context.caster() instanceof Player player && HotbarUtils.hasItem(player, HotbarUtils::isPlantableSeed);
+        return HotbarUtils.hasItem(context, HotbarUtils::isPlantableSeed);
     }
 
     @Override
@@ -33,12 +32,12 @@ public class Plant extends AbstractSpell {
 
     @Override
     protected boolean performCast(SpellContext context) {
-        if (!(context.caster() instanceof Player player) || context.level().isClientSide()) {
+        if (context.level().isClientSide()) {
             return false;
         }
 
         var level = context.level();
-        BlockPos center = player.blockPosition();
+        BlockPos center = context.originBlockPos();
         boolean plantedAny = false;
 
         for (int dx = -AREA_RADIUS; dx <= AREA_RADIUS; dx++) {
@@ -54,14 +53,14 @@ public class Plant extends AbstractSpell {
                         continue;
                     }
 
-                    ItemStack seedStack = HotbarUtils.pickWeighted(player, level.getRandom(), HotbarUtils::isPlantableSeed);
+                    ItemStack seedStack = HotbarUtils.pickWeighted(context, level.getRandom(), HotbarUtils::isPlantableSeed);
                     if (seedStack == null || !(seedStack.getItem() instanceof BlockItem blockItem)) {
                         break;
                     }
 
                     BlockState cropState = blockItem.getBlock().defaultBlockState();
                     level.setBlockAndUpdate(plantPos, cropState);
-                    level.gameEvent(GameEvent.BLOCK_PLACE, plantPos, GameEvent.Context.of(player, cropState));
+                    level.gameEvent(GameEvent.BLOCK_PLACE, plantPos, GameEvent.Context.of(cropState));
                     level.playSound(
                             null,
                             plantPos.getX(),
@@ -82,7 +81,7 @@ public class Plant extends AbstractSpell {
             return false;
         }
 
-        if (player instanceof ServerPlayer serverPlayer) {
+        if (context.caster() instanceof ServerPlayer serverPlayer) {
             serverPlayer.inventoryMenu.sendAllDataToRemote();
         }
 

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "spellgems:block/spell_dispenser_front",
+    "side": "spellgems:block/spell_dispenser",
+    "top": "spellgems:block/spell_dispenser"
+  }
+}

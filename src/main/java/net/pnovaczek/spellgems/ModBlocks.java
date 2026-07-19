@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.pnovaczek.spellgems.block.ManaInfuserBlock;
 import net.pnovaczek.spellgems.block.ManaRootCropBlock;
+import net.pnovaczek.spellgems.block.SpellDispenserBlock;
 import net.pnovaczek.spellgems.block.SpellEnchantingTableBlock;
 
 import java.util.function.Function;
@@ -35,6 +36,12 @@ public class ModBlocks {
             "spell_enchanting_table",
             SpellEnchantingTableBlock::new,
             BlockBehaviour.Properties.ofFullCopy(Blocks.ENCHANTING_TABLE)
+    );
+
+    public static final Block SPELL_DISPENSER = registerBlockAndItem(
+            "spell_dispenser",
+            SpellDispenserBlock::new,
+            BlockBehaviour.Properties.ofFullCopy(Blocks.DISPENSER)
     );
 
     private static Block registerBlockAndItem(String name, Function<BlockBehaviour.Properties, Block> blockFactory, BlockBehaviour.Properties settings) {

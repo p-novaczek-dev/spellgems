@@ -6,7 +6,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
@@ -27,80 +26,90 @@ public class Projectile extends AbstractSpell {
     @Override
     protected boolean performCast(SpellContext context) {
         var level = context.level();
-        var caster = context.caster();
         var data = context.data();
         var modifiers = data.modifierEffects();
         var strikes = data.strikeEffects();
 
-        if (!level.isClientSide() && caster instanceof Player player) {
-            var random = level.getRandom();
-            var baseDirection = context.lookAngle();
-
-            int shotCount = 1;
-            boolean isBurst = false;
-            boolean isMultishot = false;
-            int chainCount = 0;
-
-            for (var mod : modifiers) {
-                if (mod.is(ModifierEnchantments.MULTISHOT)) {
-                    isMultishot = true;
-                    shotCount = Spellgems.CONFIG.multishotCount;
-                } else if (mod.is(ModifierEnchantments.BURST)) {
-                    isBurst = true;
-                    shotCount = 5;
-                } else if (mod.is(ModifierEnchantments.CHAINING)) {
-                    chainCount = Spellgems.CONFIG.chainingCount;
-                }
-            }
-
-            ProjectileHitHandler baseHandler = createHitHandler(context, strikes, chainCount);
-
-            for (int i = 0; i < shotCount; i++) {
-                Vec3 direction = baseDirection;
-
-                if (isMultishot) {
-                    float spreadAngle = 10.0F;
-                    float angle = (i - (shotCount - 1) / 2.0F) * spreadAngle;
-                    direction = baseDirection.yRot((float) Math.toRadians(angle));
-                } else if (isBurst && i > 0) {
-                    double spread = 0.03;
-                    direction = baseDirection.add(
-                            random.nextGaussian() * spread,
-                            random.nextGaussian() * spread,
-                            random.nextGaussian() * spread
-                    ).normalize();
-                }
-
-                if (!isBurst || i == 0) {
-                    spawnShot(context, direction, baseHandler, player, level, strikes);
-                } else {
-                    int delayTicks = i * 3;
-                    SpellBurstScheduler.scheduleServer(level.getServer().getTickCount(), delayTicks, () -> {
-                        if (!player.isAlive()) return;
-
-                        Vec3 currentLook = player.getLookAngle();
-                        Vec3 dir = currentLook.add(
-                                level.getRandom().nextGaussian() * 0.03,
-                                level.getRandom().nextGaussian() * 0.03,
-                                level.getRandom().nextGaussian() * 0.03
-                        ).normalize();
-
-                        spawnShot(context, dir, baseHandler, player, level, strikes);
-                    });
-                }
-            }
-
-            return true;
+        if (level.isClientSide()) {
+            return false;
         }
-        return false;
+
+        var random = level.getRandom();
+        var baseDirection = context.lookAngle();
+
+        int shotCount = 1;
+        boolean isBurst = false;
+        boolean isMultishot = false;
+        int chainCount = 0;
+
+        for (var mod : modifiers) {
+            if (mod.is(ModifierEnchantments.MULTISHOT)) {
+                isMultishot = true;
+                shotCount = Spellgems.CONFIG.multishotCount;
+            } else if (mod.is(ModifierEnchantments.BURST)) {
+                isBurst = true;
+                shotCount = 5;
+            } else if (mod.is(ModifierEnchantments.CHAINING)) {
+                chainCount = Spellgems.CONFIG.chainingCount;
+            }
+        }
+
+        ProjectileHitHandler baseHandler = createHitHandler(context, strikes, chainCount);
+
+        for (int i = 0; i < shotCount; i++) {
+            Vec3 direction = baseDirection;
+
+            if (isMultishot) {
+                float spreadAngle = 10.0F;
+                float angle = (i - (shotCount - 1) / 2.0F) * spreadAngle;
+                direction = baseDirection.yRot((float) Math.toRadians(angle));
+            } else if (isBurst && i > 0) {
+                double spread = 0.03;
+                direction = baseDirection.add(
+                        random.nextGaussian() * spread,
+                        random.nextGaussian() * spread,
+                        random.nextGaussian() * spread
+                ).normalize();
+            }
+
+            if (!isBurst || i == 0) {
+                spawnShot(context, direction, baseHandler, level, strikes);
+            } else {
+                int delayTicks = i * 3;
+                SpellBurstScheduler.scheduleServer(level.getServer().getTickCount(), delayTicks, () -> {
+                    if (context.caster() != null && !context.caster().isAlive()) {
+                        return;
+                    }
+
+                    Vec3 currentLook = context.lookAngle();
+                    if (context.caster() != null) {
+                        currentLook = context.caster().getLookAngle();
+                    }
+                    Vec3 dir = currentLook.add(
+                            level.getRandom().nextGaussian() * 0.03,
+                            level.getRandom().nextGaussian() * 0.03,
+                            level.getRandom().nextGaussian() * 0.03
+                    ).normalize();
+
+                    spawnShot(context, dir, baseHandler, level, strikes);
+                });
+            }
+        }
+
+        return true;
     }
 
-    private void spawnShot(SpellContext context, Vec3 direction, ProjectileHitHandler handler,
-                           Player soundSource, Level level, List<StrikeEnchantment> strikes) {
+    private void spawnShot(
+            SpellContext context,
+            Vec3 direction,
+            ProjectileHitHandler handler,
+            Level level,
+            List<StrikeEnchantment> strikes
+    ) {
         SpellProjectile projectile = new SpellProjectile(context, direction, handler);
         level.addFreshEntity(projectile);
 
-        var sound = SoundEvents.ENDER_DRAGON_SHOOT; // BLAZE_SHOOT
+        var sound = SoundEvents.ENDER_DRAGON_SHOOT;
         float pitch = 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F);
 
         if (!strikes.isEmpty() && strikes.stream().anyMatch(s -> s.is(StrikeEnchantments.FROST))) {
@@ -108,9 +117,10 @@ public class Projectile extends AbstractSpell {
             pitch = 1.0F;
         }
 
+        Vec3 soundPos = context.eyeOrigin();
         level.playSound(
                 null,
-                soundSource.getX(), soundSource.getY(), soundSource.getZ(),
+                soundPos.x, soundPos.y, soundPos.z,
                 sound,
                 SoundSource.PLAYERS,
                 0.5F,
@@ -129,8 +139,9 @@ public class Projectile extends AbstractSpell {
 
             living.hurtServer(serverLevel, projectile.damageSources().magic(), spellConfig.damage);
 
+            LivingEntity strikeSource = context.caster() != null ? context.caster() : living;
             for (var strike : strikes) {
-                strike.applyTo(living, context.caster());
+                strike.applyTo(living, strikeSource);
             }
 
             if (maxChains > 0) {

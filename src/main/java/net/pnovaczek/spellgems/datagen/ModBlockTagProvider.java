@@ -16,6 +16,7 @@ public class ModBlockTagProvider extends FabricTagsProvider.BlockTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider registries) {
         builder(BlockTags.MINEABLE_WITH_PICKAXE)
-            .add(ModBlocks.MANA_INFUSER.properties().blockId());
+            .add(ModBlocks.MANA_INFUSER.properties().blockId())
+            .add(ModBlocks.SPELL_DISPENSER.properties().blockId());
     }
 }

@@ -33,8 +33,6 @@ public class Magnet extends AbstractSpell {
     @Override
     protected boolean performCast(SpellContext context) {
         var level = context.level();
-        var caster = context.caster();
-        // alive handled by base
 
         float baseRange = Spellgems.CONFIG.spells.magnet.range;
         List<UtilityEnchantment> utilities = (context.data() != null) ? context.data().utilityEffects() : List.of();
@@ -43,8 +41,10 @@ public class Magnet extends AbstractSpell {
                 ? (float) (baseRange * Spellgems.CONFIG.spells.magnet.extendMultiplier)
                 : baseRange;
 
+        Vec3 pullTarget = magnetPullTarget(context);
+
         if (level.isClientSide()) {
-            spawnParticles(level, caster.position());
+            spawnParticles(level, pullTarget);
             return false;
         }
 
@@ -52,15 +52,19 @@ public class Magnet extends AbstractSpell {
             return false;
         }
 
-        AABB searchBox = caster.getBoundingBox().inflate(range);
+        // Dispenser has no client cast path; broadcast particles from the server.
+        if (context.isDispenserCast()) {
+            spawnParticles(level, pullTarget);
+        }
+
+        AABB searchBox = new AABB(pullTarget, pullTarget).inflate(range);
         double rangeSqr = range * range;
-        Vec3 pullTarget = caster.position().add(0.0, caster.getEyeHeight() * 0.5, 0.0);
         List<ItemEntity> items = serverLevel.getEntitiesOfClass(
                 ItemEntity.class,
                 searchBox,
                 item -> item.isAlive()
                         && !item.getItem().isEmpty()
-                        && item.distanceToSqr(caster) <= rangeSqr
+                        && item.position().distanceToSqr(pullTarget) <= rangeSqr
         );
 
         boolean pulledAny = false;
@@ -71,19 +75,20 @@ public class Magnet extends AbstractSpell {
             }
 
             item.setDeltaMovement(offset.normalize().scale(PULL_SPEED));
-            if (caster instanceof Player player) {
+            // Player casts still magnetize pickup; dispenser casts only pull (BE absorbs items later).
+            if (context.caster() instanceof Player player && !context.isDispenserCast()) {
                 item.setTarget(player.getUUID());
+                item.setPickUpDelay(0);
             }
-            item.setPickUpDelay(0);
             pulledAny = true;
         }
 
         if (pulledAny) {
             serverLevel.playSound(
                     null,
-                    caster.getX(),
-                    caster.getY(),
-                    caster.getZ(),
+                    pullTarget.x,
+                    pullTarget.y,
+                    pullTarget.z,
                     SoundEvents.EXPERIENCE_ORB_PICKUP,
                     SoundSource.PLAYERS,
                     0.35F,
@@ -94,13 +99,25 @@ public class Magnet extends AbstractSpell {
         return true;
     }
 
+    /**
+     * Pull destination: player eye mid-height for living casters; raw origin for machines.
+     */
+    private static Vec3 magnetPullTarget(SpellContext context) {
+        if (context.caster() != null && !context.isDispenserCast()) {
+            var caster = context.caster();
+            return caster.position().add(0.0, caster.getEyeHeight() * 0.5, 0.0);
+        }
+        return context.origin();
+    }
+
     private static void spawnParticles(net.minecraft.world.level.Level level, Vec3 center) {
         var random = level.getRandom();
         for (int i = 0; i < PARTICLE_COUNT; i++) {
             double x = center.x + (random.nextDouble() - 0.5) * 2.0;
             double y = center.y + random.nextDouble() * 2.0;
             double z = center.z + (random.nextDouble() - 0.5) * 2.0;
-            level.addParticle(
+            SpellParticles.add(
+                    level,
                     ParticleTypes.ENCHANT,
                     x,
                     y,

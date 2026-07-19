@@ -53,8 +53,7 @@ public class SpellProjectile extends AbstractHurtingProjectile {
             this.entityData.set(DATA_TINT_COLOR, spellContext.data().getTintColor());
         }
 
-        var caster = spellContext.caster();
-        Vec3 eyePos = new Vec3(caster.getX(), caster.getEyeY() - 0.1, caster.getZ());
+        Vec3 eyePos = spellContext.eyeOrigin().add(0.0, -0.1, 0.0);
         Vec3 sourcePos = eyePos.add(direction.normalize().scale(0.6));
         setImpulse(direction, sourcePos);
     }
@@ -76,8 +75,9 @@ public class SpellProjectile extends AbstractHurtingProjectile {
 
     @SuppressWarnings("this-escape")
     private void setImpulse(Vec3 direction, Vec3 sourcePos) {
-        var caster = spellContext.caster();
-        this.setOwner(caster);
+        if (spellContext.caster() != null) {
+            this.setOwner(spellContext.caster());
+        }
         this.setPos(sourcePos.x, sourcePos.y, sourcePos.z);
         this.setDeltaMovement(direction.normalize().scale(1.8));
         this.accelerationPower = 0.06;

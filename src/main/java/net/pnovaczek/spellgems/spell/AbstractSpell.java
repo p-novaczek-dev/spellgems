@@ -7,7 +7,7 @@ import net.minecraft.world.phys.Vec3;
 public abstract class AbstractSpell implements Spell {
 
     protected static void applyCastCooldown(SpellContext context, int ticks) {
-        if (context.isWandCast()) {
+        if (!context.appliesPlayerItemCooldown()) {
             return;
         }
         if (!context.level().isClientSide() && context.caster() instanceof Player player) {
@@ -20,7 +20,12 @@ public abstract class AbstractSpell implements Spell {
 
     @Override
     public final void cast(SpellContext context) {
-        if (!context.caster().isAlive()) {
+        if (context.caster() != null && !context.caster().isAlive()) {
+            return;
+        }
+        // Dispenser self-target: FX only (blink, drink potions). No world mutation.
+        if (context.isDispenserCast() && isSelfTargeting(context)) {
+            performSelfTargetDispenserFx(context);
             return;
         }
 
@@ -34,6 +39,13 @@ public abstract class AbstractSpell implements Spell {
      * meaningful (so that cooldown should be applied).
      */
     protected abstract boolean performCast(SpellContext context);
+
+    /**
+     * Client/server FX when a self-targeting spell is cast from a dispenser.
+     * Override when particles/sounds should still play; default is no-op.
+     */
+    protected void performSelfTargetDispenserFx(SpellContext context) {
+    }
 
     protected int getCooldownTicks() {
         return 20;
@@ -84,7 +96,7 @@ public abstract class AbstractSpell implements Spell {
     }
 
     @Override
-    public final  String tooltipDescriptionKey() {
+    public final String tooltipDescriptionKey() {
         return "tooltip.spellgems.spell." + name() + ".description";
     }
 

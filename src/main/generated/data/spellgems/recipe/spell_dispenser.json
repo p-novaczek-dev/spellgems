@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "#": "minecraft:cobblestone",
+    "R": "minecraft:redstone",
+    "S": "spellgems:shimmersteel_ingot"
+  },
+  "pattern": [
+    "###",
+    "#R#",
+    "#S#"
+  ],
+  "result": {
+    "id": "spellgems:spell_dispenser"
+  }
+}

@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BonemealableBlock;
@@ -23,11 +22,7 @@ public class Grow extends AbstractSpell {
 
     @Override
     public boolean canCast(SpellContext context) {
-        if (!(context.caster() instanceof Player player)) {
-            return false;
-        }
-
-        if (!hasGrowableCrop(context, player)) {
+        if (!hasGrowableCrop(context)) {
             return false;
         }
 
@@ -35,7 +30,7 @@ public class Grow extends AbstractSpell {
             return true;
         }
 
-        return HotbarUtils.hasItem(player, HotbarUtils::isBoneMeal);
+        return HotbarUtils.hasItem(context, HotbarUtils::isBoneMeal);
     }
 
     @Override
@@ -45,21 +40,21 @@ public class Grow extends AbstractSpell {
 
     @Override
     protected boolean performCast(SpellContext context) {
-        if (!(context.caster() instanceof Player player) || context.level().isClientSide()) {
+        if (context.level().isClientSide()) {
             return false;
         }
 
         var level = context.level();
         boolean requireBoneMeal = Spellgems.CONFIG.spells.grow.requireBoneMeal;
-        BlockPos center = player.blockPosition();
+        BlockPos center = context.originBlockPos();
         boolean grewAny = false;
 
         for (int dx = -AREA_RADIUS; dx <= AREA_RADIUS; dx++) {
             for (int dz = -AREA_RADIUS; dz <= AREA_RADIUS; dz++) {
                 BlockPos base = center.offset(dx, 0, dz);
-                if (tryGrowAt(level, base, player, requireBoneMeal)) {
+                if (tryGrowAt(level, base, context, requireBoneMeal)) {
                     grewAny = true;
-                } else if (tryGrowAt(level, base.above(), player, requireBoneMeal)) {
+                } else if (tryGrowAt(level, base.above(), context, requireBoneMeal)) {
                     grewAny = true;
                 }
             }
@@ -69,15 +64,15 @@ public class Grow extends AbstractSpell {
             return false;
         }
 
-        if (requireBoneMeal && player instanceof ServerPlayer serverPlayer) {
+        if (requireBoneMeal && context.caster() instanceof ServerPlayer serverPlayer) {
             serverPlayer.inventoryMenu.sendAllDataToRemote();
         }
 
         return true;
     }
 
-    private static boolean hasGrowableCrop(SpellContext context, Player player) {
-        BlockPos center = player.blockPosition();
+    private static boolean hasGrowableCrop(SpellContext context) {
+        BlockPos center = context.originBlockPos();
         var level = context.level();
 
         for (int dx = -AREA_RADIUS; dx <= AREA_RADIUS; dx++) {
@@ -92,12 +87,14 @@ public class Grow extends AbstractSpell {
         return false;
     }
 
-    private static boolean tryGrowAt(Level level, BlockPos pos, Player player, boolean requireBoneMeal) {
+    private static boolean tryGrowAt(Level level, BlockPos pos, SpellContext context, boolean requireBoneMeal) {
         if (!isGrowableTarget(level, pos)) {
             return false;
         }
 
-        ItemStack boneMeal = requireBoneMeal ? HotbarUtils.pickWeighted(player, level.getRandom(), HotbarUtils::isBoneMeal) : null;
+        ItemStack boneMeal = requireBoneMeal
+                ? HotbarUtils.pickWeighted(context, level.getRandom(), HotbarUtils::isBoneMeal)
+                : null;
         if (requireBoneMeal && boneMeal == null) {
             return false;
         }

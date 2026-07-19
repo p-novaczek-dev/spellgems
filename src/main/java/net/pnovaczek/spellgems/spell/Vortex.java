@@ -7,15 +7,14 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.SpellgemsConfig;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -32,12 +31,8 @@ public class Vortex extends AbstractSpell {
 
     @Override
     protected boolean performCast(SpellContext context) {
-        var level = context.level();
-        var caster = context.caster();
-        // alive handled by base
-
         var config = Spellgems.CONFIG.spells.vortex;
-        Vec3 center = SpellTargeting.resolveCastCenter(caster, config.maxDistance);
+        Vec3 center = SpellTargeting.resolveCastCenter(context, config.maxDistance);
 
         boolean hasExpand = false;
         boolean isBurst = false;
@@ -66,12 +61,16 @@ public class Vortex extends AbstractSpell {
     private void executePulse(SpellContext context, Vec3 center, boolean hasExpand) {
         var level = context.level();
         var caster = context.caster();
-        if (!caster.isAlive()) return;
+        if (caster != null && !caster.isAlive()) return;
 
         if (level.isClientSide()) {
             spawnSphereParticles(context, center, hasExpand);
         } else if (level instanceof ServerLevel serverLevel) {
             applyVortexPull(context, serverLevel, center, hasExpand);
+            // Dispenser has no client cast path; broadcast particles from the server.
+            if (context.isDispenserCast()) {
+                spawnSphereParticles(context, center, hasExpand);
+            }
         }
     }
 
@@ -94,10 +93,11 @@ public class Vortex extends AbstractSpell {
 
             if (entity instanceof LivingEntity living) {
                 if (damage > 0.0F) {
-                    living.hurtServer(level, caster.damageSources().magic(), damage);
+                    living.hurtServer(level, level.damageSources().magic(), damage);
                 }
+                LivingEntity strikeSource = caster != null ? caster : living;
                 for (StrikeEnchantment strike : strikes) {
-                    strike.applyTo(living, caster);
+                    strike.applyTo(living, strikeSource);
                 }
             }
         }
@@ -137,7 +137,8 @@ public class Vortex extends AbstractSpell {
             velocity = velocity.scale(particleSpeed / len);
 
             if (strikes.isEmpty()) {
-                level.addParticle(
+                SpellParticles.add(
+                        level,
                         dustOptions,
                         pos.x, pos.y, pos.z,
                         velocity.x, velocity.y, velocity.z
@@ -157,8 +158,6 @@ public class Vortex extends AbstractSpell {
         }
 
         if (entity instanceof LivingEntity living) {
-            // knockback() subtracts the direction vector from velocity, so pass away-from-center
-            // (opposite of Nova's outward push, which passes toward-center)
             double dx = entity.getX() - center.x;
             double dz = entity.getZ() - center.z;
             living.knockback(pullStrength, dx, dz);
@@ -178,7 +177,7 @@ public class Vortex extends AbstractSpell {
                 : config.particleCount;
     }
 
-    private static boolean isVortexTarget(Entity entity, LivingEntity caster) {
+    private static boolean isVortexTarget(Entity entity, @Nullable LivingEntity caster) {
         if (entity == caster || !entity.isAlive() || entity.isSpectator()) {
             return false;
         }

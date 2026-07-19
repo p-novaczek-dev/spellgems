@@ -1,5 +1,7 @@
 package net.pnovaczek.spellgems.spell;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -9,9 +11,15 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class PlaceBlock extends AbstractSpell {
+
+    private static final double DEFAULT_REACH = 5.0;
 
     @Override
     public Identifier id() {
@@ -25,35 +33,75 @@ public class PlaceBlock extends AbstractSpell {
 
     @Override
     public boolean canCast(SpellContext context) {
-        return context.caster() instanceof Player player && HotbarUtils.hasItem(player, HotbarUtils::isPlaceableBlock);
+        return HotbarUtils.hasItem(context, HotbarUtils::isPlaceableBlock);
     }
 
     @Override
     protected boolean performCast(SpellContext context) {
-        if (!(context.caster() instanceof Player player) || context.level().isClientSide()) {
+        if (context.level().isClientSide()) {
             return false;
         }
 
-        BlockHitResult hit = SpellTargeting.resolveBlockHit(player, player.blockInteractionRange());
-        if (hit == null || !player.isWithinBlockInteractionRange(hit.getBlockPos(), 0.0)) {
+        double reach = context.caster() instanceof Player player
+                ? player.blockInteractionRange()
+                : DEFAULT_REACH;
+        BlockHitResult hit = SpellTargeting.resolveBlockHit(context, reach);
+        if (hit == null) {
             return false;
         }
 
-        ItemStack stack = HotbarUtils.pickWeighted(player, context.level().getRandom(), HotbarUtils::isPlaceableBlock);
+        if (context.caster() instanceof Player player
+                && !player.isWithinBlockInteractionRange(hit.getBlockPos(), 0.0)) {
+            return false;
+        }
+
+        ItemStack stack = HotbarUtils.pickWeighted(context, context.level().getRandom(), HotbarUtils::isPlaceableBlock);
         if (stack == null || !(stack.getItem() instanceof BlockItem blockItem)) {
             return false;
         }
 
-        UseOnContext useContext = new UseOnContext(context.level(), player, InteractionHand.MAIN_HAND, stack, hit);
-        InteractionResult result = blockItem.place(new BlockPlaceContext(useContext));
-        if (!result.consumesAction()) {
+        boolean placed;
+        if (context.caster() instanceof Player player) {
+            UseOnContext useContext = new UseOnContext(
+                    context.level(), player, InteractionHand.MAIN_HAND, stack, hit);
+            InteractionResult result = blockItem.place(new BlockPlaceContext(useContext));
+            placed = result.consumesAction();
+        } else {
+            placed = placeWithoutPlayer(context.level(), blockItem, stack, hit);
+        }
+
+        if (!placed) {
             return false;
         }
 
-        if (player instanceof ServerPlayer serverPlayer) {
+        if (context.caster() instanceof ServerPlayer serverPlayer) {
             serverPlayer.inventoryMenu.sendAllDataToRemote();
         }
 
+        return true;
+    }
+
+    /**
+     * Direct placement for non-player casters (spell dispenser). Places against the hit face.
+     */
+    private static boolean placeWithoutPlayer(Level level, BlockItem blockItem, ItemStack stack, BlockHitResult hit) {
+        Direction face = hit.getDirection();
+        BlockPos placePos = hit.getBlockPos().relative(face);
+        if (!level.getBlockState(placePos).canBeReplaced()) {
+            return false;
+        }
+
+        Block block = blockItem.getBlock();
+        BlockState state = block.defaultBlockState();
+        if (!state.canSurvive(level, placePos)) {
+            return false;
+        }
+        if (!level.setBlock(placePos, state, Block.UPDATE_ALL)) {
+            return false;
+        }
+
+        level.gameEvent(GameEvent.BLOCK_PLACE, placePos, GameEvent.Context.of(state));
+        stack.shrink(1);
         return true;
     }
 }

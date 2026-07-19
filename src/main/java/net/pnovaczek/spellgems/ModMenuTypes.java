@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.MenuType;
 import net.pnovaczek.spellgems.screen.AstralBowMenu;
 import net.pnovaczek.spellgems.screen.ManaInfuserMenu;
+import net.pnovaczek.spellgems.screen.SpellDispenserMenu;
 import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
 import net.pnovaczek.spellgems.screen.WandMenu;
 
@@ -21,6 +22,11 @@ public class ModMenuTypes {
     public static final MenuType<SpellEnchantingMenu> SPELL_ENCHANTING_TABLE = register(
             "spell_enchanting_table",
             SpellEnchantingMenu::new
+    );
+
+    public static final MenuType<SpellDispenserMenu> SPELL_DISPENSER = register(
+            "spell_dispenser",
+            SpellDispenserMenu::new
     );
 
     public static final MenuType<WandMenu> WAND = register(

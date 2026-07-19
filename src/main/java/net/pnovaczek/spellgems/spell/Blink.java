@@ -29,22 +29,42 @@ public class Blink extends AbstractSpell {
     }
 
     @Override
+    public boolean isSelfTargeting(SpellContext context) {
+        return true;
+    }
+
+    @Override
     protected int getCooldownTicks() {
         return 20;
     }
 
     @Override
+    protected void performSelfTargetDispenserFx(SpellContext context) {
+        Vec3 origin = context.origin();
+        double maxDistance = resolveMaxDistance(context);
+        Vec3 target = SpellTargeting.resolveCastCenter(context, maxDistance);
+        spawnParticles(context.level(), origin, target);
+        if (!context.level().isClientSide() && context.level() instanceof ServerLevel serverLevel) {
+            serverLevel.playSound(
+                    null,
+                    origin.x, origin.y, origin.z,
+                    SoundEvents.PLAYER_TELEPORT,
+                    SoundSource.PLAYERS,
+                    0.5F,
+                    1.0F
+            );
+        }
+    }
+
+    @Override
     protected boolean performCast(SpellContext context) {
         var caster = context.caster();
-        // alive handled by base
+        if (caster == null) {
+            return false;
+        }
 
-        double baseMaxDistance = Spellgems.CONFIG.spells.blink.maxDistance;
-        List<UtilityEnchantment> utilities = (context.data() != null) ? context.data().utilityEffects() : List.of();
-        boolean hasExtend = utilities.stream().anyMatch(u -> u.is(UtilityEnchantments.EXTEND));
-        double maxDistance = hasExtend
-                ? baseMaxDistance * Spellgems.CONFIG.spells.blink.extendMultiplier
-                : baseMaxDistance;
-        Vec3 target = SpellTargeting.resolveCastCenter(caster, maxDistance);
+        double maxDistance = resolveMaxDistance(context);
+        Vec3 target = SpellTargeting.resolveCastCenter(context, maxDistance);
 
         if (context.level().isClientSide()) {
             spawnParticles(context.level(), caster.position(), target);
@@ -87,10 +107,17 @@ public class Blink extends AbstractSpell {
         return true;
     }
 
+    private static double resolveMaxDistance(SpellContext context) {
+        double baseMaxDistance = Spellgems.CONFIG.spells.blink.maxDistance;
+        List<UtilityEnchantment> utilities = (context.data() != null) ? context.data().utilityEffects() : List.of();
+        boolean hasExtend = utilities.stream().anyMatch(u -> u.is(UtilityEnchantments.EXTEND));
+        return hasExtend
+                ? baseMaxDistance * Spellgems.CONFIG.spells.blink.extendMultiplier
+                : baseMaxDistance;
+    }
+
     private static boolean teleportCaster(ServerLevel level, LivingEntity caster, Vec3 destination) {
         if (caster instanceof ServerPlayer serverPlayer) {
-            // Use relative rotation deltas of 0 to preserve the player's current orientation.
-            // This matches the approach used by vanilla's ServerPlayer.teleportTo(x, y, z).
             ServerPlayer teleported = serverPlayer.teleport(
                     new TeleportTransition(
                             level,
@@ -155,7 +182,8 @@ public class Blink extends AbstractSpell {
     private static void spawnParticles(Level level, Vec3 origin, Vec3 destination) {
         var random = level.getRandom();
         for (int i = 0; i < PARTICLE_COUNT; i++) {
-            level.addParticle(
+            SpellParticles.add(
+                    level,
                     ParticleTypes.PORTAL,
                     origin.x + (random.nextDouble() - 0.5) * entityWidthEstimate(),
                     origin.y + random.nextDouble() * 2.0,
@@ -164,7 +192,8 @@ public class Blink extends AbstractSpell {
                     0.0,
                     random.nextGaussian()
             );
-            level.addParticle(
+            SpellParticles.add(
+                    level,
                     ParticleTypes.PORTAL,
                     destination.x + (random.nextDouble() - 0.5) * entityWidthEstimate(),
                     destination.y + random.nextDouble() * 2.0,

@@ -8,6 +8,8 @@ import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
 import org.jspecify.annotations.Nullable;
 
@@ -24,25 +26,21 @@ public class Feed extends AbstractSpell {
 
     @Override
     public boolean canCast(SpellContext context) {
-        if (!(context.caster() instanceof Player player)) {
+        if (context.resolveItemSource() == null && Spellgems.CONFIG.spells.feed.requireFeedItems) {
             return false;
         }
 
         if (!Spellgems.CONFIG.spells.feed.requireFeedItems) {
-            return hasFeedableAnimal(context, player);
+            return !findFeedableAnimals(context).isEmpty();
         }
 
-        return hasFeedableAnimalWithFood(context, player);
+        return hasFeedableAnimalWithFood(context);
     }
 
-    private static boolean hasFeedableAnimal(SpellContext context, Player player) {
-        return !findFeedableAnimals(context, player).isEmpty();
-    }
-
-    private static boolean hasFeedableAnimalWithFood(SpellContext context, Player player) {
+    private static boolean hasFeedableAnimalWithFood(SpellContext context) {
         var level = context.level();
-        for (Animal animal : findFeedableAnimals(context, player)) {
-            if (HotbarUtils.pickWeighted(player, level.getRandom(), stack -> animal.isFood(stack)) != null) {
+        for (Animal animal : findFeedableAnimals(context)) {
+            if (HotbarUtils.pickWeighted(context, level.getRandom(), stack -> animal.isFood(stack)) != null) {
                 return true;
             }
         }
@@ -56,10 +54,11 @@ public class Feed extends AbstractSpell {
         return animal.getAge() == 0;
     }
 
-    private static List<Animal> findFeedableAnimals(SpellContext context, Player player) {
-        double px = player.getX();
-        double pz = player.getZ();
-        var searchBox = player.getBoundingBox().inflate(AREA_RADIUS, 4.0, AREA_RADIUS);
+    private static List<Animal> findFeedableAnimals(SpellContext context) {
+        Vec3 origin = context.origin();
+        double px = origin.x;
+        double pz = origin.z;
+        AABB searchBox = new AABB(origin, origin).inflate(AREA_RADIUS, 4.0, AREA_RADIUS);
         return context.level().getEntitiesOfClass(Animal.class, searchBox, animal ->
                 animal.isAlive()
                         && Math.abs(animal.getX() - px) <= AREA_RADIUS
@@ -75,22 +74,22 @@ public class Feed extends AbstractSpell {
 
     @Override
     protected boolean performCast(SpellContext context) {
-        if (!(context.caster() instanceof Player player) || context.level().isClientSide()) {
+        if (context.level().isClientSide()) {
             return false;
         }
 
         var level = context.level();
         boolean requireFeedItems = Spellgems.CONFIG.spells.feed.requireFeedItems;
 
-        List<Animal> animals = findFeedableAnimals(context, player);
+        List<Animal> animals = findFeedableAnimals(context);
         boolean fedAny = false;
 
         for (Animal animal : animals) {
             ItemStack food = requireFeedItems
-                    ? HotbarUtils.pickWeighted(player, level.getRandom(), stack -> animal.isFood(stack))
+                    ? HotbarUtils.pickWeighted(context, level.getRandom(), stack -> animal.isFood(stack))
                     : null;
 
-            if (tryFeed(animal, player, food, requireFeedItems)) {
+            if (tryFeed(animal, context.caster() instanceof Player player ? player : null, food, requireFeedItems)) {
                 fedAny = true;
             }
         }
@@ -99,14 +98,14 @@ public class Feed extends AbstractSpell {
             return false;
         }
 
-        if (requireFeedItems && player instanceof ServerPlayer serverPlayer) {
+        if (requireFeedItems && context.caster() instanceof ServerPlayer serverPlayer) {
             serverPlayer.inventoryMenu.sendAllDataToRemote();
         }
 
         return true;
     }
 
-    private static boolean tryFeed(Animal animal, Player player, @Nullable ItemStack food, boolean consumeItem) {
+    private static boolean tryFeed(Animal animal, @Nullable Player player, @Nullable ItemStack food, boolean consumeItem) {
         int age = animal.getAge();
 
         if (age == 0 && animal.canFallInLove()) {

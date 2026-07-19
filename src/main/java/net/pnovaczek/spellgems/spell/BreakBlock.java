@@ -22,6 +22,8 @@ import java.util.Optional;
 
 public class BreakBlock extends AbstractSpell {
 
+    private static final double DEFAULT_REACH = 5.0;
+
     @Override
     public Identifier id() {
         return SpellIds.BREAK_BLOCK;
@@ -38,15 +40,16 @@ public class BreakBlock extends AbstractSpell {
             return false;
         }
 
-        var caster = context.caster();
-        double reach = caster instanceof Player player ? player.blockInteractionRange() : 5.0;
-        BlockHitResult hit = SpellTargeting.resolveBlockHit(caster, reach);
+        double reach = context.caster() instanceof Player player
+                ? player.blockInteractionRange()
+                : DEFAULT_REACH;
+        BlockHitResult hit = SpellTargeting.resolveBlockHit(context, reach);
         if (hit == null) {
             return false;
         }
 
         var pos = hit.getBlockPos();
-        if (caster instanceof Player player && !player.isWithinBlockInteractionRange(pos, 0.0)) {
+        if (context.caster() instanceof Player player && !player.isWithinBlockInteractionRange(pos, 0.0)) {
             return false;
         }
 
@@ -62,29 +65,40 @@ public class BreakBlock extends AbstractSpell {
         boolean hasSilkTouch = utilities.stream().anyMatch(u -> u.is(UtilityEnchantments.SILK_TOUCH));
         boolean hasSmelt = utilities.stream().anyMatch(u -> u.is(UtilityEnchantments.SMELT));
 
-        if (caster instanceof ServerPlayer serverPlayer) {
-            if (hasSilkTouch || hasSmelt) {
-                handleCustomBlockBreak(context, pos, state, serverPlayer, hasSilkTouch, hasSmelt);
-            } else {
-                serverPlayer.gameMode.destroyBlock(pos);
-            }
-        } else {
-            context.level().destroyBlock(pos, true, caster);
+        if (context.caster() instanceof ServerPlayer serverPlayer && !hasSilkTouch && !hasSmelt) {
+            serverPlayer.gameMode.destroyBlock(pos);
+            return true;
         }
 
+        // Silk/smelt or non-player casters: handle drops ourselves.
+        handleCustomBlockBreak(context, pos, state, hasSilkTouch, hasSmelt);
         return true;
     }
 
-    private void handleCustomBlockBreak(SpellContext context, BlockPos pos, BlockState state,
-                                        ServerPlayer player, boolean silkTouch, boolean smelt) {
-        ServerLevel level = (ServerLevel) context.level();
+    private void handleCustomBlockBreak(
+            SpellContext context,
+            BlockPos pos,
+            BlockState state,
+            boolean silkTouch,
+            boolean smelt
+    ) {
+        if (!(context.level() instanceof ServerLevel level)) {
+            return;
+        }
 
         List<ItemStack> drops;
         if (silkTouch) {
             ItemStack silkDrop = state.getCloneItemStack(level, pos, false);
             drops = silkDrop.isEmpty() ? List.of() : List.of(silkDrop);
         } else {
-            drops = Block.getDrops(state, level, pos, level.getBlockEntity(pos), player, ItemStack.EMPTY);
+            drops = Block.getDrops(
+                    state,
+                    level,
+                    pos,
+                    level.getBlockEntity(pos),
+                    context.caster(),
+                    ItemStack.EMPTY
+            );
         }
 
         if (smelt) {
@@ -108,7 +122,6 @@ public class BreakBlock extends AbstractSpell {
                 .getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(input), level);
         if (recipeOpt.isPresent()) {
             ItemStack result = recipeOpt.get().value().assemble(new SingleRecipeInput(input)).copy();
-            // preserve stack size scaling if input >1 (basic)
             result.setCount(result.getCount() * input.getCount());
             return result;
         }

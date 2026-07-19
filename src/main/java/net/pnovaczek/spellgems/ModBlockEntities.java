@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.pnovaczek.spellgems.block.entity.ManaInfuserBlockEntity;
+import net.pnovaczek.spellgems.block.entity.SpellDispenserBlockEntity;
 import net.pnovaczek.spellgems.block.entity.SpellEnchantingTableBlockEntity;
 
 public class ModBlockEntities {
@@ -22,6 +23,12 @@ public class ModBlockEntities {
             "spell_enchanting_table",
             SpellEnchantingTableBlockEntity::new,
             ModBlocks.SPELL_ENCHANTING_TABLE
+    );
+
+    public static final BlockEntityType<SpellDispenserBlockEntity> SPELL_DISPENSER = register(
+            "spell_dispenser",
+            SpellDispenserBlockEntity::new,
+            ModBlocks.SPELL_DISPENSER
     );
 
     private static <T extends BlockEntity> BlockEntityType<T> register(

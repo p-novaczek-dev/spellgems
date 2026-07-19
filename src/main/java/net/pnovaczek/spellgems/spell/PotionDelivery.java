@@ -17,6 +17,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.spell.enchantment.PotionDeliveryType;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -25,6 +26,21 @@ public final class PotionDelivery {
     private PotionDelivery() {
     }
 
+    public static void apply(ServerLevel level, SpellContext context, PotionEnchantment enchantment) {
+        LivingEntity caster = context.caster();
+        Vec3 origin = context.origin();
+        switch (enchantment.delivery()) {
+            case DRINK -> {
+                if (caster != null) {
+                    applyDrink(level, caster, enchantment);
+                }
+            }
+            case SPLASH -> applySplashAt(level, caster, origin, enchantment);
+            case LINGERING -> applyLingeringAt(level, caster, origin, enchantment);
+        }
+    }
+
+    /** Compatibility overload when only a living caster is available. */
     public static void apply(ServerLevel level, LivingEntity caster, PotionEnchantment enchantment) {
         switch (enchantment.delivery()) {
             case DRINK -> applyDrink(level, caster, enchantment);
@@ -62,7 +78,7 @@ public final class PotionDelivery {
 
     private static void applyDrink(ServerLevel level, LivingEntity caster, PotionEnchantment enchantment) {
         enchantment.contents().applyToLivingEntity(caster, 1.0F);
-        playDrinkSound(level, caster);
+        playDrinkSound(level, caster.position());
     }
 
     private static void applyDrinkToTarget(ServerLevel level, LivingEntity target, PotionEnchantment enchantment) {
@@ -71,7 +87,7 @@ public final class PotionDelivery {
 
     private static void applySplashAt(
             ServerLevel level,
-            LivingEntity source,
+            @Nullable LivingEntity source,
             Vec3 hitPos,
             PotionEnchantment enchantment
     ) {
@@ -103,13 +119,15 @@ public final class PotionDelivery {
 
     private static void applyLingeringAt(
             ServerLevel level,
-            LivingEntity source,
+            @Nullable LivingEntity source,
             Vec3 hitPos,
             PotionEnchantment enchantment
     ) {
         ItemStack potionItem = enchantment.toItemStack();
         AreaEffectCloud cloud = new AreaEffectCloud(level, hitPos.x, hitPos.y, hitPos.z);
-        cloud.setOwner(source);
+        if (source != null) {
+            cloud.setOwner(source);
+        }
         cloud.setRadius(3.0F);
         cloud.setRadiusOnUse(-0.5F);
         cloud.setDuration(600);
@@ -132,7 +150,7 @@ public final class PotionDelivery {
 
     private static void applyScaledEffects(
             ServerLevel level,
-            Entity source,
+            @Nullable Entity source,
             LivingEntity target,
             Iterable<MobEffectInstance> mobEffects,
             float durationScale,
@@ -141,8 +159,14 @@ public final class PotionDelivery {
         for (MobEffectInstance effectInstance : mobEffects) {
             Holder<MobEffect> effect = effectInstance.getEffect();
             if (effect.value().isInstantenous()) {
-                effect.value().applyInstantenousEffect(level, source, source instanceof LivingEntity living ? living : null,
-                        target, effectInstance.getAmplifier(), scale);
+                effect.value().applyInstantenousEffect(
+                        level,
+                        source,
+                        source instanceof LivingEntity living ? living : null,
+                        target,
+                        effectInstance.getAmplifier(),
+                        scale
+                );
             } else {
                 int duration = effectInstance.mapDuration(d -> (int) (scale * d * durationScale + 0.5));
                 MobEffectInstance newEffect = new MobEffectInstance(
@@ -159,25 +183,31 @@ public final class PotionDelivery {
         }
     }
 
-    private static void playDrinkSound(Level level, LivingEntity caster) {
-        level.playSound(null, caster.getX(), caster.getY(), caster.getZ(),
+    private static void playDrinkSound(Level level, Vec3 pos) {
+        level.playSound(null, pos.x, pos.y, pos.z,
                 SoundEvents.GENERIC_DRINK, SoundSource.PLAYERS, 0.5F,
                 level.getRandom().nextFloat() * 0.1F + 0.9F);
     }
 
+    public static void playClientEffects(SpellContext context, PotionEnchantment enchantment) {
+        playEffectsAt(context.level(), context.origin(), enchantment);
+    }
+
+    /** Compatibility overload when only a living caster is available. */
     public static void playClientEffects(Level level, LivingEntity caster, PotionEnchantment enchantment) {
-        if (!level.isClientSide()) {
+        playEffectsAt(level, caster.position(), enchantment);
+    }
+
+    /** Plays drink sound or splash-style level event at a position (client or server). */
+    public static void playEffectsAt(Level level, Vec3 pos, PotionEnchantment enchantment) {
+        PotionContents contents = enchantment.contents();
+        if (enchantment.delivery() == PotionDeliveryType.DRINK) {
+            playDrinkSound(level, pos);
             return;
         }
 
-        PotionContents contents = enchantment.contents();
         int eventType = contents.potion().isPresent()
                 && contents.potion().get().value().hasInstantEffects() ? 2007 : 2002;
-
-        if (enchantment.delivery() == PotionDeliveryType.DRINK) {
-            playDrinkSound(level, caster);
-        } else {
-            level.levelEvent(eventType, caster.blockPosition(), contents.getColor());
-        }
+        level.levelEvent(eventType, BlockPos.containing(pos), contents.getColor());
     }
 }

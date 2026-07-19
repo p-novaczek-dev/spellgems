@@ -49,3 +49,4 @@ replay_*.log
 /agent-tools/
 /code_optimization.json
 /META-INF/
+/com/

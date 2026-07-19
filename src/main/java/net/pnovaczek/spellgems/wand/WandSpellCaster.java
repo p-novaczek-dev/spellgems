@@ -97,7 +97,7 @@ public final class WandSpellCaster {
             return null;
         }
 
-        SpellContext context = new SpellContext(player.level(), player, wand, gemData);
+        SpellContext context = SpellContext.forWand(player.level(), player, wand, gemData);
         if (!spell.canCast(context)) {
             return null;
         }

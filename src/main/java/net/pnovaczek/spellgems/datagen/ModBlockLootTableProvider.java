@@ -29,5 +29,6 @@ public class ModBlockLootTableProvider extends FabricBlockLootSubProvider {
         ));
 
         dropSelf(ModBlocks.MANA_INFUSER);
+        dropSelf(ModBlocks.SPELL_DISPENSER);
     }
 }

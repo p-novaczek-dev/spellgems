@@ -28,7 +28,7 @@ public class SpellGemItem extends Item {
         SpellGemData spellData = getSpellData(stack);
         Spell spell = getSpell(spellData);
         if (spell != null) {
-            SpellContext context = new SpellContext(level, player, stack, spellData);
+            SpellContext context = SpellContext.forHand(level, player, stack, spellData);
             if (spell.canCast(context))
                 spell.cast(context);
             return InteractionResult.SUCCESS;

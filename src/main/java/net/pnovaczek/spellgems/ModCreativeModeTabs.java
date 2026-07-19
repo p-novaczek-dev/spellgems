@@ -30,6 +30,7 @@ public class ModCreativeModeTabs {
                         .displayItems((parameters, output) -> {
                             output.accept(ModBlocks.MANA_INFUSER);
                             output.accept(ModBlocks.SPELL_ENCHANTING_TABLE);
+                            output.accept(ModBlocks.SPELL_DISPENSER);
                             output.accept(ModItems.MANA_ROOT);
                             output.accept(ModItems.MANA_ESSENCE);
                             output.accept(ModItems.SHIMMERSTEEL_INGOT);

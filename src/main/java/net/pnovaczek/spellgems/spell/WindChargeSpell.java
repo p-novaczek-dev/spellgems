@@ -4,10 +4,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.hurtingprojectile.windcharge.WindCharge;
 import net.minecraft.world.item.WindChargeItem;
+import net.minecraft.world.phys.Vec3;
 
 public class WindChargeSpell extends AbstractSpell {
 
@@ -25,25 +27,38 @@ public class WindChargeSpell extends AbstractSpell {
     protected boolean performCast(SpellContext context) {
         var level = context.level();
         var caster = context.caster();
-        // alive check is handled in AbstractSpell
+        Vec3 origin = context.eyeOrigin();
+        Vec3 look = context.lookAngle();
 
         if (level instanceof ServerLevel serverLevel) {
-            Projectile.spawnProjectileFromRotation(
-                    (server, source, stack) -> createWindCharge(server, source),
-                    serverLevel,
-                    context.castingItem(),
-                    caster,
-                    0.0F,
-                    WindChargeItem.PROJECTILE_SHOOT_POWER,
-                    1.0F
-            );
+            if (caster != null) {
+                Projectile.spawnProjectileFromRotation(
+                        (server, source, stack) -> createWindCharge(server, source, context),
+                        serverLevel,
+                        context.castingItem(),
+                        caster,
+                        0.0F,
+                        WindChargeItem.PROJECTILE_SHOOT_POWER,
+                        1.0F
+                );
+            } else {
+                WindCharge windCharge = new WindCharge(
+                        serverLevel,
+                        origin.x,
+                        origin.y,
+                        origin.z,
+                        look
+                );
+                windCharge.shoot(look.x, look.y, look.z, WindChargeItem.PROJECTILE_SHOOT_POWER, 1.0F);
+                serverLevel.addFreshEntity(windCharge);
+            }
         }
 
         level.playSound(
                 null,
-                caster.getX(),
-                caster.getY(),
-                caster.getZ(),
+                origin.x,
+                origin.y,
+                origin.z,
                 SoundEvents.WIND_CHARGE_THROW,
                 SoundSource.NEUTRAL,
                 0.5F,
@@ -53,7 +68,7 @@ public class WindChargeSpell extends AbstractSpell {
         return true;
     }
 
-    private static WindCharge createWindCharge(ServerLevel level, net.minecraft.world.entity.LivingEntity source) {
+    private static WindCharge createWindCharge(ServerLevel level, LivingEntity source, SpellContext context) {
         if (source instanceof Player player) {
             return new WindCharge(
                     player,
@@ -64,12 +79,13 @@ public class WindChargeSpell extends AbstractSpell {
             );
         }
 
+        Vec3 origin = context.eyeOrigin();
         WindCharge windCharge = new WindCharge(
                 level,
-                source.getX(),
-                source.getEyeY(),
-                source.getZ(),
-                source.getLookAngle()
+                origin.x,
+                origin.y,
+                origin.z,
+                context.lookAngle()
         );
         windCharge.setOwner(source);
         return windCharge;

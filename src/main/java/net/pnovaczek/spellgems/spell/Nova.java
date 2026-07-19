@@ -6,8 +6,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
@@ -31,7 +29,6 @@ public class Nova extends AbstractSpell {
     protected boolean performCast(SpellContext context) {
         var level = context.level();
         var caster = context.caster();
-        // alive handled by base
 
         boolean hasPower = false;
         boolean hasExpand = false;
@@ -50,11 +47,16 @@ public class Nova extends AbstractSpell {
         boolean finalHasPower = hasPower;
         boolean finalHasExpand = hasExpand;
         Runnable pulse = () -> {
-            if (!caster.isAlive()) return;
+            if (caster != null && !caster.isAlive()) return;
             if (level.isClientSide()) {
+                // Local prediction for hand/wand casts
                 spawnNovaParticles(context, finalHasExpand);
             } else if (level instanceof ServerLevel serverLevel) {
                 applyNovaDamage(context, serverLevel, finalHasPower, finalHasExpand);
+                // Dispenser has no client cast path; broadcast particles from the server.
+                if (context.isDispenserCast()) {
+                    spawnNovaParticles(context, finalHasExpand);
+                }
             }
         };
 
@@ -72,26 +74,29 @@ public class Nova extends AbstractSpell {
         var config = Spellgems.CONFIG.spells.nova;
         var strikes = context.data().strikeEffects();
 
-        Vec3 center = getEffectCenter(caster, config);
+        Vec3 center = getEffectCenter(context, config);
         float radius = getEffectiveRadius(config, hasExpand);
         float damage = getEffectiveDamage(config, hasPower);
 
         AABB searchBox = new AABB(center, center).inflate(radius);
-        List<LivingEntity> targets = level.getEntitiesOfClass(LivingEntity.class, searchBox, entity -> !shouldSkipTarget(entity, caster));
+        List<LivingEntity> targets = level.getEntitiesOfClass(
+                LivingEntity.class,
+                searchBox,
+                entity -> !shouldSkipTarget(entity, caster)
+        );
 
         for (LivingEntity target : targets) {
             if (center.distanceToSqr(target.position()) > radius * radius) {
                 continue;
             }
 
-            target.hurtServer(level, caster.damageSources().magic(), damage);
+            target.hurtServer(level, level.damageSources().magic(), damage);
 
+            LivingEntity strikeSource = caster != null ? caster : target;
             for (StrikeEnchantment strike : strikes) {
-                strike.applyTo(target, caster);
+                strike.applyTo(target, strikeSource);
             }
 
-            // knockback() subtracts the direction vector from velocity, so pass toward-center
-            // (same convention as hurt knockback: sourcePosition - targetPosition)
             double dx = center.x - target.getX();
             double dz = center.z - target.getZ();
             target.knockback(config.knockbackStrength, dx, dz);
@@ -108,13 +113,12 @@ public class Nova extends AbstractSpell {
     }
 
     private void spawnNovaParticles(SpellContext context, boolean hasExpand) {
-        var caster = context.caster();
         var level = context.level();
         var config = Spellgems.CONFIG.spells.nova;
         var strikes = context.data().strikeEffects();
         var random = level.getRandom();
 
-        Vec3 center = getEffectCenter(caster, config);
+        Vec3 center = getEffectCenter(context, config);
         float radius = getEffectiveRadius(config, hasExpand);
         int particleCount = getEffectiveParticleCount(config, hasExpand);
         float particleSpeed = config.particleSpeed;
@@ -135,7 +139,8 @@ public class Nova extends AbstractSpell {
             velocity = velocity.scale(particleSpeed / len);
 
             if (strikes.isEmpty()) {
-                level.addParticle(
+                SpellParticles.add(
+                        level,
                         dustOptions,
                         pos.x, pos.y, pos.z,
                         velocity.x, velocity.y, velocity.z
@@ -148,8 +153,9 @@ public class Nova extends AbstractSpell {
         }
     }
 
-    private static Vec3 getEffectCenter(LivingEntity caster, SpellgemsConfig.NovaSpellConfig config) {
-        return new Vec3(caster.getX(), caster.getY() + config.centerYOffset, caster.getZ());
+    private static Vec3 getEffectCenter(SpellContext context, SpellgemsConfig.NovaSpellConfig config) {
+        Vec3 origin = context.origin();
+        return new Vec3(origin.x, origin.y + config.centerYOffset, origin.z);
     }
 
     private static float getEffectiveRadius(SpellgemsConfig.NovaSpellConfig config, boolean hasExpand) {
@@ -166,7 +172,7 @@ public class Nova extends AbstractSpell {
         return hasPower ? config.damage * config.powerDamageMultiplier : config.damage;
     }
 
-    private static boolean shouldSkipTarget(LivingEntity target, LivingEntity caster) {
+    private static boolean shouldSkipTarget(LivingEntity target, @org.jspecify.annotations.Nullable LivingEntity caster) {
         return target == caster || target.isSpectator() || !target.isAlive();
     }
 }

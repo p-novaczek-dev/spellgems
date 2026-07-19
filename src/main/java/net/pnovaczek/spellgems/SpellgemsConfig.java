@@ -18,6 +18,8 @@ public class SpellgemsConfig {
     public final SpellConfigs spells = new SpellConfigs();
     public final WandConfig wand = new WandConfig();
     public final AstralBowConfig astralBow = new AstralBowConfig();
+    /** Spell dispenser machine settings (cooldown is per-spell; burnout is global). */
+    public final SpellDispenserConfig spellDispenser = new SpellDispenserConfig();
     public int strikeEffectDuration = 100;
     public float strikeCloudDamage = 2.0F;
     public float drainHealPerTarget = 2.0F;
@@ -117,9 +119,24 @@ public class SpellgemsConfig {
     public static class SpellConfig {
         /** Durability cost when casting this spell from a wand. Always >= 1. */
         public int wandDurabilityCost = 1;
+        /**
+         * Cooldown in ticks after a successful cast from a spell dispenser.
+         * Triggering again before this expires still fires the spell but causes burnout.
+         */
+        public int dispenserCooldownTicks = 20;
 
         public void validate() {
             wandDurabilityCost = Math.max(1, wandDurabilityCost);
+            dispenserCooldownTicks = Math.max(0, dispenserCooldownTicks);
+        }
+    }
+
+    public static class SpellDispenserConfig {
+        /** Ticks the dispenser is disabled after firing during its spell cooldown (burnout). */
+        public int burnoutTicks = 300;
+
+        public void validate() {
+            burnoutTicks = Math.max(0, burnoutTicks);
         }
     }
 
@@ -128,6 +145,7 @@ public class SpellgemsConfig {
 
         @Override
         public void validate() {
+            super.validate();
             damage = Math.max(0f, damage);
         }
     }
@@ -160,6 +178,7 @@ public class SpellgemsConfig {
 
         @Override
         public void validate() {
+            super.validate();
             maxDistance = Math.max(1.0, maxDistance);
             extendMultiplier = Math.max(1.0, extendMultiplier);
         }
@@ -171,6 +190,7 @@ public class SpellgemsConfig {
 
         @Override
         public void validate() {
+            super.validate();
             range = Math.max(0.5f, range);
             extendMultiplier = Math.max(1.0, extendMultiplier);
         }
@@ -181,7 +201,7 @@ public class SpellgemsConfig {
 
         @Override
         public void validate() {
-            // boolean is fine
+            super.validate();
         }
     }
 
@@ -190,7 +210,7 @@ public class SpellgemsConfig {
 
         @Override
         public void validate() {
-            // boolean is fine
+            super.validate();
         }
     }
 
@@ -277,6 +297,12 @@ public class SpellgemsConfig {
         if (wand != null) wand.validate();
         if (astralBow != null) astralBow.validate();
         if (spells != null) spells.validate();
+        if (spellDispenser != null) spellDispenser.validate();
+    }
+
+    /** Per-spell dispenser cooldown in ticks (default 20). */
+    public int getDispenserCooldownTicks(Identifier spellId) {
+        return getSpellConfig(spellId).dispenserCooldownTicks;
     }
 
     /**

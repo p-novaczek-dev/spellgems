@@ -3,7 +3,7 @@ package net.pnovaczek.spellgems.spell;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -36,21 +36,22 @@ public class Harvest extends AbstractSpell {
 
     @Override
     protected boolean performCast(SpellContext context) {
-        if (!(context.caster() instanceof Player player) || context.level().isClientSide()) {
+        if (context.level().isClientSide()) {
             return false;
         }
 
         var level = context.level();
-        BlockPos center = player.blockPosition();
+        BlockPos center = context.originBlockPos();
         boolean harvestedAny = false;
 
         List<UtilityEnchantment> utilities = (context.data() != null) ? context.data().utilityEffects() : List.of();
         boolean hasSmelt = utilities.stream().anyMatch(u -> u.is(UtilityEnchantments.SMELT));
+        Entity breaker = context.caster();
 
         for (int dx = -AREA_RADIUS; dx <= AREA_RADIUS; dx++) {
             for (int dz = -AREA_RADIUS; dz <= AREA_RADIUS; dz++) {
                 BlockPos base = center.offset(dx, 0, dz);
-                if (tryHarvestCrop(level, base, player, hasSmelt) || tryHarvestCrop(level, base.above(), player, hasSmelt)) {
+                if (tryHarvestCrop(level, base, breaker, hasSmelt) || tryHarvestCrop(level, base.above(), breaker, hasSmelt)) {
                     harvestedAny = true;
                 }
             }
@@ -59,14 +60,14 @@ public class Harvest extends AbstractSpell {
         return harvestedAny;
     }
 
-    private static boolean tryHarvestCrop(Level level, BlockPos pos, Player player, boolean smelt) {
+    private static boolean tryHarvestCrop(Level level, BlockPos pos, Entity breaker, boolean smelt) {
         BlockState state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof CropBlock crop) || !crop.isMaxAge(state)) {
             return false;
         }
 
         if (smelt && level instanceof ServerLevel serverLevel) {
-            List<ItemStack> drops = Block.getDrops(state, serverLevel, pos, serverLevel.getBlockEntity(pos), player, ItemStack.EMPTY);
+            List<ItemStack> drops = Block.getDrops(state, serverLevel, pos, serverLevel.getBlockEntity(pos), breaker, ItemStack.EMPTY);
             boolean dropped = false;
             for (ItemStack drop : drops) {
                 ItemStack smelted = trySmelt(drop, serverLevel);
@@ -81,7 +82,7 @@ public class Harvest extends AbstractSpell {
             }
         }
 
-        return level.destroyBlock(pos, true, player);
+        return level.destroyBlock(pos, true, breaker);
     }
 
     private static ItemStack trySmelt(ItemStack input, ServerLevel level) {

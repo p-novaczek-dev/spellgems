@@ -16,6 +16,7 @@ import net.pnovaczek.spellgems.client.render.AstralArrowRenderer;
 import net.pnovaczek.spellgems.client.render.SpellProjectileRenderer;
 import net.pnovaczek.spellgems.client.screen.AstralBowScreen;
 import net.pnovaczek.spellgems.client.screen.ManaInfuserScreen;
+import net.pnovaczek.spellgems.client.screen.SpellDispenserScreen;
 import net.pnovaczek.spellgems.client.screen.SpellEnchantingScreen;
 import net.pnovaczek.spellgems.client.screen.WandScreen;
 
@@ -34,6 +35,7 @@ public class SpellgemsClient implements ClientModInitializer {
 		EntityRenderers.register(ModEntities.PLAGUE_CLOUD, NoopRenderer::new);
 		MenuScreens.register(ModMenuTypes.MANA_INFUSER, ManaInfuserScreen::new);
 		MenuScreens.register(ModMenuTypes.SPELL_ENCHANTING_TABLE, SpellEnchantingScreen::new);
+		MenuScreens.register(ModMenuTypes.SPELL_DISPENSER, SpellDispenserScreen::new);
 		MenuScreens.register(ModMenuTypes.WAND, WandScreen::new);
 		MenuScreens.register(ModMenuTypes.ASTRAL_BOW, AstralBowScreen::new);
 		SpellgemsKeyMappings.register();
