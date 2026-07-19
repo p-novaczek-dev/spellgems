@@ -3,11 +3,11 @@ package net.pnovaczek.spellgems.network;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.astralbow.AstralBowCaster;
 import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
 import net.pnovaczek.spellgems.wand.WandSpellCaster;
-import net.pnovaczek.spellgems.ModItems;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
@@ -21,27 +21,27 @@ public final class ModNetworking {
                 SpellEnchantingRecipeDescriptionsPayload.TYPE,
                 SpellEnchantingRecipeDescriptionsPayload.CODEC
         );
-        PayloadTypeRegistry.serverboundPlay().register(WandCastPayload.TYPE, WandCastPayload.CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(WandCycleSpellPayload.TYPE, WandCycleSpellPayload.CODEC);
-        PayloadTypeRegistry.serverboundPlay().register(WandQuickCastPayload.TYPE, WandQuickCastPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(WandInputPayload.TYPE, WandInputPayload.CODEC);
     }
 
     public static void registerServerReceivers() {
-        ServerPlayNetworking.registerGlobalReceiver(WandCastPayload.TYPE, (payload, context) ->
-                context.server().execute(() -> WandSpellCaster.tryCast(context.player())));
+        ServerPlayNetworking.registerGlobalReceiver(WandInputPayload.TYPE, (payload, context) ->
+                context.server().execute(() -> handleWandInput(context.player(), payload)));
+    }
 
-        ServerPlayNetworking.registerGlobalReceiver(WandCycleSpellPayload.TYPE, (payload, context) ->
-                context.server().execute(() -> {
-                    ItemStack held = context.player().getMainHandItem();
-                    if (held.is(ModItems.WAND)) {
-                        WandSpellCaster.cycleSelectedSpell(context.player(), payload.direction());
-                    } else if (held.is(ModItems.ASTRAL_BOW)) {
-                        AstralBowCaster.cycleSelectedGem(context.player(), payload.direction());
-                    }
-                }));
-
-        ServerPlayNetworking.registerGlobalReceiver(WandQuickCastPayload.TYPE, (payload, context) ->
-                context.server().execute(() -> WandSpellCaster.tryCastFromSlot(context.player(), payload.slot())));
+    private static void handleWandInput(ServerPlayer player, WandInputPayload payload) {
+        switch (payload.action()) {
+            case CAST -> WandSpellCaster.tryCast(player);
+            case QUICK_CAST -> WandSpellCaster.tryCastFromSlot(player, payload.value());
+            case CYCLE -> {
+                ItemStack held = player.getMainHandItem();
+                if (held.is(ModItems.WAND)) {
+                    WandSpellCaster.cycleSelectedSpell(player, payload.value());
+                } else if (held.is(ModItems.ASTRAL_BOW)) {
+                    AstralBowCaster.cycleSelectedGem(player, payload.value());
+                }
+            }
+        }
     }
 
     public static void sendRecipeDescriptions(ServerPlayer player, SpellEnchantingMenu menu, List<String> descriptions) {

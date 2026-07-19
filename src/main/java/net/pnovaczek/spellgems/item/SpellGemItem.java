@@ -29,8 +29,14 @@ public class SpellGemItem extends Item {
         Spell spell = getSpell(spellData);
         if (spell != null) {
             SpellContext context = SpellContext.forHand(level, player, stack, spellData);
-            if (spell.canCast(context))
-                spell.cast(context);
+            if (spell.canCast(context)) {
+                // Server is authoritative; client only predicts local FX.
+                if (level.isClientSide()) {
+                    spell.castPredicted(context);
+                } else {
+                    spell.cast(context);
+                }
+            }
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;

@@ -38,6 +38,9 @@ public final class WandSpellCaster {
         return tryCastFromSlot(player, null);
     }
 
+    /**
+     * Server-authoritative cast: spell effects, durability, swing.
+     */
     public static boolean tryCastFromSlot(ServerPlayer player, @Nullable Integer slot) {
         CastRequest request = prepareCast(player, slot);
         if (request == null) {
@@ -51,11 +54,15 @@ public final class WandSpellCaster {
         return true;
     }
 
-    public static void tryCastVisuals(Player player) {
-        tryCastVisualsFromSlot(player, null);
+    /**
+     * Client-only predicted FX for immediate feedback. Server {@link #tryCast} is authoritative;
+     * prediction may play FX even if the server later rejects (rare desync).
+     */
+    public static void tryPredictCast(Player player) {
+        tryPredictCastFromSlot(player, null);
     }
 
-    public static void tryCastVisualsFromSlot(Player player, @Nullable Integer slot) {
+    public static void tryPredictCastFromSlot(Player player, @Nullable Integer slot) {
         if (!player.level().isClientSide()) {
             return;
         }
@@ -65,7 +72,7 @@ public final class WandSpellCaster {
             return;
         }
 
-        request.spell().cast(request.context());
+        request.spell().castPredicted(request.context());
     }
 
     private static @Nullable CastRequest prepareCast(Player player, @Nullable Integer slotOverride) {

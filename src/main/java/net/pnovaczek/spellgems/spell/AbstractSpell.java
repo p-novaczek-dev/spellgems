@@ -18,8 +18,15 @@ public abstract class AbstractSpell implements Spell {
     @Override
     public abstract Identifier id();
 
+    /**
+     * Server-authoritative cast. Client calls are ignored so prediction never runs the
+     * full mutation path by accident (use {@link #castPredicted} on the client).
+     */
     @Override
     public final void cast(SpellContext context) {
+        if (context.level().isClientSide()) {
+            return;
+        }
         if (context.caster() != null && !context.caster().isAlive()) {
             return;
         }
@@ -35,10 +42,35 @@ public abstract class AbstractSpell implements Spell {
     }
 
     /**
+     * Client prediction: particles/sounds only. Does not apply cooldowns or run if not client.
+     */
+    @Override
+    public final void castPredicted(SpellContext context) {
+        if (!context.level().isClientSide()) {
+            return;
+        }
+        if (context.caster() != null && !context.caster().isAlive()) {
+            return;
+        }
+        performPredictedFx(context);
+    }
+
+    /**
      * Perform the spell's logic. Return true if the spell actually did something
-     * meaningful (so that cooldown should be applied).
+     * meaningful (so that cooldown should be applied). Called on the server only
+     * from {@link #cast}, except subclasses may call client branches from
+     * {@link #performPredictedFx}.
      */
     protected abstract boolean performCast(SpellContext context);
+
+    /**
+     * Client-only predicted feedback. Default runs {@link #performCast}, which existing
+     * spells already gate with {@code isClientSide()} for particles/sounds only.
+     * Override to supply lighter FX without reusing full cast logic.
+     */
+    protected void performPredictedFx(SpellContext context) {
+        performCast(context);
+    }
 
     /**
      * Client/server FX when a self-targeting spell is cast from a dispenser.
@@ -55,6 +87,7 @@ public abstract class AbstractSpell implements Spell {
      * Helper for burst scheduling (used by spells with the BURST modifier).
      * Runs the first pulse immediately; schedules the rest with increasing delay.
      * Handles client vs server scheduling transparently.
+     * Delayed pulses should re-check caster/level validity when they run.
      */
     protected void scheduleBurst(SpellContext context, int count, int tickSpacing, Runnable pulse) {
         scheduleBurst(context, count, tickSpacing, i -> pulse);
@@ -63,6 +96,7 @@ public abstract class AbstractSpell implements Spell {
     /**
      * General version allowing per-index pulse actions (useful when delayed pulses
      * need to capture current state like look direction at execution time).
+     * Delayed pulses should re-check caster/level validity when they run.
      */
     protected void scheduleBurst(SpellContext context, int count, int tickSpacing,
                                  java.util.function.IntFunction<Runnable> pulseForIndex) {
@@ -78,7 +112,7 @@ public abstract class AbstractSpell implements Spell {
                 int delayTicks = i * tickSpacing;
                 if (isClient) {
                     SpellBurstScheduler.scheduleClient(level.getGameTime(), delayTicks, action);
-                } else {
+                } else if (level.getServer() != null) {
                     SpellBurstScheduler.scheduleServer(level.getServer().getTickCount(), delayTicks, action);
                 }
             }

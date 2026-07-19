@@ -25,6 +25,8 @@ public class SpellgemsConfig {
     public float drainHealPerTarget = 2.0F;
     public int chainingCount = 5;
     public int multishotCount = 5;
+    /** Number of astral arrows spawned by the Volley strike enchantment. */
+    public int volleyArrowCount = 8;
 
     public static class WandConfig {
         /** Multiplier applied to base durability cost for each spell enchantment on a gem. */
@@ -293,6 +295,7 @@ public class SpellgemsConfig {
         drainHealPerTarget = Math.max(0f, drainHealPerTarget);
         chainingCount = Math.max(1, chainingCount);
         multishotCount = Math.max(1, multishotCount);
+        volleyArrowCount = Math.max(1, volleyArrowCount);
 
         if (wand != null) wand.validate();
         if (astralBow != null) astralBow.validate();

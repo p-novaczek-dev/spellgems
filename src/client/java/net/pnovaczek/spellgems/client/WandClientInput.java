@@ -24,8 +24,9 @@ public final class WandClientInput {
         }
 
         if (clickCount != 0 && client.missTime <= 0) {
+            // Server is authoritative; local prediction only for responsive FX.
             WandClientNetworking.sendCast();
-            WandSpellCaster.tryCastVisuals(player);
+            WandSpellCaster.tryPredictCast(player);
         }
 
         return true;
@@ -56,7 +57,7 @@ public final class WandClientInput {
         }
 
         WandClientNetworking.sendQuickCast(slot);
-        WandSpellCaster.tryCastVisualsFromSlot(player, slot);
+        WandSpellCaster.tryPredictCastFromSlot(player, slot);
     }
 
     public static boolean shouldCycleSpell(Minecraft client) {

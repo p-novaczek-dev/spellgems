@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.pnovaczek.spellgems.network.ModNetworking;
+import net.pnovaczek.spellgems.spell.SpellBurstScheduler;
 
 public class Spellgems implements ModInitializer {
 	public static final String MOD_ID = "spellgems";
@@ -37,6 +38,8 @@ public class Spellgems implements ModInitializer {
 		ModModifierEnchantments.initialize();
 		ModStrikeEnchantments.initialize();
 		ModUtilityEnchantments.initialize();
+
+		SpellBurstScheduler.initialize();
 
 		ModNetworking.registerPayloadTypes();
 		ModNetworking.registerServerReceivers();
