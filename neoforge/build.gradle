@@ -1,0 +1,48 @@
+// Workstream 0 stub: NeoForge module layout only.
+// Full ModDevGradle/NeoGradle wiring comes in Workstream 1+.
+//
+// Commands (once implemented):
+//   ./gradlew :neoforge:runClient
+//   ./gradlew :neoforge:runServer
+//   ./gradlew :neoforge:build   →  spellgems-<version>-neoforge.jar
+
+plugins {
+	id 'java'
+	id 'base'
+}
+
+// Produces spellgems-<version>-neoforge.jar
+base {
+	archivesName = archives_base_name
+}
+
+version = rootProject.mod_version
+group = rootProject.maven_group
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+	withSourcesJar()
+}
+
+// Placeholder so the project configures; replace with MDG + Minecraft deps later.
+dependencies {
+	// minecraft / neoforge will be added in Workstream 1
+}
+
+jar {
+	archiveClassifier = 'neoforge'
+	manifest {
+		attributes(
+				'Implementation-Title': 'spellgems-neoforge-stub',
+				'Implementation-Version': project.version
+		)
+	}
+	from(rootProject.file('LICENSE')) {
+		rename { "${it}_${archives_base_name}" }
+	}
+}
+
+tasks.named('sourcesJar', Jar).configure {
+	archiveClassifier = 'neoforge-sources'
+}

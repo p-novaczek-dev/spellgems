@@ -1,100 +1,61 @@
+// Root project: shared versioning only. Loader toolchains live in :fabric / :neoforge.
+
 plugins {
-	id 'net.fabricmc.fabric-loom' version "${loom_version}"
-	id 'maven-publish'
+	id 'base'
 }
 
-version = project.mod_version
-group = project.maven_group
+allprojects {
+	group = rootProject.maven_group
+	version = rootProject.mod_version
 
-repositories {
-	mavenCentral()
-	maven {
-		url = "https://api.modrinth.com/maven"
-	}
-	maven {
-		url = "https://maven.shedaniel.me/"
-	}
-	maven {
-		url = "https://maven.terraformersmc.com/releases/"
-	}
-	maven {
-		url = "https://modmaven.dev"
-	}
-}
-
-loom {
-	splitEnvironmentSourceSets()
-
-	mods {
-		"spellgems" {
-			sourceSet sourceSets.main
-			sourceSet sourceSets.client
-		}
-	}
-
-}
-
-fabricApi {
-	configureDataGeneration {
-		client = true
-	}
-}
-
-dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-
-	//compileOnly "mezz.jei:jei-26.1-pre-3-fabric:29.1.0.16"
-	compileOnly "mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}"
-	runtimeOnly "mezz.jei:jei-${minecraft_version}-fabric:${jei_version}"
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": inputs.properties.version
-	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
-}
-
-java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
-
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
-}
-
-def projectNameForJar = project.name
-jar {
-	inputs.property "projectName", projectNameForJar
-
-	from("LICENSE") {
-		rename { "${it}_${projectNameForJar}" }
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			from components.java
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
+		mavenCentral()
+		maven { url = 'https://api.modrinth.com/maven' }
+		maven { url = 'https://maven.shedaniel.me/' }
+		maven { url = 'https://maven.terraformersmc.com/releases/' }
+		maven { url = 'https://modmaven.dev' }
+		maven { url = 'https://maven.neoforged.net/releases' }
 	}
+}
+
+subprojects {
+	tasks.withType(JavaCompile).configureEach {
+		options.release = 25
+		options.encoding = 'UTF-8'
+	}
+}
+
+// Collect both loader distribution jars after they exist.
+tasks.register('releaseJars', Copy) {
+	group = 'distribution'
+	description = 'Copies fabric + neoforge jars into build/release (run after both builds).'
+	dependsOn ':fabric:build'
+	// :neoforge:build is optional until the Neo module is implemented
+	from(project(':fabric').layout.buildDirectory.dir('libs')) {
+		include '*.jar'
+		exclude '*-sources.jar', '*-dev.jar', '*-javadoc.jar'
+	}
+	into(layout.buildDirectory.dir('release'))
+	doFirst {
+		if (project(':neoforge').tasks.findByName('build') != null
+				&& project(':neoforge').tasks.named('build').get().state.executed) {
+			// no-op; copies are additive via additional from below when neo builds
+		}
+	}
+}
+
+// Prefer: ./gradlew :fabric:build :neoforge:build releaseJars once Neo exists.
+tasks.register('releaseJarsBoth', Copy) {
+	group = 'distribution'
+	description = 'Builds fabric+neoforge and copies jars to build/release.'
+	dependsOn ':fabric:build', ':neoforge:build'
+	from(project(':fabric').layout.buildDirectory.dir('libs')) {
+		include '*.jar'
+		exclude '*-sources.jar', '*-dev.jar', '*-javadoc.jar'
+	}
+	from(project(':neoforge').layout.buildDirectory.dir('libs')) {
+		include '*.jar'
+		exclude '*-sources.jar', '*-dev.jar', '*-javadoc.jar'
+	}
+	into(layout.buildDirectory.dir('release'))
 }

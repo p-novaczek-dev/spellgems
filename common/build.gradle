@@ -1,0 +1,15 @@
+// Common sources are compiled by loader modules (:fabric, :neoforge) via source-set inclusion.
+// This project is for layout/IDE organization only and does not compile Minecraft code by itself.
+
+plugins {
+	id 'base'
+}
+
+// Expose paths for loader modules
+ext {
+	commonMainJava = file('src/main/java')
+	commonMainResources = file('src/main/resources')
+	commonGenerated = file('src/main/generated')
+	commonClientJava = file('src/client/java')
+	commonClientResources = file('src/client/resources')
+}
