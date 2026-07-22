@@ -8,7 +8,6 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
-import net.fabricmc.fabric.api.client.recipe.v1.sync.ClientRecipeSynchronizedEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.server.IntegratedServer;
@@ -19,6 +18,8 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.pnovaczek.spellgems.ModBlocks;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.platform.client.ClientPlatform;
+import net.pnovaczek.spellgems.platform.client.fabric.FabricClientPlatform;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantments;
@@ -36,8 +37,8 @@ import java.util.List;
  *   <li>Integrated server {@link RecipeManager} (singleplayer / LAN host)</li>
  *   <li>Fabric {@code SynchronizedRecipes} on the client connection (multiplayer)</li>
  * </ol>
- * If JEI initializes before recipes arrive, they are pushed when Fabric's
- * {@link ClientRecipeSynchronizedEvent} fires or when JEI runtime becomes available.
+ * If JEI initializes before recipes arrive, they are pushed when the platform
+ * client recipe-sync hook fires or when JEI runtime becomes available.
  */
 @JeiPlugin
 public class SpellgemsJeiPlugin implements IModPlugin {
@@ -127,7 +128,8 @@ public class SpellgemsJeiPlugin implements IModPlugin {
             return;
         }
         syncListenerRegistered = true;
-        ClientRecipeSynchronizedEvent.EVENT.register((client, recipes) -> pushMissingRecipesToRuntime());
+        FabricClientPlatform.bootstrap();
+        ClientPlatform.client().onClientRecipesSynchronized(SpellgemsJeiPlugin::pushMissingRecipesToRuntime);
     }
 
     /**

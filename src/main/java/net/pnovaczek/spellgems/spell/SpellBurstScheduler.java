@@ -1,9 +1,8 @@
 package net.pnovaczek.spellgems.spell;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.MinecraftServer;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.platform.Platform;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +39,9 @@ public final class SpellBurstScheduler {
         }
         serverHooksRegistered = true;
 
-        ServerTickEvents.END_SERVER_TICK.register(SpellBurstScheduler::onServerTick);
-        ServerLifecycleEvents.SERVER_STOPPING.register(server -> clearServer());
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> clearServer());
+        Platform.lifecycle().onServerTickEnd(SpellBurstScheduler::onServerTick);
+        Platform.lifecycle().onServerStopping(server -> clearServer());
+        Platform.lifecycle().onServerStopped(server -> clearServer());
     }
 
     public static void scheduleServer(int currentTick, int delayTicks, Runnable action) {

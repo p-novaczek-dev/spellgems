@@ -1,8 +1,6 @@
 package net.pnovaczek.spellgems.client;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperties;
@@ -12,6 +10,8 @@ import net.pnovaczek.spellgems.ModEntities;
 import net.pnovaczek.spellgems.ModMenuTypes;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.client.network.ModClientNetworking;
+import net.pnovaczek.spellgems.platform.client.ClientPlatform;
+import net.pnovaczek.spellgems.platform.client.fabric.FabricClientPlatform;
 import net.pnovaczek.spellgems.spell.SpellBurstScheduler;
 import net.pnovaczek.spellgems.client.render.AstralArrowRenderer;
 import net.pnovaczek.spellgems.client.render.SpellProjectileRenderer;
@@ -22,6 +22,10 @@ import net.pnovaczek.spellgems.client.screen.SpellEnchantingScreen;
 import net.pnovaczek.spellgems.client.screen.WandScreen;
 
 public class SpellgemsClient implements ClientModInitializer {
+	static {
+		FabricClientPlatform.bootstrap();
+	}
+
 	@Override
 	public void onInitializeClient() {
 		RangeSelectItemModelProperties.ID_MAPPER.put(
@@ -46,9 +50,9 @@ public class SpellgemsClient implements ClientModInitializer {
 		WandSpellHighlight.register();
 
 		// Drop predicted burst pulses when leaving a world / disconnecting.
-		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> SpellBurstScheduler.clearClient());
+		ClientPlatform.client().onClientDisconnect(client -> SpellBurstScheduler.clearClient());
 
-		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+		ClientPlatform.client().onEndClientTick(client -> {
 			if (client.level == null) {
 				SpellBurstScheduler.clearClient();
 				return;

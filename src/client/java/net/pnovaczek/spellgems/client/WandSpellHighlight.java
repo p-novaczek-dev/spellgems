@@ -1,8 +1,5 @@
 package net.pnovaczek.spellgems.client;
 
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -20,6 +17,7 @@ import net.pnovaczek.spellgems.inventory.WandContainer;
 import net.pnovaczek.spellgems.item.data.AstralBowData;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.WandData;
+import net.pnovaczek.spellgems.platform.client.ClientPlatform;
 import net.pnovaczek.spellgems.wand.WandSpellCaster;
 import net.pnovaczek.spellgems.wand.WandSpellLabels;
 
@@ -36,12 +34,8 @@ public final class WandSpellHighlight {
     }
 
     public static void register() {
-        HudElementRegistry.attachElementAfter(
-                VanillaHudElements.HELD_ITEM_TOOLTIP,
-                HUD_ELEMENT_ID,
-                WandSpellHighlight::render
-        );
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        ClientPlatform.client().attachHudAfterHeldItemTooltip(HUD_ELEMENT_ID, WandSpellHighlight::render);
+        ClientPlatform.client().onEndClientTick(client -> {
             if (highlightTimer > 0) {
                 highlightTimer--;
             }

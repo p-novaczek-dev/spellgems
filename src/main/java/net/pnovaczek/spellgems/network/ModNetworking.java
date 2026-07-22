@@ -1,35 +1,32 @@
 package net.pnovaczek.spellgems.network;
 
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.astralbow.AstralBowCaster;
+import net.pnovaczek.spellgems.platform.Platform;
 import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
 import net.pnovaczek.spellgems.wand.WandSpellCaster;
 
 import java.util.List;
 
+/**
+ * Common networking orchestration. Loader-specific payload registration/send lives in {@link Platform#network()}.
+ */
 public final class ModNetworking {
 
     private ModNetworking() {
     }
 
     public static void registerPayloadTypes() {
-        PayloadTypeRegistry.clientboundPlay().register(
-                SpellEnchantingRecipeDescriptionsPayload.TYPE,
-                SpellEnchantingRecipeDescriptionsPayload.CODEC
-        );
-        PayloadTypeRegistry.serverboundPlay().register(WandInputPayload.TYPE, WandInputPayload.CODEC);
+        Platform.network().registerPayloadTypes();
     }
 
     public static void registerServerReceivers() {
-        ServerPlayNetworking.registerGlobalReceiver(WandInputPayload.TYPE, (payload, context) ->
-                context.server().execute(() -> handleWandInput(context.player(), payload)));
+        Platform.network().registerServerReceivers();
     }
 
-    private static void handleWandInput(ServerPlayer player, WandInputPayload payload) {
+    public static void handleWandInput(ServerPlayer player, WandInputPayload payload) {
         switch (payload.action()) {
             case CAST -> WandSpellCaster.tryCast(player);
             case QUICK_CAST -> WandSpellCaster.tryCastFromSlot(player, payload.value());
@@ -45,11 +42,11 @@ public final class ModNetworking {
     }
 
     public static void sendRecipeDescriptions(ServerPlayer player, SpellEnchantingMenu menu, List<String> descriptions) {
-        if (!ServerPlayNetworking.canSend(player, SpellEnchantingRecipeDescriptionsPayload.TYPE)) {
+        var type = SpellEnchantingRecipeDescriptionsPayload.TYPE;
+        if (!Platform.network().canSend(player, type)) {
             return;
         }
-
-        ServerPlayNetworking.send(
+        Platform.network().send(
                 player,
                 new SpellEnchantingRecipeDescriptionsPayload(menu.containerId, descriptions)
         );

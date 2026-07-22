@@ -1,12 +1,8 @@
 package net.pnovaczek.spellgems;
 
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
@@ -15,58 +11,58 @@ import net.pnovaczek.spellgems.block.ManaInfuserBlock;
 import net.pnovaczek.spellgems.block.ManaRootCropBlock;
 import net.pnovaczek.spellgems.block.SpellDispenserBlock;
 import net.pnovaczek.spellgems.block.SpellEnchantingTableBlock;
+import net.pnovaczek.spellgems.registry.ModRegistry;
 
 import java.util.function.Function;
 
+/**
+ * Blocks only. Block items are registered in {@link ModItems} after blocks exist.
+ * Fields are assigned in {@link #register()} (not class-init).
+ */
 public class ModBlocks {
 
-    public static final CropBlock MANA_ROOT = register(
-            "mana_root",
-            ManaRootCropBlock::new,
-            BlockBehaviour.Properties.ofFullCopy(Blocks.CARROTS)
-    );
+    public static CropBlock MANA_ROOT;
+    public static Block MANA_INFUSER;
+    public static Block SPELL_ENCHANTING_TABLE;
+    public static Block SPELL_DISPENSER;
 
-    public static final Block MANA_INFUSER = registerBlockAndItem(
-            "mana_infuser",
-            ManaInfuserBlock::new,
-            BlockBehaviour.Properties.ofFullCopy(Blocks.FURNACE)
-    );
-
-    public static final Block SPELL_ENCHANTING_TABLE = registerBlockAndItem(
-            "spell_enchanting_table",
-            SpellEnchantingTableBlock::new,
-            BlockBehaviour.Properties.ofFullCopy(Blocks.ENCHANTING_TABLE)
-    );
-
-    public static final Block SPELL_DISPENSER = registerBlockAndItem(
-            "spell_dispenser",
-            SpellDispenserBlock::new,
-            BlockBehaviour.Properties.ofFullCopy(Blocks.DISPENSER)
-    );
-
-    private static Block registerBlockAndItem(String name, Function<BlockBehaviour.Properties, Block> blockFactory, BlockBehaviour.Properties settings) {
-        ResourceKey<Block> blockKey = keyOfBlock(name);
-        Block block = blockFactory.apply(settings.setId(blockKey));
-
-        // register item for the block
-        ResourceKey<Item> itemKey = ModItems.keyOfItem(name);
-        BlockItem blockItem = new BlockItem(block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix());
-        Registry.register(BuiltInRegistries.ITEM, itemKey, blockItem);
-
-        return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
+    private ModBlocks() {
     }
 
-    private static <T extends Block> T register(String name, java.util.function.Function<BlockBehaviour.Properties, T> factory, BlockBehaviour.Properties properties) {
+    public static void register() {
+        MANA_ROOT = register(
+                "mana_root",
+                ManaRootCropBlock::new,
+                BlockBehaviour.Properties.ofFullCopy(Blocks.CARROTS)
+        );
+        MANA_INFUSER = register(
+                "mana_infuser",
+                ManaInfuserBlock::new,
+                BlockBehaviour.Properties.ofFullCopy(Blocks.FURNACE)
+        );
+        SPELL_ENCHANTING_TABLE = register(
+                "spell_enchanting_table",
+                SpellEnchantingTableBlock::new,
+                BlockBehaviour.Properties.ofFullCopy(Blocks.ENCHANTING_TABLE)
+        );
+        SPELL_DISPENSER = register(
+                "spell_dispenser",
+                SpellDispenserBlock::new,
+                BlockBehaviour.Properties.ofFullCopy(Blocks.DISPENSER)
+        );
+    }
+
+    private static <T extends Block> T register(
+            String name,
+            Function<BlockBehaviour.Properties, T> factory,
+            BlockBehaviour.Properties properties
+    ) {
         ResourceKey<Block> blockKey = keyOfBlock(name);
         T block = factory.apply(properties.setId(blockKey));
-        return Registry.register(BuiltInRegistries.BLOCK, blockKey, block);
+        return ModRegistry.register(BuiltInRegistries.BLOCK, blockKey, block);
     }
 
     public static ResourceKey<Block> keyOfBlock(String name) {
-        return ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, name));
-    }
-
-    public static void initialize() {
-        // forces static initialization
+        return ResourceKey.create(Registries.BLOCK, ModRegistry.id(name));
     }
 }

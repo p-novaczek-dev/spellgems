@@ -1,30 +1,35 @@
 package net.pnovaczek.spellgems;
 
-import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.pnovaczek.spellgems.platform.Platform;
+import net.pnovaczek.spellgems.registry.ModRegistry;
 import net.pnovaczek.spellgems.wand.WandDepletion;
 
+/**
+ * Creative tabs. Requires items/blocks already registered.
+ */
 public class ModCreativeModeTabs {
 
     public static final ResourceKey<CreativeModeTab> SPELLGEMS = ResourceKey.create(
             Registries.CREATIVE_MODE_TAB,
-            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "spellgems")
+            ModRegistry.id("spellgems")
     );
 
-    public static void initialize() {
-        Registry.register(
+    private ModCreativeModeTabs() {
+    }
+
+    public static void register() {
+        ModRegistry.register(
                 BuiltInRegistries.CREATIVE_MODE_TAB,
                 SPELLGEMS,
-                FabricCreativeModeTab.builder()
+                Platform.registries().creativeTabBuilder()
                         .title(Component.translatable("itemGroup.spellgems"))
                         .icon(() -> new ItemStack(ModItems.RAW_SPELL_GEM))
                         .displayItems((parameters, output) -> {

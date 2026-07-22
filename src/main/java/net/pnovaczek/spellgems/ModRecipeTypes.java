@@ -1,34 +1,33 @@
 package net.pnovaczek.spellgems;
 
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
+import net.pnovaczek.spellgems.registry.ModRegistry;
 
 public class ModRecipeTypes {
+    private ModRecipeTypes() {
+    }
+
     public static void register() {
-        Registry.register(
+        ModRegistry.register(
                 BuiltInRegistries.RECIPE_TYPE,
-                Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "mana_infusing"),
+                "mana_infusing",
                 ManaInfuserRecipe.TYPE
         );
-
-        Registry.register(
+        ModRegistry.register(
                 BuiltInRegistries.RECIPE_SERIALIZER,
-                Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "mana_infusing"),
+                "mana_infusing",
                 ManaInfuserRecipe.SERIALIZER
         );
-
-        Registry.register(
+        ModRegistry.register(
                 BuiltInRegistries.RECIPE_TYPE,
-                Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "spell_enchanting"),
+                "spell_enchanting",
                 SpellEnchantingRecipe.TYPE
         );
-
-        Registry.register(
+        ModRegistry.register(
                 BuiltInRegistries.RECIPE_SERIALIZER,
-                Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "spell_enchanting"),
+                "spell_enchanting",
                 SpellEnchantingRecipe.SERIALIZER
         );
     }

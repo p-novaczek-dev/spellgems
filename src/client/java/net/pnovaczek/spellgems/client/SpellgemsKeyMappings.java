@@ -1,10 +1,10 @@
 package net.pnovaczek.spellgems.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.platform.client.ClientPlatform;
 import org.lwjgl.glfw.GLFW;
 
 public final class SpellgemsKeyMappings {
@@ -22,7 +22,7 @@ public final class SpellgemsKeyMappings {
     }
 
     public static void register() {
-        CYCLE_SPELL_KEY = KeyMappingHelper.registerKeyMapping(
+        CYCLE_SPELL_KEY = ClientPlatform.client().registerKeyMapping(
                 new KeyMapping(
                         "key.spellgems.cycle_spell",
                         InputConstants.Type.KEYSYM,
@@ -32,7 +32,7 @@ public final class SpellgemsKeyMappings {
         );
 
         for (int slot = 0; slot < WAND_QUICK_CAST_SLOT_COUNT; slot++) {
-            WAND_QUICK_CAST_KEYS[slot] = KeyMappingHelper.registerKeyMapping(
+            WAND_QUICK_CAST_KEYS[slot] = ClientPlatform.client().registerKeyMapping(
                     new KeyMapping(
                             "key.spellgems.wand_quick_cast." + (slot + 1),
                             InputConstants.Type.KEYSYM,

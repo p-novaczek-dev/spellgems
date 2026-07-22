@@ -1,6 +1,5 @@
 package net.pnovaczek.spellgems.client;
 
-import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -23,6 +22,7 @@ import net.pnovaczek.spellgems.item.SpellTomeItem;
 import net.pnovaczek.spellgems.item.data.AstralBowData;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.WandData;
+import net.pnovaczek.spellgems.platform.client.ClientPlatform;
 import net.pnovaczek.spellgems.spell.Spell;
 import net.pnovaczek.spellgems.spell.SpellIds;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
@@ -35,7 +35,7 @@ import java.util.function.BiConsumer;
 
 public class SpellgemsTooltips {
     public static void register() {
-        ItemTooltipCallback.EVENT.register((stack, tooltipContext, tooltipFlag, lines) -> {
+        ClientPlatform.client().onItemTooltip((stack, tooltipContext, tooltipFlag, lines) -> {
 
             class LineAdder {
                 void addLine(String key, ChatFormatting formatting) {

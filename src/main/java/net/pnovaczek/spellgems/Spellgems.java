@@ -1,36 +1,30 @@
 package net.pnovaczek.spellgems;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
+import net.pnovaczek.spellgems.loot.VillageManaRootLoot;
+import net.pnovaczek.spellgems.network.ModNetworking;
+import net.pnovaczek.spellgems.platform.Platform;
+import net.pnovaczek.spellgems.platform.fabric.FabricPlatform;
+import net.pnovaczek.spellgems.registry.ModRegistries;
+import net.pnovaczek.spellgems.spell.SpellBurstScheduler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.pnovaczek.spellgems.network.ModNetworking;
-import net.pnovaczek.spellgems.spell.SpellBurstScheduler;
-
 public class Spellgems implements ModInitializer {
+	static {
+		// Before CONFIG static init (and any Platform.* use).
+		FabricPlatform.bootstrapCommon();
+	}
+
 	public static final String MOD_ID = "spellgems";
 	public static SpellgemsConfig CONFIG = SpellgemsConfig.load();
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	@Override
 	public void onInitialize() {
-		ModBlocks.initialize();
-		ModBlockEntities.initialize();
-		ModItems.initialize();
-		ModCreativeModeTabs.initialize();
-		ModRecipeTypes.register();
-		ModEntities.initialize();
-		ModMenuTypes.initialize();
-		ModComponents.initialize();
-		ModEntityDataSerializers.register();
+		// Content registries (idempotent; order documented on ModRegistries).
+		ModRegistries.registerAll();
 
 		ModSpells.initialize();
 		// Wand durability costs now live solely in spells.*.wandDurabilityCost (no default methods on Spell impls).
@@ -44,24 +38,7 @@ public class Spellgems implements ModInitializer {
 		ModNetworking.registerPayloadTypes();
 		ModNetworking.registerServerReceivers();
 
-		// Add mana root to village house chests via a custom loot table reference.
-		// This lets players find mana root (as seeds/crop) in village chests.
-		ResourceKey<LootTable> manaRootLoot =
-				ResourceKey.create(Registries.LOOT_TABLE, Identifier.fromNamespaceAndPath(MOD_ID, "chests/village_mana_root"));
-
-		LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
-			if (!source.isBuiltin()) {
-				return;
-			}
-			String path = key.identifier().getPath();
-			if (path.startsWith("chests/village/village_") && path.endsWith("_house")) {
-				// Inject our mana root loot table as an additional pool entry.
-				// The referenced table controls the actual chance/quantity.
-				tableBuilder.withPool(
-						LootPool.lootPool()
-								.add(NestedLootTable.lootTableReference(manaRootLoot))
-				);
-			}
-		});
+		Platform.lifecycle().onModifyLootTable((key, tableBuilder, builtin, registries) ->
+				VillageManaRootLoot.tryInject(key, tableBuilder, builtin));
 	}
 }

@@ -2,8 +2,8 @@ package net.pnovaczek.spellgems;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
+import net.pnovaczek.spellgems.platform.Platform;
 import net.pnovaczek.spellgems.spell.SpellIds;
 
 import java.io.*;
@@ -243,7 +243,7 @@ public class SpellgemsConfig {
     }
 
     public static SpellgemsConfig load() {
-        Path path = FabricLoader.getInstance().getConfigDir().resolve("spellgems.json");
+        Path path = Platform.paths().getConfigDir().resolve("spellgems.json");
         SpellgemsConfig config = null;
 
         if (path.toFile().exists()) {
@@ -266,7 +266,7 @@ public class SpellgemsConfig {
     }
 
     public void save() {
-        Path path = FabricLoader.getInstance().getConfigDir().resolve("spellgems.json");
+        Path path = Platform.paths().getConfigDir().resolve("spellgems.json");
         try (Writer writer = new FileWriter(path.toFile())) {
             GSON.toJson(this, writer);
         } catch (IOException e) {

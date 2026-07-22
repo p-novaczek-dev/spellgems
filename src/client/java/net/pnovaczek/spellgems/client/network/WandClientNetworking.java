@@ -1,7 +1,7 @@
 package net.pnovaczek.spellgems.client.network;
 
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.pnovaczek.spellgems.network.WandInputPayload;
+import net.pnovaczek.spellgems.platform.client.ClientPlatform;
 
 /**
  * Client → server wand/bow input. Mirrors {@link WandInputPayload} actions.
@@ -27,8 +27,8 @@ public final class WandClientNetworking {
     }
 
     private static void send(WandInputPayload payload) {
-        if (ClientPlayNetworking.canSend(WandInputPayload.TYPE)) {
-            ClientPlayNetworking.send(payload);
+        if (ClientPlatform.network().canSend(WandInputPayload.TYPE)) {
+            ClientPlatform.network().send(payload);
         }
     }
 }

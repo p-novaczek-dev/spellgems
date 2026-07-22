@@ -1,11 +1,10 @@
 package net.pnovaczek.spellgems.client;
 
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.client.network.WandClientNetworking;
+import net.pnovaczek.spellgems.platform.client.ClientPlatform;
 import net.pnovaczek.spellgems.wand.WandSpellCaster;
 
 public final class WandClientInput {
@@ -14,8 +13,8 @@ public final class WandClientInput {
     }
 
     public static void register() {
-        ClientPreAttackCallback.EVENT.register(WandClientInput::onPreAttack);
-        ClientTickEvents.END_CLIENT_TICK.register(WandClientInput::onClientTick);
+        ClientPlatform.client().onPreAttack(WandClientInput::onPreAttack);
+        ClientPlatform.client().onEndClientTick(WandClientInput::onClientTick);
     }
 
     private static boolean onPreAttack(Minecraft client, net.minecraft.client.player.LocalPlayer player, int clickCount) {
