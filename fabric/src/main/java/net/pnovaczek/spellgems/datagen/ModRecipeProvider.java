@@ -110,12 +110,6 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
                         .save(exporter);
 
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_WIND_CHARGE)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.WIND_CHARGE)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
                 shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_MAGNET)
                         .requires(ModItems.RAW_SPELL_GEM)
                         .requires(Items.REDSTONE)

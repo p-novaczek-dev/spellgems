@@ -51,7 +51,6 @@ public class SpellgemsConfig {
         public SpellConfig potion = new SpellConfig();
 
         // Additional spell configs (for uniform access and to host wandDurabilityCost etc.)
-        public SpellConfig windCharge = new SpellConfig();
         public SpellConfig placeBlock = new SpellConfig();
         public SpellConfig breakBlock = new SpellConfig();
         public SpellConfig harvest = new SpellConfig();
@@ -60,12 +59,10 @@ public class SpellgemsConfig {
         public SpellConfigs() {
             // Provide the canonical default wand durability costs here.
             // These are used for new configs and when keys are absent from spellgems.json.
-            // (Previously these lived in each Spell subclass via defaultDurabilityCost().)
             projectile.wandDurabilityCost = 8;
             nova.wandDurabilityCost = 16;
             vortex.wandDurabilityCost = 12;
             blink.wandDurabilityCost = 48;
-            windCharge.wandDurabilityCost = 2;
             placeBlock.wandDurabilityCost = 0;
             magnet.wandDurabilityCost = 0;
             // All others default to 1.
@@ -81,7 +78,6 @@ public class SpellgemsConfig {
             if (spellId.equals(SpellIds.FEED)) return feed;
             if (spellId.equals(SpellIds.GROW)) return grow;
             if (spellId.equals(SpellIds.POTION)) return potion;
-            if (spellId.equals(SpellIds.WIND_CHARGE)) return windCharge;
             if (spellId.equals(SpellIds.PLACE_BLOCK)) return placeBlock;
             if (spellId.equals(SpellIds.BREAK_BLOCK)) return breakBlock;
             if (spellId.equals(SpellIds.HARVEST)) return harvest;
@@ -100,7 +96,6 @@ public class SpellgemsConfig {
             if (feed != null) feed.validate();
             if (grow != null) grow.validate();
             if (potion != null) potion.validate();
-            if (windCharge != null) windCharge.validate();
             if (placeBlock != null) placeBlock.validate();
             if (breakBlock != null) breakBlock.validate();
             if (harvest != null) harvest.validate();
@@ -278,13 +273,8 @@ public class SpellgemsConfig {
     private void migrate() {
         if (version < 1) {
             version = 1;
-            // Example: if future versions change field names or structure,
+            // if future versions change field names or structure,
             // copy values from legacy locations here.
-        }
-
-        // Ensure sub-configs are not null after deserialization from very old files
-        if (spells == null) {
-            // This shouldn't normally happen, but defensive
         }
     }
 

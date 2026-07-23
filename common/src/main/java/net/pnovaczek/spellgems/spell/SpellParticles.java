@@ -10,7 +10,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Particle helpers for multiplayer-visible spell FX.
  * <p>
- * Policy (FX-01):
+ * Multiplayer FX Policy:
  * <ul>
  *   <li><b>Server</b> broadcasts particles so nearby players always see spell FX
  *       (wand, hand, dispenser, etc.).</li>

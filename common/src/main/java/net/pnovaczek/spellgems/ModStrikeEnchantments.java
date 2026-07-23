@@ -38,5 +38,6 @@ public class ModStrikeEnchantments {
         register(StrikeEnchantments.PURIFY, new StrikeEnchantment(StrikeEnchantments.PURIFY));
         register(StrikeEnchantments.VOLLEY, new StrikeEnchantment(StrikeEnchantments.VOLLEY));
         register(StrikeEnchantments.VENGEANCE, new StrikeEnchantment(StrikeEnchantments.VENGEANCE));
+        register(StrikeEnchantments.WIND_CHARGE, new StrikeEnchantment(StrikeEnchantments.WIND_CHARGE));
     }
 }

@@ -34,7 +34,6 @@ public final class ModSpells {
         register(SpellIds.NOVA, new Nova());
         register(SpellIds.VORTEX, new Vortex());
         register(SpellIds.BLINK, new Blink());
-        register(SpellIds.WIND_CHARGE, new WindChargeSpell());
         register(SpellIds.MAGNET, new Magnet());
         register(SpellIds.PLACE_BLOCK, new PlaceBlock());
         register(SpellIds.BREAK_BLOCK, new BreakBlock());

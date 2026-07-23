@@ -30,7 +30,6 @@ public class ModItemTagProvider extends FabricTagsProvider.ItemTagsProvider {
 
         builder(ModTags.UTILITY_SPELL_GEMS)
                 .add(ModItems.keyOfItem("spell_gem_blink"))
-                .add(ModItems.keyOfItem("spell_gem_wind_charge"))
                 .add(ModItems.keyOfItem("spell_gem_magnet"))
                 .add(ModItems.keyOfItem("spell_gem_place_block"))
                 .add(ModItems.keyOfItem("spell_gem_break_block"))

@@ -57,7 +57,6 @@ public class ModCreativeModeTabs {
                             output.accept(ModItems.SPELL_GEM_NOVA);
                             output.accept(ModItems.SPELL_GEM_VORTEX);
                             output.accept(ModItems.SPELL_GEM_BLINK);
-                            output.accept(ModItems.SPELL_GEM_WIND_CHARGE);
                             output.accept(ModItems.SPELL_GEM_MAGNET);
                             output.accept(ModItems.SPELL_GEM_PLACE_BLOCK);
                             output.accept(ModItems.SPELL_GEM_BREAK_BLOCK);

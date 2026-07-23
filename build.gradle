@@ -70,10 +70,3 @@ tasks.register('releaseJars', Copy) {
 		}
 	}
 }
-
-// Alias kept for older docs/scripts
-tasks.register('releaseJarsBoth') {
-	group = 'distribution'
-	description = 'Alias for releaseJars'
-	dependsOn releaseJars
-}

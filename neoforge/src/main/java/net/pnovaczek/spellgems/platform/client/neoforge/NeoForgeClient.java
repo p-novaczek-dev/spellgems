@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public final class NeoForgeClient implements PlatformClient {
+    private final List<KeyMapping.Category> pendingKeyCategories = new ArrayList<>();
     private final List<KeyMapping> pendingKeyMappings = new ArrayList<>();
     private final List<HudAttachment> pendingHud = new ArrayList<>();
     private final List<Consumer<Minecraft>> endTickCallbacks = new ArrayList<>();
@@ -47,6 +48,10 @@ public final class NeoForgeClient implements PlatformClient {
     }
 
     private void onRegisterKeys(RegisterKeyMappingsEvent event) {
+        for (KeyMapping.Category category : pendingKeyCategories) {
+            event.registerCategory(category);
+        }
+        pendingKeyCategories.clear();
         for (KeyMapping key : pendingKeyMappings) {
             event.register(key);
         }
@@ -107,6 +112,13 @@ public final class NeoForgeClient implements PlatformClient {
         for (Runnable callback : recipeSyncCallbacks) {
             callback.run();
         }
+    }
+
+    @Override
+    public KeyMapping.Category registerKeyCategory(Identifier id) {
+        KeyMapping.Category category = new KeyMapping.Category(id);
+        pendingKeyCategories.add(category);
+        return category;
     }
 
     @Override

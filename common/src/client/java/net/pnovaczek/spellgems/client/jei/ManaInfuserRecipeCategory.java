@@ -2,6 +2,8 @@ package net.pnovaczek.spellgems.client.jei;
 
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableAnimated;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
@@ -27,15 +29,37 @@ public class ManaInfuserRecipeCategory implements IRecipeCategory<RecipeHolder<M
 
     private static final Identifier BACKGROUND_LOCATION =
             Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "textures/gui/jei/mana_infuser.png");
+    /** Same progress sprite used by {@link net.pnovaczek.spellgems.client.screen.ManaInfuserScreen}. */
+    private static final Identifier PROGRESS_TEXTURE =
+            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "textures/gui/sprites/container/mana_infuser/progress.png");
+
+    /** Mapped from container (79, 34) via the same slot offset as JEI inputs/output. */
+    private static final int PROGRESS_X = 41;
+    private static final int PROGRESS_Y = 22;
+    private static final int PROGRESS_WIDTH = 24;
+    private static final int PROGRESS_HEIGHT = 16;
+    /** Default craft length (matches most recipes / block-entity default). */
+    private static final int PROGRESS_ANIMATION_TICKS = 200;
 
     private final IDrawable background;
     private final IDrawable icon;
+    private final IDrawableAnimated progressArrow;
 
     public ManaInfuserRecipeCategory(IGuiHelper guiHelper) {
         this.background = guiHelper.drawableBuilder(BACKGROUND_LOCATION, 0, 0, 116, 76)
                 .setTextureSize(116, 76)
                 .build();
         this.icon = guiHelper.createDrawableItemStack(new ItemStack(ModBlocks.MANA_INFUSER));
+
+        IDrawableStatic progressFull = guiHelper.drawableBuilder(PROGRESS_TEXTURE, 0, 0, PROGRESS_WIDTH, PROGRESS_HEIGHT)
+                .setTextureSize(PROGRESS_WIDTH, PROGRESS_HEIGHT)
+                .build();
+        this.progressArrow = guiHelper.createAnimatedDrawable(
+                progressFull,
+                PROGRESS_ANIMATION_TICKS,
+                IDrawableAnimated.StartDirection.LEFT,
+                false
+        );
     }
 
     @Override
@@ -92,9 +116,12 @@ public class ManaInfuserRecipeCategory implements IRecipeCategory<RecipeHolder<M
         // Draw custom background first (JEI draws its default border before this, we disabled border)
         this.background.draw(guiGraphics);
 
+        // Horizontal progress arrow (fills left→right), same asset/motion as the crafting GUI
+        this.progressArrow.draw(guiGraphics, PROGRESS_X, PROGRESS_Y);
+
         ManaInfuserRecipe recipe = recipeHolder.value();
 
-        // Position the cost text near the bottom of the 94px background area (slots end ~y=63)
+        // Position the cost text near the bottom of the background area (slots end ~y=63)
         Component mana = Component.translatable("tooltip.spellgems.mana_infuser.mana_level", recipe.getManaCost());
         guiGraphics.text(Minecraft.getInstance().font, mana, 4, 66, 0xFF2424DA, false);
     }

@@ -24,7 +24,6 @@ loom {
 		}
 	}
 
-	// Keep Fabric run dirs under fabric/ so they don't collide with Neo later
 	runs {
 		configureEach {
 			// default is fine (fabric/run)
@@ -56,7 +55,6 @@ sourceSets {
 fabricApi {
 	configureDataGeneration {
 		client = true
-		// Generated JSON lives in common so both loaders can ship it later
 		outputDirectory = new File(commonDir, 'src/main/generated')
 	}
 }
@@ -106,6 +104,6 @@ publishing {
 		}
 	}
 	repositories {
-		// configure when publishing
+
 	}
 }

@@ -9,12 +9,9 @@ import org.lwjgl.glfw.GLFW;
 
 public final class SpellgemsKeyMappings {
 
-    public static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
-            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "spellgems")
-    );
-
     public static final int WAND_QUICK_CAST_SLOT_COUNT = 9;
 
+    public static KeyMapping.Category CATEGORY;
     public static KeyMapping CYCLE_SPELL_KEY;
     public static final KeyMapping[] WAND_QUICK_CAST_KEYS = new KeyMapping[WAND_QUICK_CAST_SLOT_COUNT];
 
@@ -22,6 +19,11 @@ public final class SpellgemsKeyMappings {
     }
 
     public static void register() {
+        // Fabric: Category.register(Identifier). NeoForge: RegisterKeyMappingsEvent#registerCategory.
+        CATEGORY = ClientPlatform.client().registerKeyCategory(
+                Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "spellgems")
+        );
+
         CYCLE_SPELL_KEY = ClientPlatform.client().registerKeyMapping(
                 new KeyMapping(
                         "key.spellgems.cycle_spell",

@@ -23,6 +23,13 @@ import java.util.function.Consumer;
  * Lives in the client source set so dedicated servers never load it.
  */
 public interface PlatformClient {
+    /**
+     * Registers a key-mapping category for the controls screen sort order.
+     * Fabric uses {@link KeyMapping.Category#register(Identifier)};
+     * NeoForge queues it for {@code RegisterKeyMappingsEvent#registerCategory}.
+     */
+    KeyMapping.Category registerKeyCategory(Identifier id);
+
     KeyMapping registerKeyMapping(KeyMapping keyMapping);
 
     void onEndClientTick(Consumer<Minecraft> callback);

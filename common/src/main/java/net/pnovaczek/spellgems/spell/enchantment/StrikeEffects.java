@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.hurtingprojectile.windcharge.AbstractWindCharge;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
@@ -43,7 +45,7 @@ public final class StrikeEffects {
         register(StrikeEnchantments.POISON, statusEffect(MobEffects.POISON, 0x339933, ParticleTypes.GLOW_SQUID_INK, 0.35D));
         register(StrikeEnchantments.FLAME, ignite(0xFF5500, ParticleTypes.FLAME, 0.6D));
         register(StrikeEnchantments.FROST, freeze(0x88DDFF, ParticleTypes.SNOWFLAKE, 0.4D));
-        register(StrikeEnchantments.SLOW, statusEffect(MobEffects.SLOWNESS, 0x5555FF, ParticleTypes.SCULK_CHARGE_POP, 0.3D));
+        register(StrikeEnchantments.SLOW, statusEffect(MobEffects.SLOWNESS, 0x5555FF, ParticleTypes.CLOUD, 0.3D));
         register(StrikeEnchantments.LEVITATE, statusEffect(MobEffects.LEVITATION, 0xAA88FF, ParticleTypes.END_ROD, 0.25D));
 
         register(StrikeEnchantments.INFERNO, conditionalCloud(
@@ -68,7 +70,7 @@ public final class StrikeEffects {
                 0.35D,
                 (living, caster) -> living.hasEffect(MobEffects.POISON) || living.hasEffect(MobEffects.WITHER),
                 (level, pos, caster) -> new PlagueCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster),
-                SoundEvents.SLIME_SQUISH
+                SoundEvents.WITHER_AMBIENT
         ));
 
         register(StrikeEnchantments.LIGHTNING, new StrikeEffect() {
@@ -125,7 +127,7 @@ public final class StrikeEffects {
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.WHITE_SMOKE, 0.5D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ParticleTypes.SMOKE, 0.5D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -249,7 +251,46 @@ public final class StrikeEffects {
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.CLOUD, 0.1D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ParticleTypes.CRIT, 0.1D, x, y, z, random, dx, dy, dz);
+            }
+        });
+
+        // Same gust explosion as a vanilla WindCharge projectile impact
+        register(StrikeEnchantments.WIND_CHARGE, new StrikeEffect() {
+            private static final float RADIUS = 1.2F;
+
+            @Override
+            public void apply(LivingEntity target, LivingEntity caster) {
+                Level level = target.level();
+                if (level.isClientSide()) {
+                    return;
+                }
+                Vec3 pos = target.position().add(0.0, target.getBbHeight() * 0.5, 0.0);
+                level.explode(
+                        caster,
+                        null,
+                        AbstractWindCharge.EXPLOSION_DAMAGE_CALCULATOR,
+                        pos.x(),
+                        pos.y(),
+                        pos.z(),
+                        RADIUS,
+                        false,
+                        Level.ExplosionInteraction.TRIGGER,
+                        ParticleTypes.GUST_EMITTER_SMALL,
+                        ParticleTypes.GUST_EMITTER_LARGE,
+                        WeightedList.of(),
+                        SoundEvents.WIND_CHARGE_BURST
+                );
+            }
+
+            @Override
+            public int tintColor() {
+                return 0xC8E8FF;
+            }
+
+            @Override
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, ParticleTypes.SMALL_GUST, 0.4D, x, y, z, random, dx, dy, dz);
             }
         });
     }

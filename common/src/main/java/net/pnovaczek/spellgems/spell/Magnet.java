@@ -28,11 +28,6 @@ public class Magnet extends AbstractSpell {
     }
 
     @Override
-    protected int getCooldownTicks() {
-        return 10;
-    }
-
-    @Override
     protected boolean performCast(SpellContext context) {
         var level = context.level();
 

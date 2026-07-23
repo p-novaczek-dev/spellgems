@@ -27,11 +27,6 @@ public class PlaceBlock extends AbstractSpell {
     }
 
     @Override
-    protected int getCooldownTicks() {
-        return 10;
-    }
-
-    @Override
     public boolean canCast(SpellContext context) {
         return HotbarUtils.hasItem(context, HotbarUtils::isPlaceableBlock);
     }

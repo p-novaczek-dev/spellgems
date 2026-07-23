@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "spellgems:item/spell_gem_wind_charge"
-  }
-}

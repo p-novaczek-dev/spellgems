@@ -68,11 +68,6 @@ public class Feed extends AbstractSpell {
     }
 
     @Override
-    protected int getCooldownTicks() {
-        return 10;
-    }
-
-    @Override
     protected boolean performCast(SpellContext context) {
         if (context.level().isClientSide()) {
             return false;

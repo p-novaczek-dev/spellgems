@@ -11,7 +11,6 @@ public class SpellIds {
     public static final Identifier VORTEX = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "vortex");
 
     public static final Identifier BLINK = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "blink");
-    public static final Identifier WIND_CHARGE = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "wind_charge");
     public static final Identifier MAGNET = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "magnet");
     public static final Identifier PLACE_BLOCK = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "place_block");
     public static final Identifier BREAK_BLOCK = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "break_block");

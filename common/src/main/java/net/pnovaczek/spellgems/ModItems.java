@@ -39,7 +39,6 @@ public class ModItems {
     public static SpellGemItem SPELL_GEM_NOVA;
     public static SpellGemItem SPELL_GEM_VORTEX;
     public static SpellGemItem SPELL_GEM_BLINK;
-    public static SpellGemItem SPELL_GEM_WIND_CHARGE;
     public static SpellGemItem SPELL_GEM_MAGNET;
     public static SpellGemItem SPELL_GEM_PLACE_BLOCK;
     public static SpellGemItem SPELL_GEM_BREAK_BLOCK;
@@ -96,7 +95,6 @@ public class ModItems {
         SPELL_GEM_NOVA = spellGem("spell_gem_nova", SpellIds.NOVA);
         SPELL_GEM_VORTEX = spellGem("spell_gem_vortex", SpellIds.VORTEX);
         SPELL_GEM_BLINK = spellGem("spell_gem_blink", SpellIds.BLINK);
-        SPELL_GEM_WIND_CHARGE = spellGem("spell_gem_wind_charge", SpellIds.WIND_CHARGE);
         SPELL_GEM_MAGNET = spellGem("spell_gem_magnet", SpellIds.MAGNET);
         SPELL_GEM_PLACE_BLOCK = spellGem("spell_gem_place_block", SpellIds.PLACE_BLOCK);
         SPELL_GEM_BREAK_BLOCK = spellGem("spell_gem_break_block", SpellIds.BREAK_BLOCK);

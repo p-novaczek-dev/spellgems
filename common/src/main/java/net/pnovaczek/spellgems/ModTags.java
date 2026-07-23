@@ -12,7 +12,6 @@ public class ModTags {
             Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "combat_spell_gems")
     );
 
-    // Optional: more tags
     public static final TagKey<Item> UTILITY_SPELL_GEMS = TagKey.create(
             Registries.ITEM,
             Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "utility_spell_gems")

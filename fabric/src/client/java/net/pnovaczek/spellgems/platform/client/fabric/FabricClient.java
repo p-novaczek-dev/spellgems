@@ -24,6 +24,11 @@ import java.util.function.Consumer;
 
 public final class FabricClient implements PlatformClient {
     @Override
+    public KeyMapping.Category registerKeyCategory(Identifier id) {
+        return KeyMapping.Category.register(id);
+    }
+
+    @Override
     public KeyMapping registerKeyMapping(KeyMapping keyMapping) {
         return KeyMappingHelper.registerKeyMapping(keyMapping);
     }

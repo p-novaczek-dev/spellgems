@@ -104,7 +104,7 @@ public class Vortex extends AbstractSpell {
         level.playSound(
                 null,
                 center.x, center.y, center.z,
-                SoundEvents.ENDERMAN_TELEPORT,
+                SoundEvents.SHULKER_SHOOT,
                 SoundSource.PLAYERS,
                 0.6F,
                 0.8F

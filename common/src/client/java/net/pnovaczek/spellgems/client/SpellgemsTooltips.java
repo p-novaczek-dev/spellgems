@@ -28,6 +28,7 @@ import net.pnovaczek.spellgems.spell.SpellIds;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
 import net.pnovaczek.spellgems.wand.WandDepletion;
+import net.pnovaczek.spellgems.wand.WandSpellCaster;
 import net.pnovaczek.spellgems.wand.WandSpellLabels;
 
 import java.util.List;
@@ -44,14 +45,14 @@ public class SpellgemsTooltips {
                 void addLine(MutableComponent component, ChatFormatting formatting) {
                     lines.add(component.withStyle(formatting));
                 }
+                void addLineAttention(String key) { addLine(key, ChatFormatting.RED); }
                 void addLineHighlight(String key) { addLine(key, ChatFormatting.YELLOW); }
                 void addLineAttribute(String key) { addLine(key, ChatFormatting.GRAY); }
                 void addLineAttribute(MutableComponent component) { addLine(component, ChatFormatting.GRAY); }
-                void addLineDetail(String key, Object... args) {
-                    lines.add(Component.literal(" ")
-                            .append(Component.translatable(key, args).withStyle(ChatFormatting.DARK_GRAY))
-                    );
-                }
+                void addLineStat(String key) { addLine(key, ChatFormatting.DARK_GREEN); }
+                void addLineStat(MutableComponent component) { addLine(component, ChatFormatting.DARK_GREEN); }
+                void addLineDetail(String key, Object... args) { lines.add(Component.translatable(key, args).withStyle(ChatFormatting.DARK_GRAY)); }
+                void addLineDetail(MutableComponent component) { addLine(component, ChatFormatting.DARK_GRAY); }
                 void addLineHoldShift() { addLine("tooltip.spellgems.shift_hint", ChatFormatting.DARK_GRAY); }
             }
 
@@ -63,7 +64,7 @@ public class SpellgemsTooltips {
 
             if (stack.is(ModItems.WAND)) {
                 if (WandDepletion.isDepleted(stack)) {
-                    tooltip.addLine("tooltip.spellgems.wand.depleted", ChatFormatting.RED);
+                    tooltip.addLineAttention("tooltip.spellgems.wand.depleted");
                 }
                 if (Minecraft.getInstance().hasShiftDown()) {
                     appendEquippedGems(stack, WandContainer.SIZE, WandContainer::loadInto,
@@ -74,11 +75,10 @@ public class SpellgemsTooltips {
                     }
                     tooltip.addLineDetail("tooltip.spellgems.wand.configure");
                     tooltip.addLineDetail("tooltip.spellgems.wand.cast");
-                    lines.add(Component.literal(" ")
-                            .append(Component.translatable(
+                    tooltip.addLineDetail(Component.translatable(
                                     "tooltip.spellgems.wand.cycle",
                                     KeyMapping.createNameSupplier(SpellgemsKeyMappings.CYCLE_SPELL_KEY.getName()).get()
-                            ).withStyle(ChatFormatting.DARK_GRAY)));
+                            ));
                 } else {
                     tooltip.addLineHoldShift();
                 }
@@ -90,11 +90,10 @@ public class SpellgemsTooltips {
                             lines);
                     tooltip.addLineDetail("tooltip.spellgems.astral_bow.astral_arrows");
                     tooltip.addLineDetail("tooltip.spellgems.astral_bow.configure");
-                    lines.add(Component.literal(" ")
-                            .append(Component.translatable(
+                    tooltip.addLineDetail(Component.translatable(
                                     "tooltip.spellgems.astral_bow.cycle",
                                     KeyMapping.createNameSupplier(SpellgemsKeyMappings.CYCLE_SPELL_KEY.getName()).get()
-                            ).withStyle(ChatFormatting.DARK_GRAY)));
+                            ));
                 } else {
                     tooltip.addLineHoldShift();
                 }
@@ -184,6 +183,16 @@ public class SpellgemsTooltips {
                                 );
                             }
                         }
+
+                        if (shiftDown) {
+                            int wandCost = WandSpellCaster.getDurabilityCost(data.spellId(), data);
+                            tooltip.addLineStat(Component.translatable("tooltip.spellgems.spell_gem.wand_cost", wandCost));
+                            int dispenserCooldown = Spellgems.CONFIG.getDispenserCooldownTicks(data.spellId());
+                            tooltip.addLineStat(Component.translatable(
+                                    "tooltip.spellgems.spell_gem.dispenser_cooldown",
+                                    dispenserCooldown
+                            ));
+                        }
                     }
                 }
             }
@@ -246,7 +255,7 @@ public class SpellgemsTooltips {
             } else {
                 gemLine = Component.literal("  ").append(gemLine);
             }
-            lines.add(Component.literal(" ").append(gemLine.copy().withStyle(ChatFormatting.GRAY)));
+            lines.add(gemLine.copy().withStyle(ChatFormatting.GRAY));
         }
 
         if (!anyGems) {

@@ -22,8 +22,12 @@ public class StrikeEnchantments {
     public static final Identifier PURIFY = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "purify");
     public static final Identifier VOLLEY = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "volley");
     public static final Identifier VENGEANCE = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "vengeance");
+    public static final Identifier WIND_CHARGE = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "wind_charge");
 
     public static List<Identifier> getAll() {
-        return List.of(FLAME, POISON, FROST, SLOW, LEVITATE, INFERNO, FROSTBITE, PLAGUE, LIGHTNING, EXPLOSION, DRAIN, PURIFY, VOLLEY, VENGEANCE);
+        return List.of(
+                FLAME, POISON, FROST, SLOW, LEVITATE, INFERNO, FROSTBITE, PLAGUE,
+                LIGHTNING, EXPLOSION, DRAIN, PURIFY, VOLLEY, VENGEANCE, WIND_CHARGE
+        );
     }
 }

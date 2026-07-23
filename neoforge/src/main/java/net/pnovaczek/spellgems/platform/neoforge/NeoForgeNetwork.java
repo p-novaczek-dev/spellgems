@@ -62,9 +62,6 @@ public final class NeoForgeNetwork implements PlatformNetwork {
     @Override
     public void registerPayloadTypes() {
         // Handled by RegisterPayloadHandlersEvent (mod bus listener registered in ctor).
-        if (!registered) {
-            // Event fires during mod load after our listener is attached.
-        }
     }
 
     @Override

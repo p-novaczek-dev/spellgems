@@ -79,8 +79,9 @@ public abstract class AbstractSpell implements Spell {
     protected void performSelfTargetDispenserFx(SpellContext context) {
     }
 
+    /** Item cooldown ticks when casting a spell gem from hand. */
     protected int getCooldownTicks() {
-        return 20;
+        return 200;
     }
 
     /**

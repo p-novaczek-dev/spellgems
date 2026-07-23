@@ -36,11 +36,6 @@ public class Blink extends AbstractSpell {
     }
 
     @Override
-    protected int getCooldownTicks() {
-        return 20;
-    }
-
-    @Override
     protected void performSelfTargetDispenserFx(SpellContext context) {
         Vec3 origin = context.origin();
         double maxDistance = resolveMaxDistance(context);
