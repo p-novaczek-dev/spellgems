@@ -1,4 +1,5 @@
-// Root project: shared versioning only. Loader toolchains live in :fabric / :neoforge.
+// Root project: shared versioning and release distribution.
+// Loader toolchains live in :fabric / :neoforge.
 
 plugins {
 	id 'base'
@@ -25,37 +26,54 @@ subprojects {
 	}
 }
 
-// Collect both loader distribution jars after they exist.
+/**
+ * Builds both loaders and copies installable jars into build/release/:
+ *   spellgems-<version>-fabric.jar
+ *   spellgems-<version>-neoforge.jar
+ *
+ * Usage:
+ *   ./gradlew releaseJars
+ */
 tasks.register('releaseJars', Copy) {
 	group = 'distribution'
-	description = 'Copies fabric + neoforge jars into build/release (run after both builds).'
-	dependsOn ':fabric:build'
-	// :neoforge:build is optional until the Neo module is implemented
+	description = 'Build Fabric + NeoForge and copy installable jars to build/release/'
+	dependsOn ':fabric:build', ':neoforge:build'
+
+	// Fresh release folder each run
+	doFirst {
+		def releaseDir = layout.buildDirectory.dir('release').get().asFile
+		if (releaseDir.exists()) {
+			delete releaseDir
+		}
+		releaseDir.mkdirs()
+	}
+
 	from(project(':fabric').layout.buildDirectory.dir('libs')) {
-		include '*.jar'
-		exclude '*-sources.jar', '*-dev.jar', '*-javadoc.jar'
+		include '*-fabric.jar'
+		exclude '*-sources.jar', '*-fabric-sources.jar', '*-dev.jar', '*-javadoc.jar'
+	}
+	from(project(':neoforge').layout.buildDirectory.dir('libs')) {
+		include '*-neoforge.jar'
+		exclude '*-sources.jar', '*-neoforge-sources.jar', '*-dev.jar', '*-javadoc.jar'
 	}
 	into(layout.buildDirectory.dir('release'))
-	doFirst {
-		if (project(':neoforge').tasks.findByName('build') != null
-				&& project(':neoforge').tasks.named('build').get().state.executed) {
-			// no-op; copies are additive via additional from below when neo builds
+
+	duplicatesStrategy = DuplicatesStrategy.FAIL
+
+	doLast {
+		def releaseDir = layout.buildDirectory.dir('release').get().asFile
+		def jars = releaseDir.listFiles({ f -> f.name.endsWith('.jar') } as FileFilter) ?: [] as File[]
+		logger.lifecycle('Release jars in {}:', releaseDir)
+		jars.each { logger.lifecycle('  {} ({} bytes)', it.name, it.length()) }
+		if (jars.length < 2) {
+			throw new GradleException("Expected 2 release jars (fabric + neoforge), found ${jars.length}")
 		}
 	}
 }
 
-// Prefer: ./gradlew :fabric:build :neoforge:build releaseJars once Neo exists.
-tasks.register('releaseJarsBoth', Copy) {
+// Alias kept for older docs/scripts
+tasks.register('releaseJarsBoth') {
 	group = 'distribution'
-	description = 'Builds fabric+neoforge and copies jars to build/release.'
-	dependsOn ':fabric:build', ':neoforge:build'
-	from(project(':fabric').layout.buildDirectory.dir('libs')) {
-		include '*.jar'
-		exclude '*-sources.jar', '*-dev.jar', '*-javadoc.jar'
-	}
-	from(project(':neoforge').layout.buildDirectory.dir('libs')) {
-		include '*.jar'
-		exclude '*-sources.jar', '*-dev.jar', '*-javadoc.jar'
-	}
-	into(layout.buildDirectory.dir('release'))
+	description = 'Alias for releaseJars'
+	dependsOn releaseJars
 }

@@ -12,6 +12,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
+/**
+ * Shared Fabric + NeoForge: while the cycle key is held, hotbar scroll cycles wand/bow gems.
+ */
 @Mixin(MouseHandler.class)
 public abstract class MouseHandlerMixin {
 

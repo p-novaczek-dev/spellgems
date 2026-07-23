@@ -1,17 +1,10 @@
-// Workstream 0 stub: NeoForge module layout only.
-// Full ModDevGradle/NeoGradle wiring comes in Workstream 1+.
-//
-// Commands (once implemented):
-//   ./gradlew :neoforge:runClient
-//   ./gradlew :neoforge:runServer
-//   ./gradlew :neoforge:build   →  spellgems-<version>-neoforge.jar
-
 plugins {
 	id 'java'
-	id 'base'
+	id 'maven-publish'
+	id 'net.neoforged.moddev' version '2.0.142'
 }
 
-// Produces spellgems-<version>-neoforge.jar
+// Installable jar: spellgems-<version>-neoforge.jar
 base {
 	archivesName = archives_base_name
 }
@@ -20,24 +13,85 @@ version = rootProject.mod_version
 group = rootProject.maven_group
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+	toolchain.languageVersion = JavaLanguageVersion.of(25)
 	withSourcesJar()
 }
 
-// Placeholder so the project configures; replace with MDG + Minecraft deps later.
-dependencies {
-	// minecraft / neoforge will be added in Workstream 1
+def commonDir = rootProject.file('common')
+
+// Include shared common sources (main + client) into Neo main source set
+sourceSets {
+	main {
+		java {
+			srcDir new File(commonDir, 'src/main/java')
+			srcDir new File(commonDir, 'src/client/java')
+		}
+		resources {
+			srcDir new File(commonDir, 'src/main/resources')
+			srcDir new File(commonDir, 'src/main/generated')
+			srcDir new File(commonDir, 'src/client/resources')
+		}
+	}
 }
+
+neoForge {
+	version = project.neo_version
+
+	runs {
+		client {
+			client()
+			systemProperty 'neoforge.enabledGameTestNamespaces', 'spellgems'
+		}
+		server {
+			server()
+			programArgument '--nogui'
+			systemProperty 'neoforge.enabledGameTestNamespaces', 'spellgems'
+		}
+		configureEach {
+			systemProperty 'forge.logging.markers', 'REGISTRIES'
+			logLevel = org.slf4j.event.Level.INFO
+		}
+	}
+
+	mods {
+		spellgems {
+			sourceSet sourceSets.main
+		}
+	}
+}
+
+configurations {
+	runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+	// Optional JEI (compile API + local runtime only)
+	compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+	compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+	localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+}
+
+// Expand neoforge.mods.toml placeholders from templates/
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+	var replaceProperties = [
+			minecraft_version      : minecraft_version,
+			minecraft_version_range: minecraft_version_range,
+			neo_version            : neo_version,
+			mod_id                 : 'spellgems',
+			mod_name               : 'Spellgems',
+			mod_license            : 'CC0-1.0',
+			mod_version            : mod_version,
+	]
+	inputs.properties replaceProperties
+	expand replaceProperties
+	from 'src/main/templates'
+	into 'build/generated/sources/modMetadata'
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
 
 jar {
 	archiveClassifier = 'neoforge'
-	manifest {
-		attributes(
-				'Implementation-Title': 'spellgems-neoforge-stub',
-				'Implementation-Version': project.version
-		)
-	}
 	from(rootProject.file('LICENSE')) {
 		rename { "${it}_${archives_base_name}" }
 	}
@@ -45,4 +99,17 @@ jar {
 
 tasks.named('sourcesJar', Jar).configure {
 	archiveClassifier = 'neoforge-sources'
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+}
+
+publishing {
+	publications {
+		register('mavenJava', MavenPublication) {
+			artifactId = "${archives_base_name}-neoforge"
+			from components.java
+		}
+	}
 }

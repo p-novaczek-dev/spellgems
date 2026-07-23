@@ -12,6 +12,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Fabric-only: listed in {@code spellgems.fabric.mixins.json}.
+ * NeoForge uses {@code AnvilUpdateEvent} + {@link SpellTomeAnvilHandler} instead.
+ */
 @Mixin(AnvilMenu.class)
 public abstract class AnvilMenuMixin {
 

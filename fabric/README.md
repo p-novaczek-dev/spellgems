@@ -1,6 +1,6 @@
 # fabric
 
-Fabric loader module.
+Fabric loader module (Loom).
 
 ```bash
 ./gradlew :fabric:runClient
@@ -8,4 +8,7 @@ Fabric loader module.
 ./gradlew :fabric:build
 # jar → fabric/build/libs/spellgems-<version>-fabric.jar
 ./gradlew :fabric:runDatagen   # writes into common/src/main/generated
+
+# Both loaders into build/release/
+./gradlew releaseJars
 ```

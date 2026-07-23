@@ -63,6 +63,15 @@ public class ManaInfuserRecipe implements Recipe<RecipeInput> {
         return this.result.create();
     }
 
+    /**
+     * Machine recipe — not craftable in the 2x2/3x3 grid. Special recipes skip
+     * {@link RecipeManager} placement validation that warns on empty placement info.
+     */
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
+
     @Override
     public boolean showNotification() {
         return false;

@@ -9,7 +9,6 @@ import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +18,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.pnovaczek.spellgems.ModBlocks;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.platform.client.ClientPlatform;
-import net.pnovaczek.spellgems.platform.client.fabric.FabricClientPlatform;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantments;
@@ -30,15 +28,14 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * JEI plugin for mana infuser and spell enchanting recipes.
+ * Shared JEI plugin (Fabric + NeoForge). Discovered via {@link JeiPlugin}; Fabric also lists it in
+ * {@code fabric.mod.json} under {@code jei_mod_plugin}.
  * <p>
  * Recipes are resolved from:
  * <ol>
  *   <li>Integrated server {@link RecipeManager} (singleplayer / LAN host)</li>
- *   <li>Fabric {@code SynchronizedRecipes} on the client connection (multiplayer)</li>
+ *   <li>Loader multiplayer recipe sync ({@link ClientPlatform} → Fabric SynchronizedRecipes / Neo RecipesReceivedEvent)</li>
  * </ol>
- * If JEI initializes before recipes arrive, they are pushed when the platform
- * client recipe-sync hook fires or when JEI runtime becomes available.
  */
 @JeiPlugin
 public class SpellgemsJeiPlugin implements IModPlugin {
@@ -60,7 +57,6 @@ public class SpellgemsJeiPlugin implements IModPlugin {
         var jeiHelpers = registration.getJeiHelpers();
         var guiHelper = jeiHelpers.getGuiHelper();
 
-        // Collect valid potion catalysts so "any potion" slots cycle real potions.
         List<ItemStack> potionCatalysts = new ArrayList<>();
         try {
             Collection<ItemStack> allItems = jeiHelpers.getIngredientManager()
@@ -113,6 +109,7 @@ public class SpellgemsJeiPlugin implements IModPlugin {
     @Override
     public void onRuntimeAvailable(IJeiRuntime runtime) {
         jeiRuntime = runtime;
+        ensureSyncListener();
         pushMissingRecipesToRuntime();
     }
 
@@ -127,15 +124,14 @@ public class SpellgemsJeiPlugin implements IModPlugin {
         if (syncListenerRegistered) {
             return;
         }
+        if (!ClientPlatform.isInitialized()) {
+            // Client entrypoint has not bootstrapped yet; retry from onRuntimeAvailable.
+            return;
+        }
         syncListenerRegistered = true;
-        FabricClientPlatform.bootstrap();
         ClientPlatform.client().onClientRecipesSynchronized(SpellgemsJeiPlugin::pushMissingRecipesToRuntime);
     }
 
-    /**
-     * Adds recipes that were not available during {@link #registerRecipes} (common on multiplayer
-     * when Fabric recipe sync completes after JEI plugin init).
-     */
     private static void pushMissingRecipesToRuntime() {
         IJeiRuntime runtime = jeiRuntime;
         if (runtime == null) {
@@ -160,10 +156,6 @@ public class SpellgemsJeiPlugin implements IModPlugin {
         }
     }
 
-    /**
-     * Resolves custom recipes for JEI from the integrated server (SP) or Fabric-synced client recipes (MP).
-     */
-    @SuppressWarnings("unchecked")
     private static <I extends net.minecraft.world.item.crafting.RecipeInput, T extends net.minecraft.world.item.crafting.Recipe<I>>
     List<RecipeHolder<T>> collectRecipes(RecipeType<T> type) {
         Minecraft client = Minecraft.getInstance();
@@ -172,15 +164,22 @@ public class SpellgemsJeiPlugin implements IModPlugin {
         IntegratedServer integrated = client.getSingleplayerServer();
         if (integrated != null) {
             RecipeManager manager = integrated.getRecipeManager();
-            return new ArrayList<>(manager.getAllOfType(type));
+            List<RecipeHolder<T>> out = new ArrayList<>();
+            for (RecipeHolder<?> holder : manager.getRecipes()) {
+                if (holder.value().getType() == type) {
+                    @SuppressWarnings("unchecked")
+                    RecipeHolder<T> cast = (RecipeHolder<T>) holder;
+                    out.add(cast);
+                }
+            }
+            return out;
         }
 
-        // Dedicated multiplayer (and other Fabric recipe-sync servers)
-        ClientPacketListener connection = client.getConnection();
-        if (connection != null) {
-            Collection<RecipeHolder<T>> synced = connection.recipes().getSynchronizedRecipes().getAllOfType(type);
+        // Multiplayer: loader-specific synced recipe data
+        if (ClientPlatform.isInitialized()) {
+            List<RecipeHolder<T>> synced = ClientPlatform.client().getSyncedCustomRecipes(type);
             if (!synced.isEmpty()) {
-                return new ArrayList<>(synced);
+                return synced;
             }
         }
 

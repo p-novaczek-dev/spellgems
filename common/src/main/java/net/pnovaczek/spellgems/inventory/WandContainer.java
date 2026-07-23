@@ -20,7 +20,7 @@ public final class WandContainer {
         NonNullList<ItemStack> items = NonNullList.withSize(SIZE, ItemStack.EMPTY);
         contents.copyInto(items);
         for (int i = 0; i < SIZE; i++) {
-            container.items.set(i, items.get(i));
+            container.setItem(i, items.get(i));
         }
     }
 

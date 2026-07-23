@@ -11,6 +11,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
+/**
+ * Shared Fabric + NeoForge: astral bow custom draw duration (vanilla bow uses 20 ticks).
+ * Re-check {@code floatValue = 20.0F} if {@code renderArmWithItem} changes across MC versions.
+ */
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
 

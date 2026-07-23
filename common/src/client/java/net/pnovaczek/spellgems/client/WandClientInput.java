@@ -22,7 +22,8 @@ public final class WandClientInput {
             return false;
         }
 
-        if (clickCount != 0 && client.missTime <= 0) {
+        // clickCount==0 is a synthetic callback; miss-time is loader-private on Neo so we only gate on clickCount.
+        if (clickCount != 0) {
             // Server is authoritative; local prediction only for responsive FX.
             WandClientNetworking.sendCast();
             WandSpellCaster.tryPredictCast(player);

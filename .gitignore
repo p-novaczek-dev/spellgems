@@ -52,3 +52,6 @@ replay_*.log
 /code_optimization.json
 /META-INF/
 /com/
+/docs/
+/assets/
+/data/

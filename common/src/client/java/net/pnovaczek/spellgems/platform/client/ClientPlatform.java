@@ -15,6 +15,10 @@ public final class ClientPlatform {
         ClientPlatform.network = network;
     }
 
+    public static boolean isInitialized() {
+        return client != null && network != null;
+    }
+
     public static PlatformClient client() {
         return require(client, "client");
     }

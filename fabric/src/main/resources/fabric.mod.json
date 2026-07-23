@@ -3,7 +3,7 @@
 	"id": "spellgems",
 	"version": "${version}",
 	"name": "Spellgems",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Spellgems - spell gems, wands, and enchanting for Minecraft.",
 	"authors": [
 		"Me!"
 	],
@@ -16,7 +16,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"net.pnovaczek.spellgems.Spellgems"
+			"net.pnovaczek.spellgems.SpellgemsFabric"
 		],
 		"client": [
 			"net.pnovaczek.spellgems.client.SpellgemsClient"
@@ -30,6 +30,7 @@
 	},
 	"mixins": [
 		"spellgems.mixins.json",
+		"spellgems.fabric.mixins.json",
 		{
 			"config": "spellgems.client.mixins.json",
 			"environment": "client"

@@ -1,0 +1,32 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "${mod_license}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "Me!"
+description = '''
+Spellgems - spell gems, wands, and enchanting for Minecraft.
+'''
+logoFile = "assets/spellgems/icon.png"
+
+# Common mixins JSON is empty on purpose; anvil uses AnvilUpdateEvent on Neo.
+# Client mixins (scroll cycle, astral bow draw) are shared with Fabric.
+[[mixins]]
+config = "spellgems.client.mixins.json"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "[${neo_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"

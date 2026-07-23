@@ -6,9 +6,11 @@ import net.minecraft.resources.ResourceKey;
 import net.pnovaczek.spellgems.Spellgems;
 
 /**
- * Thin helpers for registering into vanilla {@link Registry}s during
- * {@link ModRegistries#registerAll()}. On NeoForge these call sites can later
- * map to {@code DeferredRegister} without changing gameplay code.
+ * Thin helpers for registering into vanilla {@link Registry}s.
+ * <p>
+ * Fabric: called during mod init with open {@link BuiltInRegistries}.
+ * NeoForge: called only from {@link ModRegistries#registerFor} while
+ * {@code RegisterEvent} is firing (same {@link Registry#register} path Neo uses).
  */
 public final class ModRegistry {
     private ModRegistry() {

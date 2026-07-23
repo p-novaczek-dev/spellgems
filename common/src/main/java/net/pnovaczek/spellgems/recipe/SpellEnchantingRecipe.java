@@ -102,6 +102,15 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
         return ItemStack.EMPTY;
     }
 
+    /**
+     * Table recipe — not craftable in the player crafting grid. Special recipes skip
+     * {@link RecipeManager} placement validation that warns on empty placement info.
+     */
+    @Override
+    public boolean isSpecial() {
+        return true;
+    }
+
     @Override
     public boolean showNotification() { return false; }
     @Override
