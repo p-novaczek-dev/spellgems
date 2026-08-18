@@ -2,6 +2,9 @@ package net.pnovaczek.spellgems.block;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -72,5 +75,23 @@ public class ManaInfuserBlock extends BaseEntityBlock {
         }
 
         return InteractionResult.PASS;
+    }
+
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!state.getValue(BlockStateProperties.LIT)) {
+            return;
+        }
+
+        double x = pos.getX() + 0.5;
+        double y = pos.getY();
+        double z = pos.getZ() + 0.5;
+        Direction direction = state.getValue(HorizontalDirectionalBlock.FACING);
+        Direction.Axis axis = direction.getAxis();
+        double spread = random.nextDouble() * 0.6 - 0.3;
+        double dx = axis == Direction.Axis.X ? direction.getStepX() * 0.52 : spread;
+        double dy = random.nextDouble() * 6.0 / 16.0;
+        double dz = axis == Direction.Axis.Z ? direction.getStepZ() * 0.52 : spread;
+        level.addParticle(ParticleTypes.SMOKE, x + dx, y + dy, z + dz, 0.0, 0.0, 0.0);
     }
 }

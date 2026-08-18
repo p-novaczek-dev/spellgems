@@ -182,7 +182,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                 // Spell Enchanting Table: 1 book + 2 shimmersteel + 4 obsidian
                 shaped(RecipeCategory.DECORATIONS, ModBlocks.SPELL_ENCHANTING_TABLE)
                         .pattern(" B ")
-                        .pattern("SSS")
+                        .pattern("SOS")
                         .pattern("OOO")
                         .define('B', Items.BOOK)
                         .define('S', ModItems.SHIMMERSTEEL_INGOT)
