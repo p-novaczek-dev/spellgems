@@ -5,9 +5,13 @@ import net.minecraft.client.Minecraft;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.client.network.WandClientNetworking;
 import net.pnovaczek.spellgems.platform.client.ClientPlatform;
+import net.pnovaczek.spellgems.spell.Spell;
 import net.pnovaczek.spellgems.wand.WandSpellCaster;
 
 public final class WandClientInput {
+
+    /** True after a click-only wand spell has fired for the current attack-key press. */
+    private static boolean clickOnlyCastThisPress;
 
     private WandClientInput() {
     }
@@ -22,17 +26,29 @@ public final class WandClientInput {
             return false;
         }
 
-        // clickCount==0 is a synthetic callback; miss-time is loader-private on Neo so we only gate on clickCount.
-        if (clickCount != 0) {
-            // Server is authoritative; local prediction only for responsive FX.
-            WandClientNetworking.sendCast();
-            WandSpellCaster.tryPredictCast(player);
+        Spell spell = WandSpellCaster.getSelectedSpell(player);
+        boolean clickOnly = spell != null && !spell.repeatWhileHeld();
+
+        // Fabric: clickCount==0 is hold. NeoForge always passes 1, including continueAttack while held.
+        if (clickOnly) {
+            if (clickOnlyCastThisPress) {
+                return true;
+            }
+            clickOnlyCastThisPress = true;
+        } else if (clickCount == 0) {
+            return true;
         }
 
+        WandClientNetworking.sendCast();
+        WandSpellCaster.tryPredictCast(player);
         return true;
     }
 
     private static void onClientTick(Minecraft client) {
+        if (client.player == null || !client.options.keyAttack.isDown()) {
+            clickOnlyCastThisPress = false;
+        }
+
         if (client.player == null || client.screen != null) {
             return;
         }

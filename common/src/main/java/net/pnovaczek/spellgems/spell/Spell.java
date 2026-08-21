@@ -32,6 +32,14 @@ public interface Spell {
         return false;
     }
 
+    /**
+     * When false, wand left-click casts once per press instead of repeating while the button is held.
+     * Spell dispensers and quick-cast keys are unaffected.
+     */
+    default boolean repeatWhileHeld() {
+        return true;
+    }
+
     String tooltipNameKey();
 
     String tooltipDescriptionKey();

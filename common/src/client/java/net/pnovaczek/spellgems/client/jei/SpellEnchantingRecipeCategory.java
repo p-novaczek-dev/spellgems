@@ -8,6 +8,7 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import mezz.jei.api.recipe.types.IRecipeType;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.component.DataComponents;
@@ -45,8 +46,8 @@ public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHold
     private final List<ItemStack> potionCatalysts;
 
     public SpellEnchantingRecipeCategory(IGuiHelper guiHelper, List<ItemStack> potionCatalysts) {
-        this.background = guiHelper.drawableBuilder(BACKGROUND_LOCATION, 0, 0, 160, 60)
-                .setTextureSize(160, 60)
+        this.background = guiHelper.drawableBuilder(BACKGROUND_LOCATION, 0, 0, 158, 57)
+                .setTextureSize(158, 57)
                 .build();
         this.icon = guiHelper.createDrawableItemStack(new ItemStack(ModBlocks.SPELL_ENCHANTING_TABLE));
         this.potionCatalysts = potionCatalysts != null ? potionCatalysts : List.of();
@@ -64,12 +65,12 @@ public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHold
 
     @Override
     public int getWidth() {
-        return 160;
+        return 158;
     }
 
     @Override
     public int getHeight() {
-        return 60;
+        return 57;
     }
 
     @Override
@@ -89,11 +90,11 @@ public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHold
         // Target (input gem/book or generic via ingredient) - left side
         var targetIngredient = recipe.getInput().getIngredient();
         if (targetIngredient != null) {
-            builder.addSlot(RecipeIngredientRole.INPUT, 5, 20)
+            builder.addSlot(RecipeIngredientRole.INPUT, 3, 18)
                     .add(targetIngredient);
         } else {
             // Fallback representative for "any combat/utility"
-            builder.addSlot(RecipeIngredientRole.INPUT, 5, 20)
+            builder.addSlot(RecipeIngredientRole.INPUT, 3, 18)
                     .add(new ItemStack(net.minecraft.world.item.Items.BOOK));
         }
 
@@ -101,7 +102,7 @@ public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHold
         var catalystDef = recipe.getCatalystDef();
         if (catalystDef.anyPotion()) {
             // Cycle through all valid potions (drinkable, splash, lingering with effects)
-            var potionSlot = builder.addSlot(RecipeIngredientRole.INPUT, 25, 20);
+            var potionSlot = builder.addSlot(RecipeIngredientRole.INPUT, 23, 18);
             if (!potionCatalysts.isEmpty()) {
                 for (ItemStack potion : potionCatalysts) {
                     potionSlot.add(potion);
@@ -121,7 +122,7 @@ public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHold
                 potionSlot.add(linger);
             }
         } else {
-            builder.addSlot(RecipeIngredientRole.INPUT, 25, 20)
+            builder.addSlot(RecipeIngredientRole.INPUT, 23, 18)
                     .add(catalystDef.asIngredient());
         }
     }
@@ -129,7 +130,6 @@ public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHold
     @Override
     public void draw(RecipeHolder<SpellEnchantingRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView,
                      GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
-        // Draw custom background first
         this.background.draw(guiGraphics);
 
         SpellEnchantingRecipe recipe = recipeHolder.value();
@@ -138,13 +138,16 @@ public class SpellEnchantingRecipeCategory implements IRecipeCategory<RecipeHold
         String key = recipe.getDescriptionKey();
         if (key != null && !key.isEmpty()) {
             Component desc = Component.translatable(key);
-            guiGraphics.text(Minecraft.getInstance().font, desc, 5, 5, 0xFFFFFFFF, true);
+            guiGraphics.text(Minecraft.getInstance().font, desc, 3, 3, 0xFFFFFFFF, true);
         }
 
+        int textColor = 0xFF8B8B8B;
+        int textPad = 3;
+
         Component levelReq = Component.translatable("container.spellgems.spell_enchanting.level_requirement", recipe.getLevelRequirement());
-        guiGraphics.text(Minecraft.getInstance().font, levelReq, 5, 40, 0xFFAAAAAA, false);
+        guiGraphics.text(Minecraft.getInstance().font, levelReq, textPad, 38, textColor, false);
 
         Component xpCost = Component.translatable("container.spellgems.spell_enchanting.xp_cost", recipe.getXpCost());
-        guiGraphics.text(Minecraft.getInstance().font, xpCost, 5, 50, 0xFFAAAAAA, false);
+        guiGraphics.text(Minecraft.getInstance().font, xpCost, textPad, 48, textColor, false);
     }
 }

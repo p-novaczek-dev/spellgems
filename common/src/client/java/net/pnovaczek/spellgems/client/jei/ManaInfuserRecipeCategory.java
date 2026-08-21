@@ -33,9 +33,8 @@ public class ManaInfuserRecipeCategory implements IRecipeCategory<RecipeHolder<M
     private static final Identifier PROGRESS_TEXTURE =
             Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "textures/gui/sprites/container/mana_infuser/progress.png");
 
-    /** Mapped from container (79, 34) via the same slot offset as JEI inputs/output. */
-    private static final int PROGRESS_X = 41;
-    private static final int PROGRESS_Y = 22;
+    private static final int PROGRESS_X = 26;
+    private static final int PROGRESS_Y = 20;
     private static final int PROGRESS_WIDTH = 24;
     private static final int PROGRESS_HEIGHT = 16;
     /** Default craft length (matches most recipes / block-entity default). */
@@ -46,8 +45,8 @@ public class ManaInfuserRecipeCategory implements IRecipeCategory<RecipeHolder<M
     private final IDrawableAnimated progressArrow;
 
     public ManaInfuserRecipeCategory(IGuiHelper guiHelper) {
-        this.background = guiHelper.drawableBuilder(BACKGROUND_LOCATION, 0, 0, 116, 76)
-                .setTextureSize(116, 76)
+        this.background = guiHelper.drawableBuilder(BACKGROUND_LOCATION, 0, 0, 86, 58)
+                .setTextureSize(86, 58)
                 .build();
         this.icon = guiHelper.createDrawableItemStack(new ItemStack(ModBlocks.MANA_INFUSER));
 
@@ -74,12 +73,12 @@ public class ManaInfuserRecipeCategory implements IRecipeCategory<RecipeHolder<M
 
     @Override
     public int getWidth() {
-        return 116;
+        return 86;
     }
 
     @Override
     public int getHeight() {
-        return 76;
+        return 58;
     }
 
     @Override
@@ -98,31 +97,36 @@ public class ManaInfuserRecipeCategory implements IRecipeCategory<RecipeHolder<M
 
         // Layout (shifted for JEI 0,0):
         // infusing ingredient (top, like lapis/coal)
-        builder.addSlot(RecipeIngredientRole.INPUT, 18, 5)
+        builder.addSlot(RecipeIngredientRole.INPUT, 3, 3)
                 .add(recipe.getInfusingItem());
 
         // item to infuse (bottom, like amethyst/iron)
-        builder.addSlot(RecipeIngredientRole.INPUT, 18, 41)
+        builder.addSlot(RecipeIngredientRole.INPUT, 3, 39)
                 .add(recipe.getInfusedItem());
 
         // Output
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 78, 23)
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 63, 21)
                 .add(recipe.getResult().create());
     }
 
     @Override
     public void draw(RecipeHolder<ManaInfuserRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView,
                      GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
-        // Draw custom background first (JEI draws its default border before this, we disabled border)
         this.background.draw(guiGraphics);
 
         // Horizontal progress arrow (fills left→right), same asset/motion as the crafting GUI
         this.progressArrow.draw(guiGraphics, PROGRESS_X, PROGRESS_Y);
 
         ManaInfuserRecipe recipe = recipeHolder.value();
+        var font = Minecraft.getInstance().font;
+        int textColor = 0xFF8B8B8B;
+        int textPad = 3;
 
-        // Position the cost text near the bottom of the background area (slots end ~y=63)
         Component mana = Component.translatable("tooltip.spellgems.mana_infuser.mana_level", recipe.getManaCost());
-        guiGraphics.text(Minecraft.getInstance().font, mana, 4, 66, 0xFF2424DA, false);
+        guiGraphics.text(font, mana, getWidth() - font.width(mana) - textPad, 3, 0xFF4824DA, false);
+
+        int seconds = recipe.getProcessingTime() / 20;
+        Component duration = Component.translatable("tooltip.spellgems.mana_infuser.duration", seconds);
+        guiGraphics.text(font, duration, getWidth() - font.width(duration) - textPad, 48, textColor, false);
     }
 }

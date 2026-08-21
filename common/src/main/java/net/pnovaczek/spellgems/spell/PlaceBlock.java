@@ -32,6 +32,11 @@ public class PlaceBlock extends AbstractSpell {
     }
 
     @Override
+    public boolean repeatWhileHeld() {
+        return false;
+    }
+
+    @Override
     protected boolean performCast(SpellContext context) {
         if (context.level().isClientSide()) {
             return false;

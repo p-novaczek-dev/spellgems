@@ -34,6 +34,11 @@ public final class WandSpellCaster {
         return prepareCast(player, slot) != null;
     }
 
+    public static @Nullable Spell getSelectedSpell(Player player) {
+        CastRequest request = prepareCast(player, null);
+        return request == null ? null : request.spell();
+    }
+
     public static boolean tryCast(ServerPlayer player) {
         return tryCastFromSlot(player, null);
     }

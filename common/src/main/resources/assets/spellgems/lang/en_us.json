@@ -59,6 +59,7 @@
   "tooltip.spellgems.astral_bow.cycle": "Hold %s + mouse wheel to select potion",
   "tooltip.spellgems.astral_bow.astral_arrows": "Does not use arrows from inventory",
   "tooltip.spellgems.mana_infuser.mana_level": "%s Mana",
+  "tooltip.spellgems.mana_infuser.duration": "%ss",
 
   "tooltip.spellgems.spell.projectile.name": "Projectile",
   "tooltip.spellgems.spell.projectile.description": "Shoots a projectile that deals damage to the target",
@@ -150,8 +151,8 @@
   "container.spellgems.astral_bow": "Astral Bow",
   "container.spellgems.spell_enchanting_table": "Spells",
   "container.spellgems.spell_enchanting.level_requirement": "Requires level %s",
-  "container.spellgems.spell_enchanting.level_cost": "%s Levels",
-  "container.spellgems.spell_enchanting.xp_cost": "%s XP",
+  "container.spellgems.spell_enchanting.level_cost": "Costs %s levels",
+  "container.spellgems.spell_enchanting.xp_cost": "Costs %s XP",
   "container.spellgems.spell_enchanting.catalyst": "%s %s",
   "container.spellgems.spell_enchanting.catalyst.any_potion": "%s Potion"
 }
