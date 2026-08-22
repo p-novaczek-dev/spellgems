@@ -28,8 +28,8 @@ subprojects {
 
 /**
  * Builds both loaders and copies installable jars into build/release/:
- *   spellgems-<version>-fabric.jar
- *   spellgems-<version>-neoforge.jar
+ *   spellgems-<mod-version>+<mc-version>-fabric.jar
+ *   spellgems-<mod-version>+<mc-version>-neoforge.jar
  *
  * Usage:
  *   ./gradlew releaseJars
@@ -38,6 +38,8 @@ tasks.register('releaseJars', Copy) {
 	group = 'distribution'
 	description = 'Build Fabric + NeoForge and copy installable jars to build/release/'
 	dependsOn ':fabric:build', ':neoforge:build'
+
+	def releaseBaseName = "${archives_base_name}-${mod_version}+${minecraft_version}"
 
 	// Fresh release folder each run
 	doFirst {
@@ -51,10 +53,12 @@ tasks.register('releaseJars', Copy) {
 	from(project(':fabric').layout.buildDirectory.dir('libs')) {
 		include '*-fabric.jar'
 		exclude '*-sources.jar', '*-fabric-sources.jar', '*-dev.jar', '*-javadoc.jar'
+		rename { "${releaseBaseName}-fabric.jar" }
 	}
 	from(project(':neoforge').layout.buildDirectory.dir('libs')) {
 		include '*-neoforge.jar'
 		exclude '*-sources.jar', '*-neoforge-sources.jar', '*-dev.jar', '*-javadoc.jar'
+		rename { "${releaseBaseName}-neoforge.jar" }
 	}
 	into(layout.buildDirectory.dir('release'))
 
