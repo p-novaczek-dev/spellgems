@@ -20,7 +20,7 @@ public class SpellgemsConfig {
     public final AstralBowConfig astralBow = new AstralBowConfig();
     /** Spell dispenser machine settings (cooldown is per-spell; burnout is global). */
     public final SpellDispenserConfig spellDispenser = new SpellDispenserConfig();
-    public int strikeEffectDuration = 100;
+    public int strikeEffectDuration = 120;
     public float strikeCloudDamage = 2.0F;
     public float drainHealPerTarget = 2.0F;
     public int chainingCount = 5;
@@ -65,6 +65,7 @@ public class SpellgemsConfig {
             blink.wandDurabilityCost = 48;
             placeBlock.wandDurabilityCost = 0;
             magnet.wandDurabilityCost = 0;
+            potion.wandDurabilityCost = 128;
             // All others default to 1.
         }
 
@@ -138,23 +139,24 @@ public class SpellgemsConfig {
     }
 
     public static class SpellCombatConfig extends SpellConfig {
-        public float damage = 1.0F;
+        public float damage = 2.0F;
+        public float powerDamageMultiplier = 4.0F;
 
         @Override
         public void validate() {
             super.validate();
             damage = Math.max(0f, damage);
+            powerDamageMultiplier = Math.max(1f, powerDamageMultiplier);
         }
     }
 
     public static class NovaSpellConfig extends SpellCombatConfig {
         public float radius = 4.0F;
         public float centerYOffset = 0.75F;
-        public float knockbackStrength = 0.3F;
-        public float powerDamageMultiplier = 2.0F;
+        public float knockbackStrength = 0.6F;
         public float expandRadiusMultiplier = 1.5F;
         public int particleCount = 90;
-        public float particleSpeed = 0.1F;
+        public float particleSpeed = 0.2F;
 
         @Override
         public void validate() {
@@ -162,7 +164,6 @@ public class SpellgemsConfig {
             radius = Math.max(0.1f, radius);
             centerYOffset = Math.max(-2f, Math.min(5f, centerYOffset));
             knockbackStrength = Math.max(0f, knockbackStrength);
-            powerDamageMultiplier = Math.max(1f, powerDamageMultiplier);
             expandRadiusMultiplier = Math.max(1f, expandRadiusMultiplier);
             particleCount = Math.max(1, particleCount);
             particleSpeed = Math.max(0f, particleSpeed);
@@ -214,8 +215,8 @@ public class SpellgemsConfig {
     public static class VortexSpellConfig extends SpellCombatConfig {
         public float radius = 4.0F;
         public float maxDistance = 16.0F;
-        public float pullDistance = 0.5F;
-        public float pullStrength = 0.5F;
+        public float pullDistance = 1.0F;
+        public float pullStrength = 1.0F;
         public float expandRadiusMultiplier = 1.5F;
         public int particleCount = 30;
         public float particleSpeed = 0.3F;

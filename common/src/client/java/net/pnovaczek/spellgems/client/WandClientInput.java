@@ -49,19 +49,25 @@ public final class WandClientInput {
             clickOnlyCastThisPress = false;
         }
 
-        if (client.player == null || client.screen != null) {
+        if (client.player == null) {
             return;
         }
 
-        if (!client.player.getMainHandItem().is(ModItems.WAND)) {
-            return;
-        }
-
+        boolean canQuickCast = client.screen == null && client.player.getMainHandItem().is(ModItems.WAND);
         for (int slot = 0; slot < SpellgemsKeyMappings.WAND_QUICK_CAST_SLOT_COUNT; slot++) {
             KeyMapping key = SpellgemsKeyMappings.WAND_QUICK_CAST_KEYS[slot];
-            if (key != null && key.consumeClick()) {
-                onQuickCast(client, slot);
-                return;
+            if (key == null) {
+                continue;
+            }
+            if (canQuickCast) {
+                if (key.consumeClick()) {
+                    onQuickCast(client, slot);
+                    return;
+                }
+            } else {
+                // Drain queued clicks so they are not replayed when the wand is later selected.
+                while (key.consumeClick()) {
+                }
             }
         }
     }

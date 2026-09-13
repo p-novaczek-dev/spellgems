@@ -169,6 +169,8 @@ public class Vortex extends AbstractSpell {
             double dx = entity.getX() - center.x;
             double dz = entity.getZ() - center.z;
             living.knockback(pullStrength, dx, dz);
+            // Players ignore needsSync; hurtMarked sends motion to the client.
+            living.hurtMarked = true;
         } else {
             Vec3 delta = offset.normalize().scale(pullDistance);
             entity.setPos(entity.getX() + delta.x, entity.getY() + delta.y, entity.getZ() + delta.z);

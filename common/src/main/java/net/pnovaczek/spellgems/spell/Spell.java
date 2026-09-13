@@ -12,8 +12,10 @@ public interface Spell {
     /**
      * Authoritative cast (server). Applies world effects and hand-item cooldowns.
      * On the client this is a no-op for mutation; use {@link #castPredicted} for local FX.
+     *
+     * @return {@code true} if the spell actually took effect (durability/swing should apply)
      */
-    void cast(SpellContext context);
+    boolean cast(SpellContext context);
 
     /**
      * Client-only predicted FX for responsive feel (wand left-click, optional hand use).

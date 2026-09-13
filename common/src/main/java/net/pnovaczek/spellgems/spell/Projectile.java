@@ -9,6 +9,7 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.SpellgemsConfig;
 import net.pnovaczek.spellgems.entity.SpellProjectile;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
@@ -40,6 +41,7 @@ public class Projectile extends AbstractSpell {
         int shotCount = 1;
         boolean isBurst = false;
         boolean isMultishot = false;
+        boolean hasPower = false;
         int chainCount = 0;
 
         for (var mod : modifiers) {
@@ -51,10 +53,12 @@ public class Projectile extends AbstractSpell {
                 shotCount = 5;
             } else if (mod.is(ModifierEnchantments.CHAINING)) {
                 chainCount = Spellgems.CONFIG.chainingCount;
+            } else if (mod.is(ModifierEnchantments.POWER)) {
+                hasPower = true;
             }
         }
 
-        ProjectileHitHandler baseHandler = createHitHandler(context, strikes, chainCount);
+        ProjectileHitHandler baseHandler = createHitHandler(context, strikes, chainCount, hasPower);
 
         for (int i = 0; i < shotCount; i++) {
             Vec3 direction = baseDirection;
@@ -128,7 +132,12 @@ public class Projectile extends AbstractSpell {
         );
     }
 
-    private ProjectileHitHandler createHitHandler(SpellContext context, List<StrikeEnchantment> strikes, int maxChains) {
+    private ProjectileHitHandler createHitHandler(
+            SpellContext context,
+            List<StrikeEnchantment> strikes,
+            int maxChains,
+            boolean hasPower
+    ) {
         return (projectile, result) -> {
             if (!(result.getEntity() instanceof LivingEntity living)) return;
 
@@ -136,8 +145,9 @@ public class Projectile extends AbstractSpell {
             if (!(lvl instanceof ServerLevel serverLevel)) return;
 
             var spellConfig = Spellgems.CONFIG.spells.projectile;
+            float damage = getEffectiveDamage(spellConfig, hasPower);
 
-            living.hurtServer(serverLevel, projectile.damageSources().magic(), spellConfig.damage);
+            living.hurtServer(serverLevel, projectile.damageSources().magic(), damage);
 
             LivingEntity strikeSource = context.caster() != null ? context.caster() : living;
             for (var strike : strikes) {
@@ -145,9 +155,17 @@ public class Projectile extends AbstractSpell {
             }
 
             if (maxChains > 0) {
+                LivingEntity caster = context.caster();
+                var conditions = TargetingConditions.forCombat()
+                        .range(6.0)
+                        .ignoreLineOfSight();
+                if (caster != null) {
+                    conditions.selector((candidate, ignored) -> candidate != caster);
+                }
+
                 var nearest = serverLevel.getNearestEntity(
                         LivingEntity.class,
-                        TargetingConditions.forCombat().range(6.0).ignoreLineOfSight(),
+                        conditions,
                         living,
                         living.getX(),
                         living.getY(),
@@ -161,11 +179,15 @@ public class Projectile extends AbstractSpell {
 
                     SpellProjectile chainProj = new SpellProjectile(
                             context, newDir, projectile.position(),
-                            createHitHandler(context, strikes, maxChains - 1)
+                            createHitHandler(context, strikes, maxChains - 1, hasPower)
                     );
                     lvl.addFreshEntity(chainProj);
                 }
             }
         };
+    }
+
+    private static float getEffectiveDamage(SpellgemsConfig.SpellCombatConfig config, boolean hasPower) {
+        return hasPower ? config.damage * config.powerDamageMultiplier : config.damage;
     }
 }

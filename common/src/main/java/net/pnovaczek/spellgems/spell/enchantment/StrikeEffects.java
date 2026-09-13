@@ -1,5 +1,6 @@
 package net.pnovaczek.spellgems.spell.enchantment;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.Identifier;
@@ -18,8 +19,15 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.hurtingprojectile.windcharge.AbstractWindCharge;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.SimpleExplosionDamageCalculator;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.entity.AstralArrow;
 import net.pnovaczek.spellgems.entity.FrostbiteCloud;
@@ -29,6 +37,7 @@ import net.pnovaczek.spellgems.spell.SpellParticles;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiPredicate;
 import org.jspecify.annotations.Nullable;
 
@@ -38,6 +47,22 @@ import org.jspecify.annotations.Nullable;
 public final class StrikeEffects {
 
     private static final int DEFAULT_TINT = 0xCCCCCC;
+    private static final double VOLLEY_SPAWN_MIN_DISTANCE = 4.0;
+    private static final double VOLLEY_SPAWN_DISTANCE_RANGE = 8.0;
+    private static final int VOLLEY_SPAWN_ATTEMPTS = 16;
+
+    /** Damages living entities only; does not break blocks or destroy dropped items. */
+    private static final ExplosionDamageCalculator EXPLOSION_ENTITIES_ONLY = new SimpleExplosionDamageCalculator(
+            false,
+            true,
+            Optional.empty(),
+            Optional.empty()
+    ) {
+        @Override
+        public boolean shouldDamageEntity(Explosion explosion, Entity entity) {
+            return entity instanceof LivingEntity;
+        }
+    };
 
     private static final Map<Identifier, StrikeEffect> BY_ID = new HashMap<>();
 
@@ -117,7 +142,17 @@ public final class StrikeEffects {
                     return;
                 }
                 Vec3 pos = target.position();
-                level.explode(caster, pos.x, pos.y, pos.z, 2.0F, false, Level.ExplosionInteraction.MOB);
+                level.explode(
+                        caster,
+                        null,
+                        EXPLOSION_ENTITIES_ONLY,
+                        pos.x,
+                        pos.y,
+                        pos.z,
+                        2.0F,
+                        false,
+                        Level.ExplosionInteraction.NONE
+                );
             }
 
             @Override
@@ -190,22 +225,23 @@ public final class StrikeEffects {
                     return;
                 }
                 RandomSource random = level.getRandom();
-                double targetCenterY = target.getY() + target.getBbHeight() * 0.5;
+                Vec3 targetCenter = target.position().add(0.0, target.getBbHeight() * 0.5, 0.0);
                 Vec3 pos = target.position();
 
                 int arrowCount = Spellgems.CONFIG.volleyArrowCount;
                 for (int i = 0; i < arrowCount; i++) {
-                    double spawnX = target.getX() + (random.nextDouble() - 0.5) * 4.0;
-                    double spawnZ = target.getZ() + (random.nextDouble() - 0.5) * 4.0;
-                    double spawnY = targetCenterY + 8.0 + random.nextDouble() * 4.0;
+                    Vec3 spawn = findVolleySpawn(level, targetCenter, random);
+                    if (spawn == null) {
+                        continue;
+                    }
 
                     AstralArrow arrow = new AstralArrow(level, caster);
-                    arrow.setPos(spawnX, spawnY, spawnZ);
+                    arrow.setPos(spawn.x, spawn.y, spawn.z);
 
-                    double dx = target.getX() - spawnX + (random.nextDouble() - 0.5) * 2.0;
-                    double dy = targetCenterY - spawnY;
-                    double dz = target.getZ() - spawnZ + (random.nextDouble() - 0.5) * 2.0;
-                    arrow.shoot(dx, dy, dz, 1.2F, 10.0F);
+                    double dx = targetCenter.x - spawn.x + (random.nextDouble() - 0.5) * 1.0;
+                    double dy = targetCenter.y - spawn.y;
+                    double dz = targetCenter.z - spawn.z + (random.nextDouble() - 0.5) * 1.0;
+                    arrow.shoot(dx, dy, dz, 1.2F, 6.0F);
 
                     level.addFreshEntity(arrow);
                 }
@@ -304,6 +340,46 @@ public final class StrikeEffects {
 
     private static void register(Identifier id, StrikeEffect effect) {
         BY_ID.put(id, effect);
+    }
+
+    private static @Nullable Vec3 findVolleySpawn(Level level, Vec3 targetCenter, RandomSource random) {
+        for (int attempt = 0; attempt < VOLLEY_SPAWN_ATTEMPTS; attempt++) {
+            Vec3 spawn = randomVolleySpawn(targetCenter, random);
+            if (hasClearVolleyPath(level, spawn, targetCenter)) {
+                return spawn;
+            }
+        }
+        return null;
+    }
+
+    private static Vec3 randomVolleySpawn(Vec3 center, RandomSource random) {
+        double theta = random.nextDouble() * Math.PI * 2.0;
+        double phi = Math.acos(2.0 * random.nextDouble() - 1.0);
+        double radius = VOLLEY_SPAWN_MIN_DISTANCE + random.nextDouble() * VOLLEY_SPAWN_DISTANCE_RANGE;
+        double sinPhi = Math.sin(phi);
+        return center.add(
+                radius * sinPhi * Math.cos(theta),
+                radius * Math.cos(phi),
+                radius * sinPhi * Math.sin(theta)
+        );
+    }
+
+    private static boolean hasClearVolleyPath(Level level, Vec3 spawn, Vec3 targetCenter) {
+        BlockPos spawnPos = BlockPos.containing(spawn);
+        if (!level.isLoaded(spawnPos)) {
+            return false;
+        }
+        if (!level.getBlockState(spawnPos).getCollisionShape(level, spawnPos).isEmpty()) {
+            return false;
+        }
+        BlockHitResult hit = level.clip(new ClipContext(
+                spawn,
+                targetCenter,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
+                CollisionContext.empty()
+        ));
+        return hit.getType() == HitResult.Type.MISS;
     }
 
     private static final StrikeEffect NO_OP = new StrikeEffect() {

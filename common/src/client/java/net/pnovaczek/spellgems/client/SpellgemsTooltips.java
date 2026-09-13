@@ -98,13 +98,6 @@ public class SpellgemsTooltips {
                     tooltip.addLineHoldShift();
                 }
             }
-            else if (stack.is(ModItems.RAW_SPELL_GEM)) {
-                if (Minecraft.getInstance().hasShiftDown()) {
-                    tooltip.addLineDetail("tooltip.spellgems.raw_spell_gem.description");
-                } else {
-                    tooltip.addLineHoldShift();
-                }
-            }
             else if (stack.is(ModItems.SPELL_TOME)) {
                 var data = SpellTomeItem.getTomeData(stack);
 

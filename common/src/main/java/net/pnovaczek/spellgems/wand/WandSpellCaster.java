@@ -52,7 +52,10 @@ public final class WandSpellCaster {
             return false;
         }
 
-        request.spell().cast(request.context());
+        if (!request.spell().cast(request.context())) {
+            return false;
+        }
+
         InteractionHand hand = getWandHand(player);
         WandDepletion.applyDurabilityCost(request.context().castingItem(), request.effectiveDurabilityCost(), player);
         player.swing(hand);

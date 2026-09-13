@@ -23,22 +23,24 @@ public abstract class AbstractSpell implements Spell {
      * full mutation path by accident (use {@link #castPredicted} on the client).
      */
     @Override
-    public final void cast(SpellContext context) {
+    public final boolean cast(SpellContext context) {
         if (context.level().isClientSide()) {
-            return;
+            return false;
         }
         if (context.caster() != null && !context.caster().isAlive()) {
-            return;
+            return false;
         }
         // Dispenser self-target: FX only (blink, drink potions). No world mutation.
         if (context.isDispenserCast() && isSelfTargeting(context)) {
             performSelfTargetDispenserFx(context);
-            return;
+            return true;
         }
 
-        if (performCast(context)) {
+        boolean success = performCast(context);
+        if (success) {
             applyCastCooldown(context, getCooldownTicks());
         }
+        return success;
     }
 
     /**

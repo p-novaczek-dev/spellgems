@@ -9,6 +9,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Relative;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.AABB;
@@ -24,6 +25,8 @@ import org.jspecify.annotations.Nullable;
 public class Blink extends AbstractSpell {
 
     private static final int PARTICLE_COUNT = 32;
+    private static final float FAIL_SOUND_VOLUME = 0.45F;
+    private static final float FAIL_SOUND_PITCH = 0.5F;
 
     @Override
     public Identifier id() {
@@ -63,10 +66,14 @@ public class Blink extends AbstractSpell {
 
         double maxDistance = resolveMaxDistance(context);
         Vec3 target = SpellTargeting.resolveCastCenter(context, maxDistance);
+        Optional<Vec3> safePosition = resolveSafeTeleportPosition(context.level(), caster, target);
 
         if (context.level().isClientSide()) {
-            // Local prediction of origin/aim; server confirms destination particles for others.
-            spawnParticles(context.level(), caster.position(), target, null);
+            if (safePosition.isPresent()) {
+                spawnParticles(context.level(), caster.position(), safePosition.get(), null);
+            } else {
+                playFailSound(context.level(), caster.position(), null);
+            }
             return false;
         }
 
@@ -74,15 +81,16 @@ public class Blink extends AbstractSpell {
             return false;
         }
 
-        Optional<Vec3> safePosition = resolveSafeTeleportPosition(serverLevel, caster, target);
+        Vec3 origin = caster.position();
         if (safePosition.isEmpty()) {
+            playFailSound(serverLevel, origin, SpellParticles.predictionExcept(caster));
             return false;
         }
 
         Vec3 destination = safePosition.get();
-        Vec3 origin = caster.position();
 
         if (!teleportCaster(serverLevel, caster, destination)) {
+            playFailSound(serverLevel, origin, SpellParticles.predictionExcept(caster));
             return false;
         }
 
@@ -143,6 +151,33 @@ public class Blink extends AbstractSpell {
         caster.teleportTo(destination.x, destination.y, destination.z);
         caster.resetFallDistance();
         return true;
+    }
+
+    private static void playFailSound(Level level, Vec3 pos, @Nullable Entity exceptViewer) {
+        if (level instanceof ServerLevel serverLevel) {
+            Player except = exceptViewer instanceof Player player ? player : null;
+            serverLevel.playSound(
+                    except,
+                    pos.x,
+                    pos.y,
+                    pos.z,
+                    SoundEvents.PLAYER_TELEPORT,
+                    SoundSource.PLAYERS,
+                    FAIL_SOUND_VOLUME,
+                    FAIL_SOUND_PITCH
+            );
+            return;
+        }
+        level.playLocalSound(
+                pos.x,
+                pos.y,
+                pos.z,
+                SoundEvents.PLAYER_TELEPORT,
+                SoundSource.PLAYERS,
+                FAIL_SOUND_VOLUME,
+                FAIL_SOUND_PITCH,
+                false
+        );
     }
 
     private static Optional<Vec3> resolveSafeTeleportPosition(Level level, LivingEntity entity, Vec3 target) {
