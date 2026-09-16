@@ -57,3 +57,5 @@ replay_*.log
 /data/
 /change_requests.json
 /change_log.json
+/features_planned.json
+/feature_ideas.json

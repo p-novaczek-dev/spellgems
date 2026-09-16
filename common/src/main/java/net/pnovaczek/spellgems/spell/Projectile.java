@@ -43,6 +43,7 @@ public class Projectile extends AbstractSpell {
         boolean isMultishot = false;
         boolean hasPower = false;
         int chainCount = 0;
+        int remainingSplits = 0;
 
         for (var mod : modifiers) {
             if (mod.is(ModifierEnchantments.MULTISHOT)) {
@@ -55,18 +56,18 @@ public class Projectile extends AbstractSpell {
                 chainCount = Spellgems.CONFIG.chainingCount;
             } else if (mod.is(ModifierEnchantments.POWER)) {
                 hasPower = true;
+            } else if (mod.is(ModifierEnchantments.SPLIT)) {
+                remainingSplits = Spellgems.CONFIG.splitDepth;
             }
         }
 
-        ProjectileHitHandler baseHandler = createHitHandler(context, strikes, chainCount, hasPower);
+        ProjectileHitHandler baseHandler = createHitHandler(context, strikes, chainCount, hasPower, remainingSplits);
 
         for (int i = 0; i < shotCount; i++) {
             Vec3 direction = baseDirection;
 
             if (isMultishot) {
-                float spreadAngle = 10.0F;
-                float angle = (i - (shotCount - 1) / 2.0F) * spreadAngle;
-                direction = baseDirection.yRot((float) Math.toRadians(angle));
+                direction = horizontalSpread(baseDirection, i, shotCount, 10.0F);
             } else if (isBurst && i > 0) {
                 double spread = 0.03;
                 direction = baseDirection.add(
@@ -116,11 +117,6 @@ public class Projectile extends AbstractSpell {
         var sound = SoundEvents.ENDER_DRAGON_SHOOT;
         float pitch = 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F);
 
-        if (!strikes.isEmpty() && strikes.stream().anyMatch(s -> s.is(StrikeEnchantments.FROST))) {
-            sound = SoundEvents.SNOWBALL_THROW;
-            pitch = 1.0F;
-        }
-
         Vec3 soundPos = context.eyeOrigin();
         level.playSound(
                 null,
@@ -136,7 +132,8 @@ public class Projectile extends AbstractSpell {
             SpellContext context,
             List<StrikeEnchantment> strikes,
             int maxChains,
-            boolean hasPower
+            boolean hasPower,
+            int remainingSplits
     ) {
         return (projectile, result) -> {
             if (!(result.getEntity() instanceof LivingEntity living)) return;
@@ -152,6 +149,10 @@ public class Projectile extends AbstractSpell {
             LivingEntity strikeSource = context.caster() != null ? context.caster() : living;
             for (var strike : strikes) {
                 strike.applyTo(living, strikeSource);
+            }
+
+            if (remainingSplits > 0) {
+                spawnSplitProjectiles(context, projectile, living, strikes, maxChains, hasPower, remainingSplits - 1);
             }
 
             if (maxChains > 0) {
@@ -179,12 +180,42 @@ public class Projectile extends AbstractSpell {
 
                     SpellProjectile chainProj = new SpellProjectile(
                             context, newDir, projectile.position(),
-                            createHitHandler(context, strikes, maxChains - 1, hasPower)
+                            createHitHandler(context, strikes, maxChains - 1, hasPower, remainingSplits)
                     );
                     lvl.addFreshEntity(chainProj);
                 }
             }
         };
+    }
+
+    private void spawnSplitProjectiles(
+            SpellContext context,
+            SpellProjectile source,
+            LivingEntity hitTarget,
+            List<StrikeEnchantment> strikes,
+            int maxChains,
+            boolean hasPower,
+            int remainingSplits
+    ) {
+        Vec3 movement = source.getDeltaMovement();
+        Vec3 baseDirection = movement.lengthSqr() < 1.0E-6
+                ? context.lookAngle()
+                : movement.normalize();
+
+        int count = Spellgems.CONFIG.splitCount;
+        ProjectileHitHandler childHandler = createHitHandler(context, strikes, maxChains, hasPower, remainingSplits);
+
+        for (int i = 0; i < count; i++) {
+            Vec3 direction = horizontalSpread(baseDirection, i, count, 20.0F);
+            SpellProjectile split = new SpellProjectile(context, direction, source.position(), childHandler);
+            split.ignoreHitEntity(hitTarget);
+            source.level().addFreshEntity(split);
+        }
+    }
+
+    private static Vec3 horizontalSpread(Vec3 baseDirection, int index, int count, float spreadAngle) {
+        float angle = (index - (count - 1) / 2.0F) * spreadAngle;
+        return baseDirection.yRot((float) Math.toRadians(angle));
     }
 
     private static float getEffectiveDamage(SpellgemsConfig.SpellCombatConfig config, boolean hasPower) {

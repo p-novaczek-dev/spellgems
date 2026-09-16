@@ -1,6 +1,7 @@
 package net.pnovaczek.spellgems.spell.enchantment;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.Identifier;
@@ -24,6 +25,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.SimpleExplosionDamageCalculator;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -33,6 +35,8 @@ import net.pnovaczek.spellgems.entity.AstralArrow;
 import net.pnovaczek.spellgems.entity.FrostbiteCloud;
 import net.pnovaczek.spellgems.entity.InfernoCloud;
 import net.pnovaczek.spellgems.entity.PlagueCloud;
+import net.pnovaczek.spellgems.entity.RootCloud;
+import net.pnovaczek.spellgems.spell.AbstractSpell;
 import net.pnovaczek.spellgems.spell.SpellParticles;
 
 import java.util.HashMap;
@@ -72,6 +76,179 @@ public final class StrikeEffects {
         register(StrikeEnchantments.FROST, freeze(0x88DDFF, ParticleTypes.SNOWFLAKE, 0.4D));
         register(StrikeEnchantments.SLOW, statusEffect(MobEffects.SLOWNESS, 0x5555FF, ParticleTypes.CLOUD, 0.3D));
         register(StrikeEnchantments.LEVITATE, statusEffect(MobEffects.LEVITATION, 0xAA88FF, ParticleTypes.END_ROD, 0.25D));
+        register(StrikeEnchantments.WEAKEN, statusEffect(
+                MobEffects.WEAKNESS,
+                0x484D48,
+                ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, 0xFF484D48),
+                0.35D
+        ));
+        register(StrikeEnchantments.GLOW, statusEffect(MobEffects.GLOWING, 0x66FFFF, ParticleTypes.GLOW, 0.35D));
+        register(StrikeEnchantments.SHATTER, new StrikeEffect() {
+            private static final float FREEZE_RADIUS = 6.0F;
+
+            @Override
+            public void apply(LivingEntity target, LivingEntity caster) {
+                Level level = target.level();
+                if (level.isClientSide() || !(level instanceof ServerLevel serverLevel)) {
+                    return;
+                }
+                if (target.getTicksFrozen() <= 0) {
+                    return;
+                }
+
+                Vec3 pos = target.position();
+                level.explode(
+                        caster,
+                        null,
+                        EXPLOSION_ENTITIES_ONLY,
+                        pos.x,
+                        pos.y,
+                        pos.z,
+                        2.0F,
+                        false,
+                        Level.ExplosionInteraction.NONE
+                );
+
+                AABB searchBox = new AABB(pos, pos).inflate(FREEZE_RADIUS);
+                for (LivingEntity nearby : serverLevel.getEntitiesOfClass(
+                        LivingEntity.class,
+                        searchBox,
+                        entity -> entity != caster && entity.isAlive() && !entity.isSpectator()
+                )) {
+                    if (pos.distanceToSqr(nearby.position()) > FREEZE_RADIUS * FREEZE_RADIUS) {
+                        continue;
+                    }
+                    nearby.setTicksFrozen(Spellgems.CONFIG.strikeEffectDuration);
+                }
+
+                spawnNovaBurstParticles(
+                        level,
+                        pos.add(0.0, target.getBbHeight() * 0.5, 0.0),
+                        ParticleTypes.SNOWFLAKE,
+                        null
+                );
+            }
+
+            @Override
+            public int tintColor() {
+                return 0x66BBDD;
+            }
+
+            @Override
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, ParticleTypes.SNOWFLAKE, 0.4D, x, y, z, random, dx, dy, dz);
+            }
+        });
+        register(StrikeEnchantments.COMBUST, new StrikeEffect() {
+            private static final float IGNITE_RADIUS = 6.0F;
+
+            @Override
+            public void apply(LivingEntity target, LivingEntity caster) {
+                Level level = target.level();
+                if (level.isClientSide() || !(level instanceof ServerLevel serverLevel)) {
+                    return;
+                }
+                if (target.getRemainingFireTicks() <= 0) {
+                    return;
+                }
+
+                Vec3 pos = target.position();
+                level.explode(
+                        caster,
+                        null,
+                        EXPLOSION_ENTITIES_ONLY,
+                        pos.x,
+                        pos.y,
+                        pos.z,
+                        2.0F,
+                        false,
+                        Level.ExplosionInteraction.NONE
+                );
+
+                AABB searchBox = new AABB(pos, pos).inflate(IGNITE_RADIUS);
+                for (LivingEntity nearby : serverLevel.getEntitiesOfClass(
+                        LivingEntity.class,
+                        searchBox,
+                        entity -> entity != caster && entity.isAlive() && !entity.isSpectator()
+                )) {
+                    if (pos.distanceToSqr(nearby.position()) > IGNITE_RADIUS * IGNITE_RADIUS) {
+                        continue;
+                    }
+                    nearby.setRemainingFireTicks(Spellgems.CONFIG.strikeEffectDuration);
+                }
+
+                spawnNovaBurstParticles(
+                        level,
+                        pos.add(0.0, target.getBbHeight() * 0.5, 0.0),
+                        ParticleTypes.FLAME,
+                        null
+                );
+            }
+
+            @Override
+            public int tintColor() {
+                return 0xCC3300;
+            }
+
+            @Override
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, ParticleTypes.FLAME, 0.6D, x, y, z, random, dx, dy, dz);
+            }
+        });
+        register(StrikeEnchantments.JUDGEMENT, new StrikeEffect() {
+            private static final float WEAKNESS_RADIUS = 6.0F;
+
+            @Override
+            public void apply(LivingEntity target, LivingEntity caster) {
+                Level level = target.level();
+                if (level.isClientSide() || !(level instanceof ServerLevel serverLevel)) {
+                    return;
+                }
+                if (!target.hasEffect(MobEffects.GLOWING)) {
+                    return;
+                }
+
+                target.hurtServer(serverLevel, caster.damageSources().magic(), Spellgems.CONFIG.judgementDamage);
+
+                Vec3 pos = target.position();
+                AABB searchBox = new AABB(pos, pos).inflate(WEAKNESS_RADIUS);
+                for (LivingEntity nearby : serverLevel.getEntitiesOfClass(
+                        LivingEntity.class,
+                        searchBox,
+                        entity -> entity != caster && entity.isAlive() && !entity.isSpectator()
+                )) {
+                    if (pos.distanceToSqr(nearby.position()) > WEAKNESS_RADIUS * WEAKNESS_RADIUS) {
+                        continue;
+                    }
+                    nearby.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, Spellgems.CONFIG.strikeEffectDuration, 0));
+                }
+
+                spawnNovaBurstParticles(
+                        level,
+                        pos.add(0.0, target.getBbHeight() * 0.5, 0.0),
+                        ParticleTypes.ELECTRIC_SPARK,
+                        null
+                );
+                level.playSound(
+                        null,
+                        pos.x(), pos.y(), pos.z(),
+                        SoundEvents.BELL_BLOCK,
+                        SoundSource.PLAYERS,
+                        10.0F,
+                        0.4F + level.getRandom().nextFloat() * 0.2F
+                );
+            }
+
+            @Override
+            public int tintColor() {
+                return 0xFFEE88;
+            }
+
+            @Override
+            public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
+                particles(level, exceptViewer, ParticleTypes.ELECTRIC_SPARK, 0.3D, x, y, z, random, dx, dy, dz);
+            }
+        });
 
         register(StrikeEnchantments.INFERNO, conditionalCloud(
                 0xCC3300,
@@ -96,6 +273,14 @@ public final class StrikeEffects {
                 (living, caster) -> living.hasEffect(MobEffects.POISON) || living.hasEffect(MobEffects.WITHER),
                 (level, pos, caster) -> new PlagueCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster),
                 SoundEvents.WITHER_AMBIENT
+        ));
+        register(StrikeEnchantments.ROOT, conditionalCloud(
+                0x484D48,
+                ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, 0xFF484D48),
+                0.35D,
+                (living, caster) -> living.hasEffect(MobEffects.WEAKNESS),
+                (level, pos, caster) -> new RootCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster),
+                SoundEvents.ROOTED_DIRT_BREAK
         ));
 
         register(StrikeEnchantments.LIGHTNING, new StrikeEffect() {
@@ -502,6 +687,36 @@ public final class StrikeEffects {
                 particles(level, exceptViewer, particle, spread, x, y, z, random, dx, dy, dz);
             }
         };
+    }
+
+    private static void spawnNovaBurstParticles(
+            Level level,
+            Vec3 center,
+            ParticleOptions particle,
+            @Nullable Entity exceptViewer
+    ) {
+        var config = Spellgems.CONFIG.spells.nova;
+        var random = level.getRandom();
+        float radius = config.radius;
+        float particleSpeed = Spellgems.CONFIG.strikeBurstParticleSpeed;
+        int particleCount = config.particleCount;
+
+        for (int i = 0; i < particleCount; i++) {
+            Vec3 pos = AbstractSpell.randomPointInSphere(center, radius, random);
+            Vec3 velocity = pos.subtract(center);
+            double len = velocity.length();
+            if (len < 1.0E-8) {
+                continue;
+            }
+            velocity = velocity.scale(particleSpeed / len);
+            SpellParticles.add(
+                    level,
+                    exceptViewer,
+                    particle,
+                    pos.x, pos.y, pos.z,
+                    velocity.x, velocity.y, velocity.z
+            );
+        }
     }
 
     private static void particles(

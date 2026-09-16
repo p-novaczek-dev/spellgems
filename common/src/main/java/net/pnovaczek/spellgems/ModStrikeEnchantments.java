@@ -29,6 +29,12 @@ public class ModStrikeEnchantments {
         register(StrikeEnchantments.FROST, new StrikeEnchantment(StrikeEnchantments.FROST));
         register(StrikeEnchantments.SLOW, new StrikeEnchantment(StrikeEnchantments.SLOW));
         register(StrikeEnchantments.LEVITATE, new StrikeEnchantment(StrikeEnchantments.LEVITATE));
+        register(StrikeEnchantments.WEAKEN, new StrikeEnchantment(StrikeEnchantments.WEAKEN));
+        register(StrikeEnchantments.GLOW, new StrikeEnchantment(StrikeEnchantments.GLOW));
+        register(StrikeEnchantments.SHATTER, new StrikeEnchantment(StrikeEnchantments.SHATTER));
+        register(StrikeEnchantments.COMBUST, new StrikeEnchantment(StrikeEnchantments.COMBUST));
+        register(StrikeEnchantments.JUDGEMENT, new StrikeEnchantment(StrikeEnchantments.JUDGEMENT));
+        register(StrikeEnchantments.ROOT, new StrikeEnchantment(StrikeEnchantments.ROOT));
         register(StrikeEnchantments.INFERNO, new StrikeEnchantment(StrikeEnchantments.INFERNO));
         register(StrikeEnchantments.FROSTBITE, new StrikeEnchantment(StrikeEnchantments.FROSTBITE));
         register(StrikeEnchantments.PLAGUE, new StrikeEnchantment(StrikeEnchantments.PLAGUE));

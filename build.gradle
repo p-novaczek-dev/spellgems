@@ -51,13 +51,11 @@ tasks.register('releaseJars', Copy) {
 	}
 
 	from(project(':fabric').layout.buildDirectory.dir('libs')) {
-		include '*-fabric.jar'
-		exclude '*-sources.jar', '*-fabric-sources.jar', '*-dev.jar', '*-javadoc.jar'
+		include "${archives_base_name}-${mod_version}-fabric.jar"
 		rename { "${releaseBaseName}-fabric.jar" }
 	}
 	from(project(':neoforge').layout.buildDirectory.dir('libs')) {
-		include '*-neoforge.jar'
-		exclude '*-sources.jar', '*-neoforge-sources.jar', '*-dev.jar', '*-javadoc.jar'
+		include "${archives_base_name}-${mod_version}-neoforge.jar"
 		rename { "${releaseBaseName}-neoforge.jar" }
 	}
 	into(layout.buildDirectory.dir('release'))

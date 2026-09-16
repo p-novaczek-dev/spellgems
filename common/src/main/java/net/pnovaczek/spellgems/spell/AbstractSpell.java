@@ -144,10 +144,20 @@ public abstract class AbstractSpell implements Spell {
      * Returns a uniformly random point inside a sphere of the given radius centered at 'center'.
      * Uses volume-uniform sampling (cube root of radius).
      */
-    static Vec3 randomPointInSphere(Vec3 center, float radius, net.minecraft.util.RandomSource random) {
+    public static Vec3 randomPointInSphere(Vec3 center, float radius, net.minecraft.util.RandomSource random) {
+        return randomPointInDirection(center, radius * Math.cbrt(random.nextDouble()), random);
+    }
+
+    /**
+     * Returns a uniformly random point on the surface of a sphere of the given radius.
+     */
+    public static Vec3 randomPointOnSphere(Vec3 center, float radius, net.minecraft.util.RandomSource random) {
+        return randomPointInDirection(center, radius, random);
+    }
+
+    private static Vec3 randomPointInDirection(Vec3 center, double r, net.minecraft.util.RandomSource random) {
         double theta = Math.PI * 2 * random.nextDouble();
         double phi = Math.acos(2 * random.nextDouble() - 1);
-        double r = radius * Math.cbrt(random.nextDouble());
         double sinPhi = Math.sin(phi);
 
         return center.add(

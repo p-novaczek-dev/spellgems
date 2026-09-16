@@ -13,6 +13,12 @@ public class StrikeEnchantments {
     public static final Identifier FROST = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "frost");
     public static final Identifier SLOW = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "slow");
     public static final Identifier LEVITATE = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "levitate");
+    public static final Identifier WEAKEN = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "weaken");
+    public static final Identifier GLOW = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "glow");
+    public static final Identifier SHATTER = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "shatter");
+    public static final Identifier COMBUST = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "combust");
+    public static final Identifier JUDGEMENT = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "judgement");
+    public static final Identifier ROOT = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "root");
     public static final Identifier INFERNO = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "inferno");
     public static final Identifier FROSTBITE = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "frostbite");
     public static final Identifier PLAGUE = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "plague");
@@ -26,7 +32,7 @@ public class StrikeEnchantments {
 
     public static List<Identifier> getAll() {
         return List.of(
-                FLAME, POISON, FROST, SLOW, LEVITATE, INFERNO, FROSTBITE, PLAGUE,
+                FLAME, POISON, FROST, SLOW, LEVITATE, WEAKEN, GLOW, SHATTER, COMBUST, JUDGEMENT, ROOT, INFERNO, FROSTBITE, PLAGUE,
                 LIGHTNING, EXPLOSION, DRAIN, PURIFY, VOLLEY, VENGEANCE, WIND_CHARGE
         );
     }

@@ -57,5 +57,6 @@ public final class SpellgemsClientBootstrap {
 		EntityRenderers.register(ModEntities.INFERNO_CLOUD, NoopRenderer::new);
 		EntityRenderers.register(ModEntities.FROSTBITE_CLOUD, NoopRenderer::new);
 		EntityRenderers.register(ModEntities.PLAGUE_CLOUD, NoopRenderer::new);
+		EntityRenderers.register(ModEntities.ROOT_CLOUD, NoopRenderer::new);
 	}
 }

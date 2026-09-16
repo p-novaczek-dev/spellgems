@@ -5,6 +5,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
@@ -15,6 +16,9 @@ import net.pnovaczek.spellgems.ModEntityDataSerializers;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.spell.ProjectileHitHandler;
 import net.pnovaczek.spellgems.spell.SpellContext;
+import org.jspecify.annotations.Nullable;
+
+import java.util.UUID;
 
 public class SpellProjectile extends AbstractHurtingProjectile {
 
@@ -29,6 +33,8 @@ public class SpellProjectile extends AbstractHurtingProjectile {
 
     private final SpellContext spellContext;
     private final ProjectileHitHandler hitHandler;
+    /** Entity just struck by a parent projectile; split children must not immediately re-hit it. */
+    private @Nullable UUID ignoredHitEntity;
 
     public SpellProjectile(EntityType<? extends SpellProjectile> entityType, Level level) {
         super(entityType, level);
@@ -88,6 +94,18 @@ public class SpellProjectile extends AbstractHurtingProjectile {
         super.defineSynchedData(builder);
         builder.define(DATA_SPELL_GEM, new CompoundTag());
         builder.define(DATA_TINT_COLOR, 0xFFFFFF);
+    }
+
+    public void ignoreHitEntity(Entity entity) {
+        this.ignoredHitEntity = entity.getUUID();
+    }
+
+    @Override
+    protected boolean canHitEntity(Entity entity) {
+        if (this.ignoredHitEntity != null && this.ignoredHitEntity.equals(entity.getUUID())) {
+            return false;
+        }
+        return super.canHitEntity(entity);
     }
 
     @Override

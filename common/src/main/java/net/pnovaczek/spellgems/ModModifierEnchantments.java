@@ -27,6 +27,7 @@ public final class ModModifierEnchantments {
     public static void initialize() {
         register(ModifierEnchantments.CHAINING, new ModifierEnchantment(ModifierEnchantments.CHAINING));
         register(ModifierEnchantments.MULTISHOT, new ModifierEnchantment(ModifierEnchantments.MULTISHOT));
+        register(ModifierEnchantments.SPLIT, new ModifierEnchantment(ModifierEnchantments.SPLIT));
         register(ModifierEnchantments.PIERCING, new ModifierEnchantment(ModifierEnchantments.PIERCING));
         register(ModifierEnchantments.POWER, new ModifierEnchantment(ModifierEnchantments.POWER));
         register(ModifierEnchantments.BURST, new ModifierEnchantment(ModifierEnchantments.BURST));

@@ -23,8 +23,15 @@ public class SpellgemsConfig {
     public int strikeEffectDuration = 120;
     public float strikeCloudDamage = 2.0F;
     public float drainHealPerTarget = 2.0F;
+    public float judgementDamage = 16.0F;
+    /** Outward speed of Shatter/Combust/Judgement trigger burst particles. */
+    public float strikeBurstParticleSpeed = 0.5F;
     public int chainingCount = 5;
     public int multishotCount = 5;
+    /** Number of child projectiles spawned when Split hits a target. */
+    public int splitCount = 3;
+    /** How many times a projectile lineage may split (children can split again). */
+    public int splitDepth = 2;
     /** Number of astral arrows spawned by the Volley strike enchantment. */
     public int volleyArrowCount = 8;
 
@@ -155,8 +162,8 @@ public class SpellgemsConfig {
         public float centerYOffset = 0.75F;
         public float knockbackStrength = 0.6F;
         public float expandRadiusMultiplier = 1.5F;
-        public int particleCount = 90;
-        public float particleSpeed = 0.2F;
+        public int particleCount = 120;
+        public float particleSpeed = 0.0F;
 
         @Override
         public void validate() {
@@ -284,8 +291,12 @@ public class SpellgemsConfig {
         strikeEffectDuration = Math.max(1, strikeEffectDuration);
         strikeCloudDamage = Math.max(0f, strikeCloudDamage);
         drainHealPerTarget = Math.max(0f, drainHealPerTarget);
+        judgementDamage = Math.max(0f, judgementDamage);
+        strikeBurstParticleSpeed = Math.max(0f, strikeBurstParticleSpeed);
         chainingCount = Math.max(1, chainingCount);
         multishotCount = Math.max(1, multishotCount);
+        splitCount = Math.max(1, splitCount);
+        splitDepth = Math.max(1, splitDepth);
         volleyArrowCount = Math.max(1, volleyArrowCount);
 
         if (wand != null) wand.validate();

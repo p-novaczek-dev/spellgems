@@ -108,7 +108,7 @@ public class Nova extends AbstractSpell {
                 SoundEvents.DRAGON_FIREBALL_EXPLODE,
                 SoundSource.PLAYERS,
                 0.5F,
-                1.0F
+                0.6F + level.getRandom().nextFloat() * 0.2F
         );
     }
 
@@ -134,7 +134,7 @@ public class Nova extends AbstractSpell {
         var dustOptions = new DustParticleOptions(dustColor, 1.0F);
 
         for (int i = 0; i < particleCount; i++) {
-            Vec3 pos = randomPointInSphere(center, radius, random);
+            Vec3 pos = randomPointOnSphere(center, radius, random);
             Vec3 velocity = pos.subtract(center);
             double len = velocity.length();
             if (len < 1.0E-8) {

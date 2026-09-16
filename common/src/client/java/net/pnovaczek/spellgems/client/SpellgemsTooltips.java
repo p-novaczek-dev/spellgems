@@ -202,6 +202,9 @@ public class SpellgemsTooltips {
         if (enchantmentId.equals(ModifierEnchantments.MULTISHOT)) {
             return new Object[]{Spellgems.CONFIG.multishotCount};
         }
+        if (enchantmentId.equals(ModifierEnchantments.SPLIT)) {
+            return new Object[]{Spellgems.CONFIG.splitCount};
+        }
         return new Object[0];
     }
 
