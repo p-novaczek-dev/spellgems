@@ -1,10 +1,13 @@
 package net.pnovaczek.spellgems.platform.neoforge;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -51,6 +54,17 @@ public final class NeoForgeLifecycle implements PlatformLifecycle {
                 }
             }
             // Note: generic callback expects a Builder; Neo path handles village inject above.
+        });
+    }
+
+    @Override
+    public void onPlayerAttackLiving(PlayerAttackLivingCallback callback) {
+        NeoForge.EVENT_BUS.addListener((AttackEntityEvent event) -> {
+            if (event.getTarget() instanceof LivingEntity living && event.getEntity() instanceof Player player) {
+                if (!player.level().isClientSide()) {
+                    callback.onAttack(player, living, player.getMainHandItem());
+                }
+            }
         });
     }
 }

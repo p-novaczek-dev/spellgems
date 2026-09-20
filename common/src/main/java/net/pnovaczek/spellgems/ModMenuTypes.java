@@ -7,6 +7,7 @@ import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.pnovaczek.spellgems.registry.ModRegistry;
 import net.pnovaczek.spellgems.screen.AstralBowMenu;
+import net.pnovaczek.spellgems.screen.GemForgeMenu;
 import net.pnovaczek.spellgems.screen.ManaInfuserMenu;
 import net.pnovaczek.spellgems.screen.SpellDispenserMenu;
 import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
@@ -22,6 +23,7 @@ public class ModMenuTypes {
     public static MenuType<SpellDispenserMenu> SPELL_DISPENSER;
     public static MenuType<WandMenu> WAND;
     public static MenuType<AstralBowMenu> ASTRAL_BOW;
+    public static MenuType<GemForgeMenu> GEM_FORGE;
 
     private ModMenuTypes() {
     }
@@ -32,6 +34,7 @@ public class ModMenuTypes {
         SPELL_DISPENSER = register("spell_dispenser", SpellDispenserMenu::new);
         WAND = register("wand", WandMenu::new);
         ASTRAL_BOW = register("astral_bow", AstralBowMenu::new);
+        GEM_FORGE = register("gem_forge", GemForgeMenu::new);
     }
 
     private static <T extends net.minecraft.world.inventory.AbstractContainerMenu> MenuType<T> register(

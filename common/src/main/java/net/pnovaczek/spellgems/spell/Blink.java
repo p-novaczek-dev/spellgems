@@ -83,19 +83,19 @@ public class Blink extends AbstractSpell {
 
         Vec3 origin = caster.position();
         if (safePosition.isEmpty()) {
-            playFailSound(serverLevel, origin, SpellParticles.predictionExcept(caster));
+            playFailSound(serverLevel, origin, SpellParticles.predictionExcept(context));
             return false;
         }
 
         Vec3 destination = safePosition.get();
 
         if (!teleportCaster(serverLevel, caster, destination)) {
-            playFailSound(serverLevel, origin, SpellParticles.predictionExcept(caster));
+            playFailSound(serverLevel, origin, SpellParticles.predictionExcept(context));
             return false;
         }
 
         // Multiplayer-visible FX; skip caster if they already predicted.
-        spawnParticles(serverLevel, origin, destination, SpellParticles.predictionExcept(caster));
+        spawnParticles(serverLevel, origin, destination, SpellParticles.predictionExcept(context));
 
         serverLevel.playSound(
                 null,

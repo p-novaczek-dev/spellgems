@@ -31,5 +31,6 @@ public class ModBlockLootTableProvider extends FabricBlockLootSubProvider {
         dropSelf(ModBlocks.MANA_INFUSER);
         add(ModBlocks.SPELL_ENCHANTING_TABLE, this::createNameableBlockEntityTable);
         dropSelf(ModBlocks.SPELL_DISPENSER);
+        dropSelf(ModBlocks.GEM_FORGE);
     }
 }

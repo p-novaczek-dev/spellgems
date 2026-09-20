@@ -11,6 +11,7 @@ import net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyE
 import net.pnovaczek.spellgems.client.SpellgemsClientBootstrap;
 import net.pnovaczek.spellgems.client.renderer.item.properties.numeric.AstralBowPull;
 import net.pnovaczek.spellgems.client.screen.AstralBowScreen;
+import net.pnovaczek.spellgems.client.screen.GemForgeScreen;
 import net.pnovaczek.spellgems.client.screen.ManaInfuserScreen;
 import net.pnovaczek.spellgems.client.screen.SpellDispenserScreen;
 import net.pnovaczek.spellgems.client.screen.SpellEnchantingScreen;
@@ -43,6 +44,7 @@ public class SpellgemsNeoForgeClient {
         event.register(ModMenuTypes.SPELL_DISPENSER, SpellDispenserScreen::new);
         event.register(ModMenuTypes.WAND, WandScreen::new);
         event.register(ModMenuTypes.ASTRAL_BOW, AstralBowScreen::new);
+        event.register(ModMenuTypes.GEM_FORGE, GemForgeScreen::new);
     }
 
     private void onRegisterRangeSelect(RegisterRangeSelectItemModelPropertyEvent event) {

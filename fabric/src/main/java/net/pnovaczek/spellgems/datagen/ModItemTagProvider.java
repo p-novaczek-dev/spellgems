@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -39,6 +40,10 @@ public class ModItemTagProvider extends FabricTagsProvider.ItemTagsProvider {
                 .add(ModItems.keyOfItem("spell_gem_grow"))
                 .add(ModItems.keyOfItem("spell_gem_potion"));
 
+        builder(ModTags.SPELL_GEMS)
+                .addTag(ModTags.COMBAT_SPELL_GEMS)
+                .addTag(ModTags.UTILITY_SPELL_GEMS);
+
         builder(ModTags.SMELT_SPELL_GEMS)
                 .add(ModItems.keyOfItem("spell_gem_break_block"))
                 .add(ModItems.keyOfItem("spell_gem_harvest"));
@@ -52,6 +57,12 @@ public class ModItemTagProvider extends FabricTagsProvider.ItemTagsProvider {
 
         builder(ModTags.CATALYST_BOOKS)
                 .add(ModItems.keyOfItem("spell_tome"));
+
+        builder(ModTags.SOCKETABLE_WEAPONS)
+                .add(ResourceKey.create(Registries.ITEM, Identifier.withDefaultNamespace("mace")));
+
+        builder(ModTags.GREATER_SPELL_GEMS)
+                .add(ModItems.keyOfItem("greater_spell_gem"));
 
         // Make mana root (and thus the plant spell) recognize it as a plantable seed,
         // and allow vanilla systems (villagers etc.) to treat it as one.

@@ -135,7 +135,9 @@ public class WandMenu extends AbstractContainerMenu {
     }
 
     private static boolean isSpellGem(ItemStack stack) {
-        return stack.is(ModTags.COMBAT_SPELL_GEMS) || stack.is(ModTags.UTILITY_SPELL_GEMS);
+        return stack.is(ModTags.COMBAT_SPELL_GEMS)
+                || stack.is(ModTags.UTILITY_SPELL_GEMS)
+                || stack.is(ModTags.GREATER_SPELL_GEMS);
     }
 
     private static class SpellGemSlot extends Slot {

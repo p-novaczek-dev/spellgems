@@ -3,18 +3,23 @@ package net.pnovaczek.spellgems.datagen;
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.pnovaczek.spellgems.ModBlocks;
 import net.pnovaczek.spellgems.ModItems;
+import net.pnovaczek.spellgems.ModTags;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.recipe.GemForgeRecipeBuilder;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipeBuilder;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipeBuilder;
@@ -179,6 +184,37 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
                         .save(exporter);
 
+                // Gem Forge: 2 shimmersteel above a 2x2 of cobblestone
+                shaped(RecipeCategory.DECORATIONS, ModBlocks.GEM_FORGE)
+                        .pattern("SS")
+                        .pattern("CC")
+                        .pattern("CC")
+                        .define('S', ModItems.SHIMMERSTEEL_INGOT)
+                        .define('C', Blocks.COBBLESTONE)
+                        .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
+                        .save(exporter);
+
+                GemForgeRecipeBuilder.applyTome(
+                                ingredientFromTag(ModTags.SPELL_GEMS),
+                                ingredientFromTag(ModTags.CATALYST_BOOKS),
+                                27)
+                        .save(exporter, "apply_spell_tome");
+
+                GemForgeRecipeBuilder.socketWeapon(
+                                ingredientFromTag(ModTags.SOCKETABLE_WEAPONS),
+                                Ingredient.of(ModItems.SPELL_GEM_NOVA),
+                                1395)
+                        .save(exporter, "socket_nova_weapon");
+
+                GemForgeRecipeBuilder.unsocketWeapon(ingredientFromTag(ModTags.SOCKETABLE_WEAPONS), 0)
+                        .save(exporter, "unsocket_weapon");
+
+                GemForgeRecipeBuilder.combineGreater(
+                                ingredientFromTag(ModTags.COMBAT_SPELL_GEMS),
+                                ingredientFromTag(ModTags.COMBAT_SPELL_GEMS),
+                                5345)
+                        .save(exporter, "greater_spell_gem");
+
                 // Spell Enchanting Table: 1 book + 2 shimmersteel + 4 obsidian
                 shaped(RecipeCategory.DECORATIONS, ModBlocks.SPELL_ENCHANTING_TABLE)
                         .pattern(" B ")
@@ -283,6 +319,15 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .save(exporter, "extend");
             }
         };
+    }
+
+    /**
+     * Tag ingredient that serializes as {@code #namespace:path} without requiring the tag
+     * to be bound yet (recipe datagen runs before our item tags exist).
+     */
+    @SuppressWarnings("deprecation")
+    private static Ingredient ingredientFromTag(TagKey<Item> tag) {
+        return Ingredient.of(HolderSet.emptyNamed(BuiltInRegistries.ITEM, tag));
     }
 
     @Override

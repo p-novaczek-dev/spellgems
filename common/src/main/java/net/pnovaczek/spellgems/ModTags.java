@@ -17,6 +17,11 @@ public class ModTags {
             Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "utility_spell_gems")
     );
 
+    public static final TagKey<Item> SPELL_GEMS = TagKey.create(
+            Registries.ITEM,
+            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "spell_gems")
+    );
+
     public static final TagKey<Item> SMELT_SPELL_GEMS = TagKey.create(
             Registries.ITEM,
             Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "smelt_spell_gems")
@@ -35,6 +40,16 @@ public class ModTags {
     public static final TagKey<Item> WAND_ENCHANTABLE = TagKey.create(
             Registries.ITEM,
             Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "wand_enchantable")
+    );
+
+    public static final TagKey<Item> SOCKETABLE_WEAPONS = TagKey.create(
+            Registries.ITEM,
+            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "socketable_weapons")
+    );
+
+    public static final TagKey<Item> GREATER_SPELL_GEMS = TagKey.create(
+            Registries.ITEM,
+            Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "greater_spell_gems")
     );
 
     public static void register() {

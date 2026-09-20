@@ -163,6 +163,14 @@ public final class WandSpellCaster {
     }
 
     public static int getDurabilityCost(Identifier spellId, SpellGemData gemData) {
+        int cost = partDurabilityCost(spellId, gemData);
+        if (gemData != null) {
+            cost += gemData.followUp().map(follow -> partDurabilityCost(follow.spellId(), follow)).orElse(0);
+        }
+        return Math.max(1, cost);
+    }
+
+    private static int partDurabilityCost(Identifier spellId, SpellGemData gemData) {
         float cost = getBaseDurabilityCost(spellId);
         if (gemData != null) {
             float multiplier = Spellgems.CONFIG.wand.spellEnchantmentDurabilityCostMultiplier;

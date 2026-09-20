@@ -1,0 +1,7 @@
+{
+  "type": "spellgems:gem_forging",
+  "ingredient_1": "#spellgems:socketable_weapons",
+  "ingredient_2": "spellgems:spell_gem_nova",
+  "operation": "socket_weapon",
+  "xp_cost": 1395
+}

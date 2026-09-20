@@ -6,6 +6,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.pnovaczek.spellgems.item.AstralBowItem;
 import net.pnovaczek.spellgems.item.SpellGemItem;
@@ -31,6 +32,7 @@ public class ModItems {
     public static BlockItem MANA_INFUSER;
     public static BlockItem SPELL_ENCHANTING_TABLE;
     public static BlockItem SPELL_DISPENSER;
+    public static BlockItem GEM_FORGE;
 
     public static WandItem WAND;
     public static AstralBowItem ASTRAL_BOW;
@@ -47,6 +49,7 @@ public class ModItems {
     public static SpellGemItem SPELL_GEM_FEED;
     public static SpellGemItem SPELL_GEM_GROW;
     public static SpellGemItem SPELL_GEM_POTION;
+    public static SpellGemItem GREATER_SPELL_GEM;
 
     public static SpellTomeItem SPELL_TOME;
 
@@ -69,6 +72,7 @@ public class ModItems {
         MANA_INFUSER = registerBlockItem("mana_infuser", ModBlocks.MANA_INFUSER);
         SPELL_ENCHANTING_TABLE = registerBlockItem("spell_enchanting_table", ModBlocks.SPELL_ENCHANTING_TABLE);
         SPELL_DISPENSER = registerBlockItem("spell_dispenser", ModBlocks.SPELL_DISPENSER);
+        GEM_FORGE = registerBlockItem("gem_forge", ModBlocks.GEM_FORGE);
 
         WAND = register(
                 "wand",
@@ -103,6 +107,18 @@ public class ModItems {
         SPELL_GEM_FEED = spellGem("spell_gem_feed", SpellIds.FEED);
         SPELL_GEM_GROW = spellGem("spell_gem_grow", SpellIds.GROW);
         SPELL_GEM_POTION = spellGem("spell_gem_potion", SpellIds.POTION);
+        GREATER_SPELL_GEM = register(
+                "greater_spell_gem",
+                SpellGemItem::new,
+                new Item.Properties()
+                        .stacksTo(1)
+                        .rarity(Rarity.EPIC)
+                        .component(
+                                ModComponents.SPELL_GEM_DATA,
+                                SpellGemData.create(SpellIds.PROJECTILE)
+                                        .withFollowUp(SpellGemData.create(SpellIds.NOVA))
+                        )
+        );
 
         SPELL_TOME = register(
                 "spell_tome",

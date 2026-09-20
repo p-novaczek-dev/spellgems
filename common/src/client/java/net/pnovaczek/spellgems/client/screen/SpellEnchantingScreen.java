@@ -16,13 +16,13 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.pnovaczek.spellgems.ExperienceLevels;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantments;
 
 import com.google.common.collect.Lists;
 import java.util.List;
-import java.util.Locale;
 
 public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchantingMenu> {
 
@@ -199,7 +199,8 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
                     .withStyle(ChatFormatting.GRAY));
         }
 
-        String relativeLevelCost = formatRelativeLevelCost(this.menu.getXpCost(recipeIndex));
+        String relativeLevelCost = ExperienceLevels.formatLevelsForXpCost(
+                this.menu.getXpCost(recipeIndex), this.minecraft.player);
         if (!meetsXpRequirement(recipeIndex)) {
             texts.add(Component.translatable("container.spellgems.spell_enchanting.level_cost", relativeLevelCost)
                     .withStyle(ChatFormatting.RED));
@@ -228,12 +229,6 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
                 : catalystLabel.withStyle(ChatFormatting.RED));
 
         return texts;
-    }
-
-    private String formatRelativeLevelCost(int xpCost) {
-        int xpPerLevel = this.minecraft.player.getXpNeededForNextLevel();
-        double relativeLevels = (double) xpCost / xpPerLevel;
-        return String.format(Locale.ROOT, "%.1f", relativeLevels);
     }
 
     private boolean meetsLevelRequirement(int recipeIndex) {

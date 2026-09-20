@@ -1,0 +1,7 @@
+{
+  "type": "spellgems:gem_forging",
+  "ingredient_1": "#spellgems:spell_gems",
+  "ingredient_2": "#spellgems:catalyst_books",
+  "operation": "apply_tome",
+  "xp_cost": 27
+}

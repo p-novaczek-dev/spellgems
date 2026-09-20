@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.SpellgemsConfig;
+import net.pnovaczek.spellgems.item.GreaterSpellGems;
 import net.pnovaczek.spellgems.entity.SpellProjectile;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
@@ -114,17 +115,14 @@ public class Projectile extends AbstractSpell {
         SpellProjectile projectile = new SpellProjectile(context, direction, handler);
         level.addFreshEntity(projectile);
 
-        var sound = SoundEvents.ENDER_DRAGON_SHOOT;
-        float pitch = 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F);
-
         Vec3 soundPos = context.eyeOrigin();
         level.playSound(
                 null,
                 soundPos.x, soundPos.y, soundPos.z,
-                sound,
+                SoundEvents.ENDER_DRAGON_SHOOT,
                 SoundSource.PLAYERS,
                 0.5F,
-                pitch
+                0.6F + level.getRandom().nextFloat() * 0.2F
         );
     }
 
@@ -150,6 +148,7 @@ public class Projectile extends AbstractSpell {
             for (var strike : strikes) {
                 strike.applyTo(living, strikeSource);
             }
+            GreaterSpellGems.onDirectHit(context, living);
 
             if (remainingSplits > 0) {
                 spawnSplitProjectiles(context, projectile, living, strikes, maxChains, hasPower, remainingSplits - 1);

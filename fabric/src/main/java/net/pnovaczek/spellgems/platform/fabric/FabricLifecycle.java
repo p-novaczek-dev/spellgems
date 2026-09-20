@@ -2,8 +2,11 @@ package net.pnovaczek.spellgems.platform.fabric;
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.pnovaczek.spellgems.platform.PlatformLifecycle;
 
 import java.util.function.Consumer;
@@ -28,5 +31,15 @@ public final class FabricLifecycle implements PlatformLifecycle {
     public void onModifyLootTable(LootTableModifyCallback callback) {
         LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) ->
                 callback.modify(key, tableBuilder, source.isBuiltin(), registries));
+    }
+
+    @Override
+    public void onPlayerAttackLiving(PlayerAttackLivingCallback callback) {
+        AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+            if (!world.isClientSide() && entity instanceof LivingEntity living) {
+                callback.onAttack(player, living, player.getItemInHand(hand));
+            }
+            return InteractionResult.PASS;
+        });
     }
 }

@@ -1,0 +1,7 @@
+{
+  "type": "spellgems:gem_forging",
+  "ingredient_1": "#spellgems:combat_spell_gems",
+  "ingredient_2": "#spellgems:combat_spell_gems",
+  "operation": "combine_greater",
+  "xp_cost": 5345
+}

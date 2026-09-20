@@ -11,31 +11,60 @@ import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantment;
 
 import java.util.List;
+import java.util.Optional;
 
 public record SpellGemData(
         Identifier spellId,
         List<ModifierEnchantment> modifierEffects,
         List<StrikeEnchantment> strikeEffects,
         List<UtilityEnchantment> utilityEffects,
-        List<PotionEnchantment> potionEffects
+        List<PotionEnchantment> potionEffects,
+        Optional<SpellGemData> followUp
 ) {
 
-    public static final Codec<SpellGemData> CODEC = RecordCodecBuilder.create(instance ->
-            instance.group(
-                    Identifier.CODEC.fieldOf("spell_id").forGetter(SpellGemData::spellId),
-                    ModifierEnchantment.CODEC.listOf().fieldOf("modifiers").forGetter(SpellGemData::modifierEffects),
-                    StrikeEnchantment.CODEC.listOf().fieldOf("strikes").forGetter(SpellGemData::strikeEffects),
-                    UtilityEnchantment.CODEC.listOf().fieldOf("utilities").forGetter(SpellGemData::utilityEffects),
-                    PotionEnchantment.CODEC.listOf().fieldOf("potions").forGetter(SpellGemData::potionEffects)
-            ).apply(instance, SpellGemData::new)
+    public static final Codec<SpellGemData> CODEC = Codec.recursive("spell_gem_data", self ->
+            RecordCodecBuilder.create(instance ->
+                    instance.group(
+                            Identifier.CODEC.fieldOf("spell_id").forGetter(SpellGemData::spellId),
+                            ModifierEnchantment.CODEC.listOf().fieldOf("modifiers").forGetter(SpellGemData::modifierEffects),
+                            StrikeEnchantment.CODEC.listOf().fieldOf("strikes").forGetter(SpellGemData::strikeEffects),
+                            UtilityEnchantment.CODEC.listOf().fieldOf("utilities").forGetter(SpellGemData::utilityEffects),
+                            PotionEnchantment.CODEC.listOf().fieldOf("potions").forGetter(SpellGemData::potionEffects),
+                            self.optionalFieldOf("follow_up").forGetter(SpellGemData::followUp)
+                    ).apply(instance, SpellGemData::new)
+            )
     );
 
+    public SpellGemData(
+            Identifier spellId,
+            List<ModifierEnchantment> modifierEffects,
+            List<StrikeEnchantment> strikeEffects,
+            List<UtilityEnchantment> utilityEffects,
+            List<PotionEnchantment> potionEffects
+    ) {
+        this(spellId, modifierEffects, strikeEffects, utilityEffects, potionEffects, Optional.empty());
+    }
+
     public static SpellGemData create(Identifier identifier) {
-        return new SpellGemData(identifier, List.of(), List.of(), List.of(), List.of());
+        return new SpellGemData(identifier, List.of(), List.of(), List.of(), List.of(), Optional.empty());
+    }
+
+    public SpellGemData withFollowUp(SpellGemData followUp) {
+        return new SpellGemData(
+                spellId, modifierEffects, strikeEffects, utilityEffects, potionEffects, Optional.of(followUp));
+    }
+
+    public SpellGemData withoutFollowUp() {
+        if (followUp.isEmpty()) {
+            return this;
+        }
+        return new SpellGemData(
+                spellId, modifierEffects, strikeEffects, utilityEffects, potionEffects, Optional.empty());
     }
 
     public boolean isEnchanted() {
-        return enchantmentCount() > 0;
+        return enchantmentCount() > 0
+                || followUp.map(SpellGemData::isEnchanted).orElse(false);
     }
 
     public int enchantmentCount() {

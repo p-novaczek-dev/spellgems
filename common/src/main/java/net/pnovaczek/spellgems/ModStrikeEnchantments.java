@@ -35,6 +35,7 @@ public class ModStrikeEnchantments {
         register(StrikeEnchantments.COMBUST, new StrikeEnchantment(StrikeEnchantments.COMBUST));
         register(StrikeEnchantments.JUDGEMENT, new StrikeEnchantment(StrikeEnchantments.JUDGEMENT));
         register(StrikeEnchantments.ROOT, new StrikeEnchantment(StrikeEnchantments.ROOT));
+        register(StrikeEnchantments.VAMPIRIC_MIST, new StrikeEnchantment(StrikeEnchantments.VAMPIRIC_MIST));
         register(StrikeEnchantments.INFERNO, new StrikeEnchantment(StrikeEnchantments.INFERNO));
         register(StrikeEnchantments.FROSTBITE, new StrikeEnchantment(StrikeEnchantments.FROSTBITE));
         register(StrikeEnchantments.PLAGUE, new StrikeEnchantment(StrikeEnchantments.PLAGUE));

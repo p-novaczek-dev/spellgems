@@ -23,6 +23,12 @@ public class SpellgemsConfig {
     public int strikeEffectDuration = 120;
     public float strikeCloudDamage = 2.0F;
     public float drainHealPerTarget = 2.0F;
+    /** Damage dealt by Vampiric Mist to each enemy in the cloud, each interval. */
+    public float vampiricMistDamage = 3.0F;
+    /** Health restored to the caster per enemy damaged by Vampiric Mist. */
+    public float vampiricMistHealPerTarget = 1.0F;
+    /** Ticks between Vampiric Mist damage pulses. */
+    public int vampiricMistIntervalTicks = 20;
     public float judgementDamage = 16.0F;
     /** Outward speed of Shatter/Combust/Judgement trigger burst particles. */
     public float strikeBurstParticleSpeed = 0.5F;
@@ -34,6 +40,8 @@ public class SpellgemsConfig {
     public int splitDepth = 2;
     /** Number of astral arrows spawned by the Volley strike enchantment. */
     public int volleyArrowCount = 8;
+    /** Delay in ticks before a greater gem's second spell fires on a direct hit. */
+    public int greaterGemFollowUpDelayTicks = 10;
 
     public static class WandConfig {
         /** Multiplier applied to base durability cost for each spell enchantment on a gem. */
@@ -162,8 +170,8 @@ public class SpellgemsConfig {
         public float centerYOffset = 0.75F;
         public float knockbackStrength = 0.6F;
         public float expandRadiusMultiplier = 1.5F;
-        public int particleCount = 120;
-        public float particleSpeed = 0.0F;
+        public int particleCount = 360;
+        public float particleSpeed = 0.5F;
 
         @Override
         public void validate() {
@@ -291,6 +299,9 @@ public class SpellgemsConfig {
         strikeEffectDuration = Math.max(1, strikeEffectDuration);
         strikeCloudDamage = Math.max(0f, strikeCloudDamage);
         drainHealPerTarget = Math.max(0f, drainHealPerTarget);
+        vampiricMistDamage = Math.max(0f, vampiricMistDamage);
+        vampiricMistHealPerTarget = Math.max(0f, vampiricMistHealPerTarget);
+        vampiricMistIntervalTicks = Math.max(1, vampiricMistIntervalTicks);
         judgementDamage = Math.max(0f, judgementDamage);
         strikeBurstParticleSpeed = Math.max(0f, strikeBurstParticleSpeed);
         chainingCount = Math.max(1, chainingCount);
@@ -298,6 +309,7 @@ public class SpellgemsConfig {
         splitCount = Math.max(1, splitCount);
         splitDepth = Math.max(1, splitDepth);
         volleyArrowCount = Math.max(1, volleyArrowCount);
+        greaterGemFollowUpDelayTicks = Math.max(0, greaterGemFollowUpDelayTicks);
 
         if (wand != null) wand.validate();
         if (astralBow != null) astralBow.validate();

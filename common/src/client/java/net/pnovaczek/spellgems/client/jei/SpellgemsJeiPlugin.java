@@ -18,6 +18,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.pnovaczek.spellgems.ModBlocks;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.platform.client.ClientPlatform;
+import net.pnovaczek.spellgems.recipe.GemForgeRecipe;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantments;
@@ -43,6 +44,7 @@ public class SpellgemsJeiPlugin implements IModPlugin {
     private static @Nullable IJeiRuntime jeiRuntime;
     private static boolean manaRecipesInJei;
     private static boolean enchantingRecipesInJei;
+    private static boolean gemForgeRecipesInJei;
     private static boolean syncListenerRegistered;
 
     @Override
@@ -72,7 +74,8 @@ public class SpellgemsJeiPlugin implements IModPlugin {
 
         registration.addRecipeCategories(
                 new ManaInfuserRecipeCategory(guiHelper),
-                new SpellEnchantingRecipeCategory(guiHelper, potionCatalysts)
+                new SpellEnchantingRecipeCategory(guiHelper, potionCatalysts),
+                new GemForgeRecipeCategory(guiHelper)
         );
     }
 
@@ -91,6 +94,12 @@ public class SpellgemsJeiPlugin implements IModPlugin {
             registration.addRecipes(SpellEnchantingRecipeCategory.TYPE, enchantingRecipes);
             enchantingRecipesInJei = true;
         }
+
+        List<RecipeHolder<GemForgeRecipe>> gemForgeRecipes = collectRecipes(GemForgeRecipe.TYPE);
+        if (!gemForgeRecipes.isEmpty()) {
+            registration.addRecipes(GemForgeRecipeCategory.TYPE, gemForgeRecipes);
+            gemForgeRecipesInJei = true;
+        }
     }
 
     @Override
@@ -103,6 +112,10 @@ public class SpellgemsJeiPlugin implements IModPlugin {
         registration.addRecipeCatalyst(
                 new ItemStack(ModBlocks.SPELL_ENCHANTING_TABLE),
                 SpellEnchantingRecipeCategory.TYPE
+        );
+        registration.addRecipeCatalyst(
+                new ItemStack(ModBlocks.GEM_FORGE),
+                GemForgeRecipeCategory.TYPE
         );
     }
 
@@ -118,6 +131,7 @@ public class SpellgemsJeiPlugin implements IModPlugin {
         jeiRuntime = null;
         manaRecipesInJei = false;
         enchantingRecipesInJei = false;
+        gemForgeRecipesInJei = false;
     }
 
     private static void ensureSyncListener() {
@@ -152,6 +166,14 @@ public class SpellgemsJeiPlugin implements IModPlugin {
             if (!enchantingRecipes.isEmpty()) {
                 recipeManager.addRecipes(SpellEnchantingRecipeCategory.TYPE, enchantingRecipes);
                 enchantingRecipesInJei = true;
+            }
+        }
+
+        if (!gemForgeRecipesInJei) {
+            List<RecipeHolder<GemForgeRecipe>> gemForgeRecipes = collectRecipes(GemForgeRecipe.TYPE);
+            if (!gemForgeRecipes.isEmpty()) {
+                recipeManager.addRecipes(GemForgeRecipeCategory.TYPE, gemForgeRecipes);
+                gemForgeRecipesInJei = true;
             }
         }
     }

@@ -11,6 +11,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.SpellgemsConfig;
+import net.pnovaczek.spellgems.item.GreaterSpellGems;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
 
@@ -56,7 +57,7 @@ public class Nova extends AbstractSpell {
             } else if (level instanceof ServerLevel serverLevel) {
                 applyNovaDamage(context, serverLevel, finalHasPower, finalHasExpand);
                 // Always broadcast from server (multiplayer + dispenser). Skip caster if they predicted.
-                spawnNovaParticles(context, finalHasExpand, SpellParticles.predictionExcept(caster));
+                spawnNovaParticles(context, finalHasExpand, SpellParticles.predictionExcept(context));
             }
         };
 
@@ -100,6 +101,7 @@ public class Nova extends AbstractSpell {
             double dx = center.x - target.getX();
             double dz = center.z - target.getZ();
             target.knockback(config.knockbackStrength, dx, dz);
+            GreaterSpellGems.onDirectHit(context, target);
         }
 
         level.playSound(
@@ -134,7 +136,7 @@ public class Nova extends AbstractSpell {
         var dustOptions = new DustParticleOptions(dustColor, 1.0F);
 
         for (int i = 0; i < particleCount; i++) {
-            Vec3 pos = randomPointOnSphere(center, radius, random);
+            Vec3 pos = randomPointInSphere(center, radius, random);
             Vec3 velocity = pos.subtract(center);
             double len = velocity.length();
             if (len < 1.0E-8) {

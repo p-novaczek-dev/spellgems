@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.pnovaczek.spellgems.block.GemForgeBlock;
 import net.pnovaczek.spellgems.block.ManaInfuserBlock;
 import net.pnovaczek.spellgems.block.ManaRootCropBlock;
 import net.pnovaczek.spellgems.block.SpellDispenserBlock;
@@ -25,6 +26,7 @@ public class ModBlocks {
     public static Block MANA_INFUSER;
     public static Block SPELL_ENCHANTING_TABLE;
     public static Block SPELL_DISPENSER;
+    public static Block GEM_FORGE;
 
     private ModBlocks() {
     }
@@ -48,6 +50,11 @@ public class ModBlocks {
         SPELL_DISPENSER = register(
                 "spell_dispenser",
                 SpellDispenserBlock::new,
+                BlockBehaviour.Properties.ofFullCopy(Blocks.DISPENSER)
+        );
+        GEM_FORGE = register(
+                "gem_forge",
+                GemForgeBlock::new,
                 BlockBehaviour.Properties.ofFullCopy(Blocks.DISPENSER)
         );
     }

@@ -18,6 +18,7 @@ public class ModBlockTagProvider extends FabricTagsProvider.BlockTagsProvider {
         builder(BlockTags.MINEABLE_WITH_PICKAXE)
             .add(ModBlocks.MANA_INFUSER.properties().blockId())
             .add(ModBlocks.SPELL_ENCHANTING_TABLE.properties().blockId())
-            .add(ModBlocks.SPELL_DISPENSER.properties().blockId());
+            .add(ModBlocks.SPELL_DISPENSER.properties().blockId())
+            .add(ModBlocks.GEM_FORGE.properties().blockId());
     }
 }

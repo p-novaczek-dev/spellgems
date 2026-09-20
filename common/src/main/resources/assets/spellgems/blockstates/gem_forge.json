@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "spellgems:block/gem_forge"
+    }
+  }
+}

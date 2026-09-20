@@ -1,0 +1,6 @@
+{
+  "type": "spellgems:gem_forging",
+  "ingredient_1": "#spellgems:socketable_weapons",
+  "operation": "unsocket_weapon",
+  "xp_cost": 0
+}

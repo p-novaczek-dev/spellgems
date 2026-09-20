@@ -16,8 +16,11 @@ import net.pnovaczek.spellgems.ModEntityDataSerializers;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.spell.ProjectileHitHandler;
 import net.pnovaczek.spellgems.spell.SpellContext;
+import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import org.jspecify.annotations.Nullable;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class SpellProjectile extends AbstractHurtingProjectile {
@@ -33,25 +36,30 @@ public class SpellProjectile extends AbstractHurtingProjectile {
 
     private final SpellContext spellContext;
     private final ProjectileHitHandler hitHandler;
+    private final boolean piercing;
     /** Entity just struck by a parent projectile; split children must not immediately re-hit it. */
     private @Nullable UUID ignoredHitEntity;
+    private final Set<UUID> piercedEntities = new HashSet<>();
 
     public SpellProjectile(EntityType<? extends SpellProjectile> entityType, Level level) {
         super(entityType, level);
         this.spellContext = null;
         this.hitHandler = null;
+        this.piercing = false;
     }
 
     public SpellProjectile(double x, double y, double z, Vec3 direction, Level level) {
         super(ModEntities.SPELL_PROJECTILE, x, y, z, direction, level);
         this.spellContext = null;
         this.hitHandler = null;
+        this.piercing = false;
     }
 
     @SuppressWarnings("this-escape")
     public SpellProjectile(SpellContext spellContext, Vec3 direction, ProjectileHitHandler hitHandler) {
         this.spellContext = spellContext;
         this.hitHandler = hitHandler;
+        this.piercing = hasPiercing(spellContext);
         super(ModEntities.SPELL_PROJECTILE, spellContext.level());
 
         if (spellContext.data() != null) {
@@ -68,6 +76,7 @@ public class SpellProjectile extends AbstractHurtingProjectile {
     public SpellProjectile(SpellContext spellContext, Vec3 direction, Vec3 sourcePos, ProjectileHitHandler hitHandler) {
         this.spellContext = spellContext;
         this.hitHandler = hitHandler;
+        this.piercing = hasPiercing(spellContext);
         super(ModEntities.SPELL_PROJECTILE, spellContext.level());
 
         if (spellContext.data() != null) {
@@ -105,6 +114,9 @@ public class SpellProjectile extends AbstractHurtingProjectile {
         if (this.ignoredHitEntity != null && this.ignoredHitEntity.equals(entity.getUUID())) {
             return false;
         }
+        if (this.piercedEntities.contains(entity.getUUID())) {
+            return false;
+        }
         return super.canHitEntity(entity);
     }
 
@@ -126,6 +138,10 @@ public class SpellProjectile extends AbstractHurtingProjectile {
             hitHandler.onHit(this, result);
         }
 
+        if (this.piercing) {
+            this.piercedEntities.add(result.getEntity().getUUID());
+            return;
+        }
         this.discard();
     }
 
@@ -190,5 +206,17 @@ public class SpellProjectile extends AbstractHurtingProjectile {
 
     public int getTintColor() {
         return this.entityData.get(DATA_TINT_COLOR);
+    }
+
+    private static boolean hasPiercing(@Nullable SpellContext context) {
+        if (context == null || context.data() == null) {
+            return false;
+        }
+        for (var modifier : context.data().modifierEffects()) {
+            if (modifier.is(ModifierEnchantments.PIERCING)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

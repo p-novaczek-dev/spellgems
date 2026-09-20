@@ -1,5 +1,6 @@
 package net.pnovaczek.spellgems;
 
+import net.pnovaczek.spellgems.item.WeaponSocketing;
 import net.pnovaczek.spellgems.loot.VillageManaRootLoot;
 import net.pnovaczek.spellgems.network.ModNetworking;
 import net.pnovaczek.spellgems.platform.Platform;
@@ -55,5 +56,6 @@ public final class Spellgems {
 
 		Platform.lifecycle().onModifyLootTable((key, tableBuilder, builtin, registries) ->
 				VillageManaRootLoot.tryInject(key, tableBuilder, builtin));
+		Platform.lifecycle().onPlayerAttackLiving(WeaponSocketing::onPlayerAttackLiving);
 	}
 }

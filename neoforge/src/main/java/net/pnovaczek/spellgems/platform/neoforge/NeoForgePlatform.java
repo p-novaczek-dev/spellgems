@@ -5,6 +5,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.pnovaczek.spellgems.platform.Platform;
+import net.pnovaczek.spellgems.recipe.GemForgeRecipe;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.registry.ModRegistries;
@@ -34,8 +35,6 @@ public final class NeoForgePlatform {
                 new NeoPlatformRegistries()
         );
         modBus.addListener(NeoForgePlatform::onRegisterEvent);
-        // Anvil tome+gem combine via event (no AnvilMenuMixin on Neo).
-        NeoForgeAnvilHandler.register();
         // Request custom recipe types be sent to clients (JEI / multiplayer).
         NeoForge.EVENT_BUS.addListener(NeoForgePlatform::onDatapackSync);
     }
@@ -45,6 +44,6 @@ public final class NeoForgePlatform {
     }
 
     private static void onDatapackSync(OnDatapackSyncEvent event) {
-        event.sendRecipes(ManaInfuserRecipe.TYPE, SpellEnchantingRecipe.TYPE);
+        event.sendRecipes(ManaInfuserRecipe.TYPE, SpellEnchantingRecipe.TYPE, GemForgeRecipe.TYPE);
     }
 }

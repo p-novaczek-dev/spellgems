@@ -3,6 +3,7 @@ package net.pnovaczek.spellgems.client;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -15,10 +16,12 @@ import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.ModSpells;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.SpellgemsConfig;
 import net.pnovaczek.spellgems.inventory.AstralBowContainer;
 import net.pnovaczek.spellgems.inventory.WandContainer;
 import net.pnovaczek.spellgems.item.SpellGemItem;
 import net.pnovaczek.spellgems.item.SpellTomeItem;
+import net.pnovaczek.spellgems.item.WeaponSocketing;
 import net.pnovaczek.spellgems.item.data.AstralBowData;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.WandData;
@@ -118,78 +121,141 @@ public class SpellgemsTooltips {
                 }
             }
             else if (stack.getItem() instanceof SpellGemItem) {
-                var data = stack.getComponents().get(ModComponents.SPELL_GEM_DATA);
-
-                if (data != null) {
-                    Spell spell = ModSpells.get(data.spellId());
-
-                    if (spell != null) {
-                        boolean shiftDown = Minecraft.getInstance().hasShiftDown();
-
-                        tooltip.addLineHighlight(spell.tooltipNameKey());
-
-                        if (shiftDown) {
-                            if (spell.id().equals(SpellIds.POTION)) {
-                                if (data.potionEffects().isEmpty()) {
-                                    tooltip.addLineDetail(spell.tooltipDescriptionKey());
-                                }
-                                tooltip.addLineDetail("tooltip.spellgems.spell_gem_potion.astral_bow");
-                            } else {
-                                tooltip.addLineDetail(spell.tooltipDescriptionKey());
-                            }
-                        } else {
-                            tooltip.addLineHoldShift();
-                        }
-
-                        for (var effect : data.modifierEffects()) {
-                            tooltip.addLineAttribute(effect.tooltipNameKey());
-                            if (shiftDown) {
-                                tooltip.addLineDetail(
-                                        effect.tooltipDescriptionKey(),
-                                        enchantmentDescriptionArgs(effect.id())
-                                );
-                            }
-                        }
-
-                        for (var effect : data.strikeEffects()) {
-                            tooltip.addLineAttribute(effect.tooltipNameKey());
-                            if (shiftDown) {
-                                tooltip.addLineDetail(effect.tooltipDescriptionKey());
-                            }
-                        }
-
-                        for (var effect : data.utilityEffects()) {
-                            tooltip.addLineAttribute(effect.tooltipNameKey());
-                            if (shiftDown) {
-                                tooltip.addLineDetail(effect.tooltipDescriptionKey());
-                            }
-                        }
-
-                        for (PotionEnchantment enchantment : data.potionEffects()) {
-                            tooltip.addLineAttribute(enchantment.displayName().copy());
-                            if (shiftDown) {
-                                PotionContents.addPotionTooltip(
-                                        enchantment.contents().getAllEffects(),
-                                        lines::add,
-                                        enchantment.durationScale(),
-                                        tooltipContext.tickRate()
-                                );
-                            }
-                        }
-
-                        if (shiftDown) {
-                            int wandCost = WandSpellCaster.getDurabilityCost(data.spellId(), data);
-                            tooltip.addLineStat(Component.translatable("tooltip.spellgems.spell_gem.wand_cost", wandCost));
-                            int dispenserCooldown = Spellgems.CONFIG.getDispenserCooldownTicks(data.spellId());
-                            tooltip.addLineStat(Component.translatable(
-                                    "tooltip.spellgems.spell_gem.dispenser_cooldown",
-                                    dispenserCooldown
-                            ));
-                        }
-                    }
-                }
+                appendGreaterOrSingleGemTooltip(stack.get(ModComponents.SPELL_GEM_DATA), lines, tooltipContext, true);
+            } else {
+                appendGreaterOrSingleGemTooltip(WeaponSocketing.getSocketedGem(stack), lines, tooltipContext, false);
             }
         });
+    }
+
+    private static void appendGreaterOrSingleGemTooltip(
+            SpellGemData data,
+            List<Component> lines,
+            net.minecraft.world.item.Item.TooltipContext tooltipContext,
+            boolean includeCastStats
+    ) {
+        if (data == null) {
+            return;
+        }
+        boolean shiftDown = Minecraft.getInstance().hasShiftDown();
+        if (data.followUp().isPresent()) {
+            appendSpellGemTooltip(data.withoutFollowUp(), lines, tooltipContext, false);
+            appendSpellGemTooltip(data.followUp().get(), lines, tooltipContext, false);
+        } else {
+            appendSpellGemTooltip(data, lines, tooltipContext, includeCastStats);
+        }
+        if (!shiftDown) {
+            lines.add(Component.translatable("tooltip.spellgems.shift_hint").withStyle(ChatFormatting.DARK_GRAY));
+        } else if (includeCastStats && data.followUp().isPresent()) {
+            appendCastStats(data, lines);
+        }
+    }
+
+    private static void appendSpellGemTooltip(
+            SpellGemData data,
+            List<Component> lines,
+            net.minecraft.world.item.Item.TooltipContext tooltipContext,
+            boolean includeCastStats
+    ) {
+        if (data == null) {
+            return;
+        }
+        Spell spell = ModSpells.get(data.spellId());
+        if (spell == null) {
+            return;
+        }
+
+        boolean shiftDown = Minecraft.getInstance().hasShiftDown();
+        lines.add(Component.translatable(spell.tooltipNameKey()).withStyle(ChatFormatting.YELLOW));
+
+        if (shiftDown) {
+            if (spell.id().equals(SpellIds.POTION)) {
+                if (data.potionEffects().isEmpty()) {
+                    lines.add(Component.translatable(spell.tooltipDescriptionKey()).withStyle(ChatFormatting.DARK_GRAY));
+                }
+                lines.add(Component.translatable("tooltip.spellgems.spell_gem_potion.astral_bow").withStyle(ChatFormatting.DARK_GRAY));
+            } else {
+                lines.add(Component.translatable(spell.tooltipDescriptionKey()).withStyle(ChatFormatting.DARK_GRAY));
+            }
+        }
+
+        for (var effect : data.modifierEffects()) {
+            lines.add(Component.translatable(effect.tooltipNameKey()).withStyle(ChatFormatting.GRAY));
+            if (shiftDown) {
+                lines.add(Component.translatable(
+                        effect.tooltipDescriptionKey(),
+                        enchantmentDescriptionArgs(effect.id())
+                ).withStyle(ChatFormatting.DARK_GRAY));
+            }
+        }
+
+        for (var effect : data.strikeEffects()) {
+            lines.add(Component.translatable(effect.tooltipNameKey()).withStyle(ChatFormatting.GRAY));
+            if (shiftDown) {
+                lines.add(Component.translatable(effect.tooltipDescriptionKey()).withStyle(ChatFormatting.DARK_GRAY));
+            }
+        }
+
+        for (var effect : data.utilityEffects()) {
+            lines.add(Component.translatable(effect.tooltipNameKey()).withStyle(ChatFormatting.GRAY));
+            if (shiftDown) {
+                lines.add(Component.translatable(effect.tooltipDescriptionKey()).withStyle(ChatFormatting.DARK_GRAY));
+            }
+        }
+
+        for (PotionEnchantment enchantment : data.potionEffects()) {
+            lines.add(enchantment.displayName().copy().withStyle(ChatFormatting.GRAY));
+            if (shiftDown) {
+                PotionContents.addPotionTooltip(
+                        enchantment.contents().getAllEffects(),
+                        lines::add,
+                        enchantment.durationScale(),
+                        tooltipContext.tickRate()
+                );
+            }
+        }
+
+        if (shiftDown) {
+            appendDamageStat(data, lines);
+            if (includeCastStats) {
+                appendCastStats(data, lines);
+            }
+        }
+    }
+
+    private static void appendDamageStat(SpellGemData data, List<Component> lines) {
+        SpellgemsConfig.SpellConfig config = Spellgems.CONFIG.getSpellConfig(data.spellId());
+        if (!(config instanceof SpellgemsConfig.SpellCombatConfig combat) || combat.damage <= 0.0F) {
+            return;
+        }
+        float damage = combat.damage;
+        for (var effect : data.modifierEffects()) {
+            if (effect.is(ModifierEnchantments.POWER)) {
+                damage *= combat.powerDamageMultiplier;
+                break;
+            }
+        }
+        if (damage <= 0.0F) {
+            return;
+        }
+        String formatted = damage == (int) damage
+                ? Integer.toString((int) damage)
+                : String.format(java.util.Locale.ROOT, "%.1f", damage);
+        appendIndentedStat(lines, Component.translatable("tooltip.spellgems.spell_gem.damage", formatted));
+    }
+
+    private static void appendCastStats(SpellGemData data, List<Component> lines) {
+        int wandCost = WandSpellCaster.getDurabilityCost(data.spellId(), data);
+        appendIndentedStat(lines, Component.translatable("tooltip.spellgems.spell_gem.wand_cost", wandCost));
+        int dispenserCooldown = Spellgems.CONFIG.getDispenserCooldownTicks(data.spellId());
+        if (data.followUp().isPresent()) {
+            dispenserCooldown += Spellgems.CONFIG.getDispenserCooldownTicks(data.followUp().get().spellId());
+        }
+        appendIndentedStat(lines, Component.translatable("tooltip.spellgems.spell_gem.dispenser_cooldown", dispenserCooldown));
+    }
+
+    private static void appendIndentedStat(List<Component> lines, Component text) {
+        lines.add(CommonComponents.space().append(text).withStyle(ChatFormatting.DARK_GREEN));
     }
 
     private static Object[] enchantmentDescriptionArgs(Identifier enchantmentId) {

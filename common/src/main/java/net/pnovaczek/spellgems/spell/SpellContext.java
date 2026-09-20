@@ -53,6 +53,41 @@ public record SpellContext(
         return forPlayer(level, player, wand, data, CastSource.WAND, null);
     }
 
+    /** Socketed-weapon hit. Origin at the struck target so area spells center on them. */
+    public static SpellContext forWeapon(Level level, Player player, ItemStack weapon, SpellGemData data, LivingEntity target) {
+        return new SpellContext(
+                level,
+                player,
+                weapon,
+                data,
+                CastSource.WEAPON,
+                target.position(),
+                player.getLookAngle(),
+                null
+        );
+    }
+
+    /** Greater-gem follow-up. Origin at the struck target; no client prediction. */
+    public static SpellContext forFollowUp(
+            Level level,
+            @Nullable LivingEntity caster,
+            ItemStack castingItem,
+            SpellGemData data,
+            LivingEntity target
+    ) {
+        Vec3 look = caster != null ? caster.getLookAngle() : new Vec3(0.0, 0.0, 1.0);
+        return new SpellContext(
+                level,
+                caster,
+                castingItem,
+                data,
+                CastSource.FOLLOW_UP,
+                target.position(),
+                look,
+                null
+        );
+    }
+
     /**
      * Dispenser (or other machine) cast. {@code caster} may be null.
      * {@code itemSource} is the machine inventory used by feed/grow/plant/place.

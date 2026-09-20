@@ -36,6 +36,7 @@ import net.pnovaczek.spellgems.entity.FrostbiteCloud;
 import net.pnovaczek.spellgems.entity.InfernoCloud;
 import net.pnovaczek.spellgems.entity.PlagueCloud;
 import net.pnovaczek.spellgems.entity.RootCloud;
+import net.pnovaczek.spellgems.entity.VampiricMistCloud;
 import net.pnovaczek.spellgems.spell.AbstractSpell;
 import net.pnovaczek.spellgems.spell.SpellParticles;
 
@@ -281,6 +282,14 @@ public final class StrikeEffects {
                 (living, caster) -> living.hasEffect(MobEffects.WEAKNESS),
                 (level, pos, caster) -> new RootCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster),
                 SoundEvents.ROOTED_DIRT_BREAK
+        ));
+        register(StrikeEnchantments.VAMPIRIC_MIST, conditionalCloud(
+                0x8B0000,
+                ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, 0xFF8B0000),
+                0.35D,
+                (living, caster) -> living.hasEffect(MobEffects.WEAKNESS),
+                (level, pos, caster) -> new VampiricMistCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster),
+                SoundEvents.PHANTOM_BITE
         ));
 
         register(StrikeEnchantments.LIGHTNING, new StrikeEffect() {

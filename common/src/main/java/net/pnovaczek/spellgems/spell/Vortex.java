@@ -12,6 +12,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.SpellgemsConfig;
+import net.pnovaczek.spellgems.item.GreaterSpellGems;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
 import org.jspecify.annotations.Nullable;
@@ -32,7 +33,9 @@ public class Vortex extends AbstractSpell {
     @Override
     protected boolean performCast(SpellContext context) {
         var config = Spellgems.CONFIG.spells.vortex;
-        Vec3 center = SpellTargeting.resolveCastCenter(context, config.maxDistance);
+        Vec3 center = context.source().usesFixedOrigin()
+                ? context.origin()
+                : SpellTargeting.resolveCastCenter(context, config.maxDistance);
 
         boolean hasExpand = false;
         boolean isBurst = false;
@@ -69,7 +72,7 @@ public class Vortex extends AbstractSpell {
         } else if (level instanceof ServerLevel serverLevel) {
             applyVortexPull(context, serverLevel, center, hasExpand);
             // Always broadcast from server. Skip caster if they already predicted.
-            spawnSphereParticles(context, center, hasExpand, SpellParticles.predictionExcept(caster));
+            spawnSphereParticles(context, center, hasExpand, SpellParticles.predictionExcept(context));
         }
     }
 
@@ -98,6 +101,7 @@ public class Vortex extends AbstractSpell {
                 for (StrikeEnchantment strike : strikes) {
                     strike.applyTo(living, strikeSource);
                 }
+                GreaterSpellGems.onDirectHit(context, living);
             }
         }
 

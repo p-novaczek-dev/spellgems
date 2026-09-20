@@ -16,7 +16,8 @@ import org.jspecify.annotations.Nullable;
  *       (wand, hand, dispenser, etc.).</li>
  *   <li><b>Client</b> prediction ({@link Spell#castPredicted}) may also spawn local
  *       particles for low latency; pass the caster as {@code exceptViewer} on the
- *       server so the caster is not double-rendered.</li>
+ *       server so the caster is not double-rendered. Sources without prediction
+ *       (dispenser, socketed weapon) broadcast to the caster as well.</li>
  *   <li>Dispenser and other null-caster casts broadcast to everyone.</li>
  * </ul>
  * {@link Level#addParticle} is client-only; server uses {@link ServerLevel#sendParticles}.
@@ -99,9 +100,12 @@ public final class SpellParticles {
 
     /**
      * Viewer to exclude from server broadcasts when the caster already has predicted FX.
-     * Null for dispenser / non-player / no prediction.
+     * Null when there is no prediction (dispenser, socketed weapon, non-player).
      */
-    public static @Nullable Entity predictionExcept(@Nullable Entity caster) {
-        return caster instanceof ServerPlayer ? caster : null;
+    public static @Nullable Entity predictionExcept(SpellContext context) {
+        if (!context.source().hasClientPrediction()) {
+            return null;
+        }
+        return context.caster() instanceof ServerPlayer ? context.caster() : null;
     }
 }

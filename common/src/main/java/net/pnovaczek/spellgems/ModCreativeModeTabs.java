@@ -8,6 +8,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.pnovaczek.spellgems.item.GreaterSpellGems;
 import net.pnovaczek.spellgems.platform.Platform;
 import net.pnovaczek.spellgems.registry.ModRegistry;
 import net.pnovaczek.spellgems.wand.WandDepletion;
@@ -36,6 +37,7 @@ public class ModCreativeModeTabs {
                             output.accept(ModBlocks.MANA_INFUSER);
                             output.accept(ModBlocks.SPELL_ENCHANTING_TABLE);
                             output.accept(ModBlocks.SPELL_DISPENSER);
+                            output.accept(ModBlocks.GEM_FORGE);
                             output.accept(ModItems.MANA_ROOT);
                             output.accept(ModItems.MANA_ESSENCE);
                             output.accept(ModItems.SHIMMERSTEEL_INGOT);
@@ -56,6 +58,7 @@ public class ModCreativeModeTabs {
                             output.accept(ModItems.SPELL_GEM_PROJECTILE);
                             output.accept(ModItems.SPELL_GEM_NOVA);
                             output.accept(ModItems.SPELL_GEM_VORTEX);
+                            GreaterSpellGems.allCombinationStacks().forEach(output::accept);
                             output.accept(ModItems.SPELL_GEM_BLINK);
                             output.accept(ModItems.SPELL_GEM_MAGNET);
                             output.accept(ModItems.SPELL_GEM_PLACE_BLOCK);

@@ -132,6 +132,9 @@ public class SpellDispenserBlockEntity extends BlockEntity implements WorldlyCon
         spell.cast(context);
 
         int cd = Spellgems.CONFIG.getDispenserCooldownTicks(spell.id());
+        if (gemData.followUp().isPresent()) {
+            cd += Spellgems.CONFIG.getDispenserCooldownTicks(gemData.followUp().get().spellId());
+        }
         cooldownMax = Math.max(0, cd);
         cooldownRemaining = cooldownMax;
 
@@ -234,7 +237,9 @@ public class SpellDispenserBlockEntity extends BlockEntity implements WorldlyCon
 
     public static boolean isSpellGem(ItemStack stack) {
         return !stack.isEmpty()
-                && (stack.is(ModTags.COMBAT_SPELL_GEMS) || stack.is(ModTags.UTILITY_SPELL_GEMS));
+                && (stack.is(ModTags.COMBAT_SPELL_GEMS)
+                || stack.is(ModTags.UTILITY_SPELL_GEMS)
+                || stack.is(ModTags.GREATER_SPELL_GEMS));
     }
 
     private void syncData() {

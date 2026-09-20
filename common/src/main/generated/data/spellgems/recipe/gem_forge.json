@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": "minecraft:cobblestone",
+    "S": "spellgems:shimmersteel_ingot"
+  },
+  "pattern": [
+    "SS",
+    "CC",
+    "CC"
+  ],
+  "result": {
+    "id": "spellgems:gem_forge"
+  }
+}

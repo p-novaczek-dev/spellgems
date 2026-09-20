@@ -1,6 +1,7 @@
 package net.pnovaczek.spellgems;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.pnovaczek.spellgems.recipe.GemForgeRecipe;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.registry.ModRegistry;
@@ -26,6 +27,11 @@ public class ModRecipeTypes {
                 "spell_enchanting",
                 SpellEnchantingRecipe.TYPE
         );
+        ModRegistry.register(
+                BuiltInRegistries.RECIPE_TYPE,
+                "gem_forging",
+                GemForgeRecipe.TYPE
+        );
     }
 
     public static void registerSerializers() {
@@ -38,6 +44,11 @@ public class ModRecipeTypes {
                 BuiltInRegistries.RECIPE_SERIALIZER,
                 "spell_enchanting",
                 SpellEnchantingRecipe.SERIALIZER
+        );
+        ModRegistry.register(
+                BuiltInRegistries.RECIPE_SERIALIZER,
+                "gem_forging",
+                GemForgeRecipe.SERIALIZER
         );
     }
 }

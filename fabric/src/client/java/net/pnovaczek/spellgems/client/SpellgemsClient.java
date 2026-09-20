@@ -8,6 +8,7 @@ import net.pnovaczek.spellgems.ModMenuTypes;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.client.renderer.item.properties.numeric.AstralBowPull;
 import net.pnovaczek.spellgems.client.screen.AstralBowScreen;
+import net.pnovaczek.spellgems.client.screen.GemForgeScreen;
 import net.pnovaczek.spellgems.client.screen.ManaInfuserScreen;
 import net.pnovaczek.spellgems.client.screen.SpellDispenserScreen;
 import net.pnovaczek.spellgems.client.screen.SpellEnchantingScreen;
@@ -35,6 +36,7 @@ public class SpellgemsClient implements ClientModInitializer {
 		MenuScreens.register(ModMenuTypes.SPELL_DISPENSER, SpellDispenserScreen::new);
 		MenuScreens.register(ModMenuTypes.WAND, WandScreen::new);
 		MenuScreens.register(ModMenuTypes.ASTRAL_BOW, AstralBowScreen::new);
+		MenuScreens.register(ModMenuTypes.GEM_FORGE, GemForgeScreen::new);
 
 		SpellgemsClientBootstrap.registerEntityRenderers();
 		SpellgemsClientBootstrap.initializeClient();

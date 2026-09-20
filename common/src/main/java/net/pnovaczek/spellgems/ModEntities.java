@@ -11,6 +11,7 @@ import net.pnovaczek.spellgems.entity.InfernoCloud;
 import net.pnovaczek.spellgems.entity.PlagueCloud;
 import net.pnovaczek.spellgems.entity.RootCloud;
 import net.pnovaczek.spellgems.entity.SpellProjectile;
+import net.pnovaczek.spellgems.entity.VampiricMistCloud;
 import net.pnovaczek.spellgems.registry.ModRegistry;
 
 /**
@@ -24,6 +25,7 @@ public class ModEntities {
     public static EntityType<FrostbiteCloud> FROSTBITE_CLOUD;
     public static EntityType<PlagueCloud> PLAGUE_CLOUD;
     public static EntityType<RootCloud> ROOT_CLOUD;
+    public static EntityType<VampiricMistCloud> VAMPIRIC_MIST_CLOUD;
 
     private ModEntities() {
     }
@@ -91,6 +93,17 @@ public class ModEntities {
                 "root_cloud",
                 EntityType.Builder.<RootCloud>of(
                                 (entityType, level) -> new RootCloud(entityType, level),
+                                MobCategory.MISC
+                        )
+                        .sized(0.5F, 0.5F)
+                        .clientTrackingRange(10)
+                        .updateInterval(20)
+        );
+
+        VAMPIRIC_MIST_CLOUD = register(
+                "vampiric_mist_cloud",
+                EntityType.Builder.<VampiricMistCloud>of(
+                                (entityType, level) -> new VampiricMistCloud(entityType, level),
                                 MobCategory.MISC
                         )
                         .sized(0.5F, 0.5F)

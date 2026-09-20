@@ -20,11 +20,13 @@
   "item.spellgems.spell_gem_feed": "Spell Gem",
   "item.spellgems.spell_gem_grow": "Spell Gem",
   "item.spellgems.spell_gem_potion": "Spell Gem",
+  "item.spellgems.greater_spell_gem": "Greater Spell Gem",
   "item.spellgems.spell_tome": "Spell Tome",
 
   "block.spellgems.mana_infuser": "Mana Infuser",
   "block.spellgems.spell_enchanting_table": "Spell Enchanting Table",
   "block.spellgems.spell_dispenser": "Spell Dispenser",
+  "block.spellgems.gem_forge": "Gem Forge",
   "block.spellgems.mana_root": "Mana Root",
 
   "tooltip.spellgems.spell_dispenser.cooldown": "Cooldown: %s",
@@ -47,8 +49,9 @@
   "tooltip.spellgems.equipped_gems.empty": "No spell gems equipped",
   "tooltip.spellgems.spell_gem.wand_cost": "%s Wand cost",
   "tooltip.spellgems.spell_gem.dispenser_cooldown": "%s Dispenser cooldown",
+  "tooltip.spellgems.spell_gem.damage": "%s Damage",
   "tooltip.spellgems.error": "ERROR",
-  "tooltip.spellgems.spell_tome.description": "Can be applied to spell gems in an anvil",
+  "tooltip.spellgems.spell_tome.description": "Can be applied to spell gems in a Gem Forge",
   "tooltip.spellgems.wand.depleted": "Cannot cast spells while depleted",
   "tooltip.spellgems.wand.repair": "Repair with Shimmersteel in an anvil, or use Mending / Recharge",
   "tooltip.spellgems.wand.configure": "Shift + Right-click to configure spells",
@@ -122,6 +125,8 @@
   "tooltip.spellgems.spell_enchantment.judgement.description": "Heavy extra damage to glowing targets; weakens nearby enemies",
   "tooltip.spellgems.spell_enchantment.root.name": "Root",
   "tooltip.spellgems.spell_enchantment.root.description": "Roots and withers weakened targets in an area",
+  "tooltip.spellgems.spell_enchantment.vampiric_mist.name": "Vampiric Mist",
+  "tooltip.spellgems.spell_enchantment.vampiric_mist.description": "Creates vampiric AoE (heal for every target taking damage) on weakened targets",
   "tooltip.spellgems.spell_enchantment.inferno.name": "Inferno",
   "tooltip.spellgems.spell_enchantment.inferno.description": "Creates fiery AoE (burn, wither, slow) on burning/withered targets",
   "tooltip.spellgems.spell_enchantment.frostbite.name": "Frostbite",
@@ -167,5 +172,8 @@
   "container.spellgems.spell_enchanting.level_cost": "Costs %s levels",
   "container.spellgems.spell_enchanting.xp_cost": "Costs %s XP",
   "container.spellgems.spell_enchanting.catalyst": "%s %s",
-  "container.spellgems.spell_enchanting.catalyst.any_potion": "%s Potion"
+  "container.spellgems.spell_enchanting.catalyst.any_potion": "%s Potion",
+
+  "container.spellgems.gem_forge": "Gem Forge",
+  "container.spellgems.gem_forge.level_cost": "Level Cost: %s"
 }

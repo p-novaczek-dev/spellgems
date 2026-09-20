@@ -51,7 +51,7 @@ public class Magnet extends AbstractSpell {
         }
 
         // Always broadcast from server (multiplayer + dispenser). Skip caster if they predicted.
-        spawnParticles(level, pullTarget, SpellParticles.predictionExcept(context.caster()));
+        spawnParticles(level, pullTarget, SpellParticles.predictionExcept(context));
 
         AABB searchBox = new AABB(pullTarget, pullTarget).inflate(range);
         double rangeSqr = range * range;

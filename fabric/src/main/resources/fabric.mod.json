@@ -29,7 +29,6 @@
 	},
 	"mixins": [
 		"spellgems.mixins.json",
-		"spellgems.fabric.mixins.json",
 		{
 			"config": "spellgems.client.mixins.json",
 			"environment": "client"

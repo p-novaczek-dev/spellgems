@@ -1,8 +1,6 @@
-package net.pnovaczek.spellgems.anvil;
+package net.pnovaczek.spellgems.item;
 
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
 import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModTags;
@@ -19,24 +17,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public final class SpellTomeAnvilHandler {
+/**
+ * Applies a spell tome's enchantment onto a spell gem.
+ * Slot order does not matter.
+ */
+public final class SpellTomeApplier {
 
-    public static final int XP_COST = 2;
-
-    private SpellTomeAnvilHandler() {
+    private SpellTomeApplier() {
     }
 
-    public record CombineResult(ItemStack result, int xpCost) {
-    }
-
-    public enum EnchantmentType {
+    private enum EnchantmentType {
         MODIFIER,
         STRIKE,
         UTILITY,
         UNKNOWN
     }
 
-    public static Optional<CombineResult> tryCombine(ItemStack gemStack, ItemStack tomeStack) {
+    public static Optional<ItemStack> tryApply(ItemStack first, ItemStack second) {
+        Optional<ItemStack> result = apply(first, second);
+        if (result.isPresent()) {
+            return result;
+        }
+        return apply(second, first);
+    }
+
+    private static Optional<ItemStack> apply(ItemStack gemStack, ItemStack tomeStack) {
         if (gemStack.isEmpty() || tomeStack.isEmpty()) {
             return Optional.empty();
         }
@@ -68,14 +73,10 @@ public final class SpellTomeAnvilHandler {
         SpellGemData newData = applyEnchantment(gemData, enchantmentId, type);
         ItemStack result = gemStack.copy();
         result.set(ModComponents.SPELL_GEM_DATA, newData);
-
-        int repairCost = gemStack.getOrDefault(DataComponents.REPAIR_COST, 0);
-        result.set(DataComponents.REPAIR_COST, AnvilMenu.calculateIncreasedRepairCost(repairCost));
-
-        return Optional.of(new CombineResult(result, XP_COST));
+        return Optional.of(result);
     }
 
-    public static EnchantmentType getEnchantmentType(Identifier enchantmentId) {
+    private static EnchantmentType getEnchantmentType(Identifier enchantmentId) {
         if (ModifierEnchantments.getAll().contains(enchantmentId)) {
             return EnchantmentType.MODIFIER;
         }
@@ -101,15 +102,12 @@ public final class SpellTomeAnvilHandler {
             EnchantmentType type
     ) {
         return switch (type) {
-            case MODIFIER -> !gemData.modifierEffects().isEmpty()
-                    ? false
-                    : ModifierEnchantments.getCompatible(gemData.spellId()).contains(enchantmentId);
-            case STRIKE -> !gemData.strikeEffects().isEmpty()
-                    ? false
-                    : gemStack.is(ModTags.COMBAT_SPELL_GEMS);
-            case UTILITY -> !gemData.utilityEffects().isEmpty()
-                    ? false
-                    : gemStack.is(ModTags.UTILITY_SPELL_GEMS);
+            case MODIFIER -> gemData.modifierEffects().isEmpty()
+                    && ModifierEnchantments.getCompatible(gemData.spellId()).contains(enchantmentId);
+            case STRIKE -> gemData.strikeEffects().isEmpty()
+                    && gemStack.is(ModTags.COMBAT_SPELL_GEMS);
+            case UTILITY -> gemData.utilityEffects().isEmpty()
+                    && gemStack.is(ModTags.UTILITY_SPELL_GEMS);
             case UNKNOWN -> false;
         };
     }

@@ -46,7 +46,7 @@ public class SpellGemItem extends Item {
     public @NonNull Component getName(@NonNull ItemStack stack) {
         MutableComponent name = super.getName(stack).copy();
         var data = getSpellData(stack);
-        if (data != null && data.isEnchanted()) {
+        if (data != null && data.isEnchanted() && data.followUp().isEmpty()) {
             name.withStyle(ChatFormatting.AQUA);
         }
         return name;

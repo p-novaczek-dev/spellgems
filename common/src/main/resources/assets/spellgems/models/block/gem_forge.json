@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "spellgems:block/gem_forge_top",
+    "bottom": "spellgems:block/gem_forge_bottom",
+    "side": "spellgems:block/gem_forge_side"
+  }
+}

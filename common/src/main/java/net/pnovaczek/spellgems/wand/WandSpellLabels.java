@@ -41,8 +41,22 @@ public final class WandSpellLabels {
                     .withStyle(ChatFormatting.GRAY));
         }
 
+        appendSpellPart(line, data);
+        data.followUp().ifPresent(follow -> {
+            line.append(Component.literal(" + ").withStyle(ChatFormatting.GRAY));
+            appendSpellPart(line, follow);
+        });
+
+        return line;
+    }
+
+    private static void appendSpellPart(MutableComponent line, SpellGemData data) {
+        Spell spell = ModSpells.get(data.spellId());
+        if (spell == null) {
+            return;
+        }
         line.append(Component.translatable(spell.tooltipNameKey())
-                .withStyle(data.isEnchanted() ? ChatFormatting.AQUA : ChatFormatting.YELLOW));
+                .withStyle(data.enchantmentCount() > 0 ? ChatFormatting.AQUA : ChatFormatting.YELLOW));
 
         List<Component> enchantments = collectEnchantmentNames(data);
         if (!enchantments.isEmpty()) {
@@ -55,8 +69,6 @@ public final class WandSpellLabels {
             }
             line.append(Component.literal("]").withStyle(ChatFormatting.GRAY));
         }
-
-        return line;
     }
 
     private static List<Component> collectEnchantmentNames(SpellGemData data) {
