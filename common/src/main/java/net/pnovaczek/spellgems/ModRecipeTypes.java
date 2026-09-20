@@ -4,6 +4,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.pnovaczek.spellgems.recipe.GemForgeRecipe;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
+import net.pnovaczek.spellgems.recipe.TransmuteRecipe;
 import net.pnovaczek.spellgems.registry.ModRegistry;
 
 public class ModRecipeTypes {
@@ -32,6 +33,11 @@ public class ModRecipeTypes {
                 "gem_forging",
                 GemForgeRecipe.TYPE
         );
+        ModRegistry.register(
+                BuiltInRegistries.RECIPE_TYPE,
+                "transmuting",
+                TransmuteRecipe.TYPE
+        );
     }
 
     public static void registerSerializers() {
@@ -49,6 +55,11 @@ public class ModRecipeTypes {
                 BuiltInRegistries.RECIPE_SERIALIZER,
                 "gem_forging",
                 GemForgeRecipe.SERIALIZER
+        );
+        ModRegistry.register(
+                BuiltInRegistries.RECIPE_SERIALIZER,
+                "transmuting",
+                TransmuteRecipe.SERIALIZER
         );
     }
 }

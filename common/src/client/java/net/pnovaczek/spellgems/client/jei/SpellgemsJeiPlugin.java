@@ -18,9 +18,11 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.pnovaczek.spellgems.ModBlocks;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.platform.client.ClientPlatform;
+import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.recipe.GemForgeRecipe;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
+import net.pnovaczek.spellgems.recipe.TransmuteRecipe;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantments;
 import org.jspecify.annotations.Nullable;
 
@@ -45,6 +47,7 @@ public class SpellgemsJeiPlugin implements IModPlugin {
     private static boolean manaRecipesInJei;
     private static boolean enchantingRecipesInJei;
     private static boolean gemForgeRecipesInJei;
+    private static boolean transmuteRecipesInJei;
     private static boolean syncListenerRegistered;
 
     @Override
@@ -75,7 +78,8 @@ public class SpellgemsJeiPlugin implements IModPlugin {
         registration.addRecipeCategories(
                 new ManaInfuserRecipeCategory(guiHelper),
                 new SpellEnchantingRecipeCategory(guiHelper, potionCatalysts),
-                new GemForgeRecipeCategory(guiHelper)
+                new GemForgeRecipeCategory(guiHelper),
+                new TransmuteRecipeCategory(guiHelper)
         );
     }
 
@@ -100,6 +104,12 @@ public class SpellgemsJeiPlugin implements IModPlugin {
             registration.addRecipes(GemForgeRecipeCategory.TYPE, gemForgeRecipes);
             gemForgeRecipesInJei = true;
         }
+
+        List<RecipeHolder<TransmuteRecipe>> transmuteRecipes = collectRecipes(TransmuteRecipe.TYPE);
+        if (!transmuteRecipes.isEmpty()) {
+            registration.addRecipes(TransmuteRecipeCategory.TYPE, transmuteRecipes);
+            transmuteRecipesInJei = true;
+        }
     }
 
     @Override
@@ -117,6 +127,10 @@ public class SpellgemsJeiPlugin implements IModPlugin {
                 new ItemStack(ModBlocks.GEM_FORGE),
                 GemForgeRecipeCategory.TYPE
         );
+        registration.addRecipeCatalyst(
+                new ItemStack(ModItems.SPELL_GEM_TRANSMUTE),
+                TransmuteRecipeCategory.TYPE
+        );
     }
 
     @Override
@@ -132,6 +146,7 @@ public class SpellgemsJeiPlugin implements IModPlugin {
         manaRecipesInJei = false;
         enchantingRecipesInJei = false;
         gemForgeRecipesInJei = false;
+        transmuteRecipesInJei = false;
     }
 
     private static void ensureSyncListener() {
@@ -174,6 +189,14 @@ public class SpellgemsJeiPlugin implements IModPlugin {
             if (!gemForgeRecipes.isEmpty()) {
                 recipeManager.addRecipes(GemForgeRecipeCategory.TYPE, gemForgeRecipes);
                 gemForgeRecipesInJei = true;
+            }
+        }
+
+        if (!transmuteRecipesInJei) {
+            List<RecipeHolder<TransmuteRecipe>> transmuteRecipes = collectRecipes(TransmuteRecipe.TYPE);
+            if (!transmuteRecipes.isEmpty()) {
+                recipeManager.addRecipes(TransmuteRecipeCategory.TYPE, transmuteRecipes);
+                transmuteRecipesInJei = true;
             }
         }
     }

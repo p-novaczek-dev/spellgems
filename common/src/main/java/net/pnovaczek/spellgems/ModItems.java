@@ -50,6 +50,7 @@ public class ModItems {
     public static SpellGemItem SPELL_GEM_FEED;
     public static SpellGemItem SPELL_GEM_GROW;
     public static SpellGemItem SPELL_GEM_POTION;
+    public static SpellGemItem SPELL_GEM_TRANSMUTE;
     public static SpellGemItem GREATER_SPELL_GEM;
 
     public static SpellTomeItem SPELL_TOME;
@@ -109,6 +110,7 @@ public class ModItems {
         SPELL_GEM_FEED = spellGem("spell_gem_feed", SpellIds.FEED);
         SPELL_GEM_GROW = spellGem("spell_gem_grow", SpellIds.GROW);
         SPELL_GEM_POTION = spellGem("spell_gem_potion", SpellIds.POTION);
+        SPELL_GEM_TRANSMUTE = spellGem("spell_gem_transmute", SpellIds.TRANSMUTE);
         GREATER_SPELL_GEM = register(
                 "greater_spell_gem",
                 SpellGemItem::new,

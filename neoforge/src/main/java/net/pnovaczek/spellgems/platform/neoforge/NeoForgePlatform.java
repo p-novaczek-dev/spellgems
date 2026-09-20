@@ -8,6 +8,7 @@ import net.pnovaczek.spellgems.platform.Platform;
 import net.pnovaczek.spellgems.recipe.GemForgeRecipe;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
+import net.pnovaczek.spellgems.recipe.TransmuteRecipe;
 import net.pnovaczek.spellgems.registry.ModRegistries;
 
 /**
@@ -44,6 +45,6 @@ public final class NeoForgePlatform {
     }
 
     private static void onDatapackSync(OnDatapackSyncEvent event) {
-        event.sendRecipes(ManaInfuserRecipe.TYPE, SpellEnchantingRecipe.TYPE, GemForgeRecipe.TYPE);
+        event.sendRecipes(ManaInfuserRecipe.TYPE, SpellEnchantingRecipe.TYPE, GemForgeRecipe.TYPE, TransmuteRecipe.TYPE);
     }
 }

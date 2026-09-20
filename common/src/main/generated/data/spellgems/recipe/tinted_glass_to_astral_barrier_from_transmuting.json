@@ -1,0 +1,7 @@
+{
+  "type": "spellgems:transmuting",
+  "ingredient": "minecraft:tinted_glass",
+  "result": {
+    "id": "spellgems:astral_barrier"
+  }
+}

@@ -72,6 +72,7 @@ public class SpellgemsConfig {
         public SpellConfig breakBlock = new SpellConfig();
         public SpellConfig harvest = new SpellConfig();
         public SpellConfig plant = new SpellConfig();
+        public SpellConfig transmute = new SpellConfig();
 
         public SpellConfigs() {
             // Provide the canonical default wand durability costs here.
@@ -83,7 +84,8 @@ public class SpellgemsConfig {
             placeBlock.wandDurabilityCost = 0;
             magnet.wandDurabilityCost = 0;
             potion.wandDurabilityCost = 128;
-            // All others default to 1.
+            transmute.wandDurabilityCost = 4;
+            transmute.dispenserCooldownTicks = 1;
         }
 
         /** Returns a spell-specific config by ID (for more uniform access). */
@@ -100,6 +102,7 @@ public class SpellgemsConfig {
             if (spellId.equals(SpellIds.BREAK_BLOCK)) return breakBlock;
             if (spellId.equals(SpellIds.HARVEST)) return harvest;
             if (spellId.equals(SpellIds.PLANT)) return plant;
+            if (spellId.equals(SpellIds.TRANSMUTE)) return transmute;
 
             // Unknown spell: return a fresh default (cost=1)
             return new SpellConfig();
@@ -118,6 +121,7 @@ public class SpellgemsConfig {
             if (breakBlock != null) breakBlock.validate();
             if (harvest != null) harvest.validate();
             if (plant != null) plant.validate();
+            if (transmute != null) transmute.validate();
         }
     }
 

@@ -42,5 +42,6 @@ public final class ModSpells {
         register(SpellIds.FEED, new Feed());
         register(SpellIds.GROW, new Grow());
         register(SpellIds.POTION, new PotionSpell());
+        register(SpellIds.TRANSMUTE, new Transmute());
     }
 }

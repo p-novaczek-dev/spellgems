@@ -69,6 +69,7 @@ public class ModCreativeModeTabs {
                             output.accept(ModItems.SPELL_GEM_FEED);
                             output.accept(ModItems.SPELL_GEM_GROW);
                             output.accept(ModItems.SPELL_GEM_POTION);
+                            output.accept(ModItems.SPELL_GEM_TRANSMUTE);
                         })
                         .build()
         );

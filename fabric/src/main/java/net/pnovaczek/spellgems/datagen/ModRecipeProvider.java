@@ -23,6 +23,7 @@ import net.pnovaczek.spellgems.recipe.GemForgeRecipeBuilder;
 import net.pnovaczek.spellgems.recipe.ManaInfuserRecipeBuilder;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipeBuilder;
+import net.pnovaczek.spellgems.recipe.TransmuteRecipeBuilder;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -162,6 +163,15 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .requires(Items.GLASS_BOTTLE)
                         .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
                         .save(exporter, "spell_gem_potion");
+
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_TRANSMUTE)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.AMETHYST_SHARD)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
+                TransmuteRecipeBuilder.create(Ingredient.of(Blocks.TINTED_GLASS), ModBlocks.ASTRAL_BARRIER)
+                        .save(exporter, "tinted_glass_to_astral_barrier");
 
                 // Wand: 1 stick + 1 shimmersteel (shimmersteel above stick)
                 shaped(RecipeCategory.TOOLS, ModItems.WAND)

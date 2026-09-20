@@ -20,6 +20,7 @@
   "item.spellgems.spell_gem_feed": "Spell Gem",
   "item.spellgems.spell_gem_grow": "Spell Gem",
   "item.spellgems.spell_gem_potion": "Spell Gem",
+  "item.spellgems.spell_gem_transmute": "Spell Gem",
   "item.spellgems.greater_spell_gem": "Greater Spell Gem",
   "item.spellgems.spell_tome": "Spell Tome",
 
@@ -90,6 +91,8 @@
   "tooltip.spellgems.spell.grow.description": "Applies bone meal effect to crops in a 9×9 area using bone meal from the player's hotbar",
   "tooltip.spellgems.spell.potion.name": "Potion",
   "tooltip.spellgems.spell.potion.description": "Can be enchanted with any potion",
+  "tooltip.spellgems.spell.transmute.name": "Transmute",
+  "tooltip.spellgems.spell.transmute.description": "Changes blocks into other blocks",
   "tooltip.spellgems.spell_gem_potion.astral_bow": "Can be used in an Astral Bow for a tipped arrow effect",
 
   "tooltip.spellgems.spell_enchantment.chaining.name": "Chaining",

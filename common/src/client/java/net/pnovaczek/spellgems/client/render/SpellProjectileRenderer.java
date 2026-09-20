@@ -17,7 +17,10 @@ public class SpellProjectileRenderer extends EntityRenderer<SpellProjectile, Spe
 
     private static final Identifier TEXTURE =
             Identifier.fromNamespaceAndPath("spellgems", "textures/entity/projectiles/spell_projectile.png");
+    private static final Identifier TRANSMUTE_TEXTURE =
+            Identifier.fromNamespaceAndPath("spellgems", "textures/entity/projectiles/spell_transmute.png");
     private static final RenderType RENDER_TYPE = RenderTypes.entityCutout(TEXTURE);
+    private static final RenderType TRANSMUTE_RENDER_TYPE = RenderTypes.entityCutout(TRANSMUTE_TEXTURE);
 
     public SpellProjectileRenderer(final Context context) {
         super(context);
@@ -34,6 +37,7 @@ public class SpellProjectileRenderer extends EntityRenderer<SpellProjectile, Spe
     public void extractRenderState(SpellProjectile entity, SpellProjectileRenderState state, float partialTick) {
         super.extractRenderState(entity, state, partialTick);
         state.tintColor = entity.getTintColor();
+        state.transmute = entity.isTransmuteProjectile();
     }
 
     @Override
@@ -54,7 +58,8 @@ public class SpellProjectileRenderer extends EntityRenderer<SpellProjectile, Spe
 
         // Tint is stored as RGB; vertex color is ARGB. Alpha 0 is discarded by shader packs.
         int tint = 0xFF000000 | (state.tintColor & 0xFFFFFF);
-        submitNodeCollector.submitCustomGeometry(poseStack, RENDER_TYPE, (pose, buffer) -> {
+        RenderType renderType = state.transmute ? TRANSMUTE_RENDER_TYPE : RENDER_TYPE;
+        submitNodeCollector.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> {
             vertex(buffer, pose, state.lightCoords, tint, -0.5F, -0.5F, 0.0F, 1.0F);
             vertex(buffer, pose, state.lightCoords, tint, 0.5F, -0.5F, 1.0F, 1.0F);
             vertex(buffer, pose, state.lightCoords, tint, 0.5F, 0.5F, 1.0F, 0.0F);

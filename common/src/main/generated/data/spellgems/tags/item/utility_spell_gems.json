@@ -8,6 +8,7 @@
     "spellgems:spell_gem_harvest",
     "spellgems:spell_gem_feed",
     "spellgems:spell_gem_grow",
-    "spellgems:spell_gem_potion"
+    "spellgems:spell_gem_potion",
+    "spellgems:spell_gem_transmute"
   ]
 }
