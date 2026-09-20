@@ -33,6 +33,7 @@ public class ModItems {
     public static BlockItem SPELL_ENCHANTING_TABLE;
     public static BlockItem SPELL_DISPENSER;
     public static BlockItem GEM_FORGE;
+    public static BlockItem ASTRAL_BARRIER;
 
     public static WandItem WAND;
     public static AstralBowItem ASTRAL_BOW;
@@ -73,6 +74,7 @@ public class ModItems {
         SPELL_ENCHANTING_TABLE = registerBlockItem("spell_enchanting_table", ModBlocks.SPELL_ENCHANTING_TABLE);
         SPELL_DISPENSER = registerBlockItem("spell_dispenser", ModBlocks.SPELL_DISPENSER);
         GEM_FORGE = registerBlockItem("gem_forge", ModBlocks.GEM_FORGE);
+        ASTRAL_BARRIER = registerBlockItem("astral_barrier", ModBlocks.ASTRAL_BARRIER);
 
         WAND = register(
                 "wand",

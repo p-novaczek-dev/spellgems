@@ -42,6 +42,8 @@ public class SpellgemsConfig {
     public int volleyArrowCount = 8;
     /** Delay in ticks before a greater gem's second spell fires on a direct hit. */
     public int greaterGemFollowUpDelayTicks = 10;
+    /** Max connected astral barrier blocks flipped by one redstone pulse. */
+    public int astralBarrierMaxCompoundSize = 256;
 
     public static class WandConfig {
         /** Multiplier applied to base durability cost for each spell enchantment on a gem. */
@@ -310,6 +312,7 @@ public class SpellgemsConfig {
         splitDepth = Math.max(1, splitDepth);
         volleyArrowCount = Math.max(1, volleyArrowCount);
         greaterGemFollowUpDelayTicks = Math.max(0, greaterGemFollowUpDelayTicks);
+        astralBarrierMaxCompoundSize = Math.max(1, astralBarrierMaxCompoundSize);
 
         if (wand != null) wand.validate();
         if (astralBow != null) astralBow.validate();

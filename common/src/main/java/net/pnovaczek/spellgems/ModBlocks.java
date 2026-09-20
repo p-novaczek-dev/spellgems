@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.pnovaczek.spellgems.block.AstralBarrierBlock;
 import net.pnovaczek.spellgems.block.GemForgeBlock;
 import net.pnovaczek.spellgems.block.ManaInfuserBlock;
 import net.pnovaczek.spellgems.block.ManaRootCropBlock;
@@ -27,6 +28,7 @@ public class ModBlocks {
     public static Block SPELL_ENCHANTING_TABLE;
     public static Block SPELL_DISPENSER;
     public static Block GEM_FORGE;
+    public static Block ASTRAL_BARRIER;
 
     private ModBlocks() {
     }
@@ -56,6 +58,13 @@ public class ModBlocks {
                 "gem_forge",
                 GemForgeBlock::new,
                 BlockBehaviour.Properties.ofFullCopy(Blocks.DISPENSER)
+        );
+        ASTRAL_BARRIER = register(
+                "astral_barrier",
+                AstralBarrierBlock::new,
+                BlockBehaviour.Properties.ofFullCopy(Blocks.TINTED_GLASS)
+                        .dynamicShape()
+                        .explosionResistance(3600000.8F)
         );
     }
 

@@ -38,6 +38,7 @@ public class ModCreativeModeTabs {
                             output.accept(ModBlocks.SPELL_ENCHANTING_TABLE);
                             output.accept(ModBlocks.SPELL_DISPENSER);
                             output.accept(ModBlocks.GEM_FORGE);
+                            output.accept(ModBlocks.ASTRAL_BARRIER);
                             output.accept(ModItems.MANA_ROOT);
                             output.accept(ModItems.MANA_ESSENCE);
                             output.accept(ModItems.SHIMMERSTEEL_INGOT);

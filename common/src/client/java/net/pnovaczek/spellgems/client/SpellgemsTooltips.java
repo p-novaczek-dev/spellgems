@@ -61,6 +61,11 @@ public class SpellgemsTooltips {
 
             LineAdder tooltip = new LineAdder();
 
+            if (stack.is(ModItems.ASTRAL_BARRIER)) {
+                tooltip.addLineHighlight("tooltip.spellgems.astral_barrier.wither_proof");
+                tooltip.addLineDetail("tooltip.spellgems.astral_barrier.description");
+            }
+
             if (stack.is(ModItems.WAND) || stack.is(ModItems.ASTRAL_BOW)) {
                 stripVanillaContainerLines(lines);
             }

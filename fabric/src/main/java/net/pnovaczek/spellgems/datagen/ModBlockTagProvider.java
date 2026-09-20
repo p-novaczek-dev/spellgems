@@ -20,5 +20,8 @@ public class ModBlockTagProvider extends FabricTagsProvider.BlockTagsProvider {
             .add(ModBlocks.SPELL_ENCHANTING_TABLE.properties().blockId())
             .add(ModBlocks.SPELL_DISPENSER.properties().blockId())
             .add(ModBlocks.GEM_FORGE.properties().blockId());
+
+        builder(BlockTags.WITHER_IMMUNE)
+            .add(ModBlocks.ASTRAL_BARRIER.properties().blockId());
     }
 }

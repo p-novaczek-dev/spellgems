@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "reversed=false,powered=false": {
+      "model": "spellgems:block/astral_barrier"
+    },
+    "reversed=false,powered=true": {
+      "model": "spellgems:block/astral_barrier"
+    },
+    "reversed=true,powered=false": {
+      "model": "spellgems:block/astral_barrier_reversed"
+    },
+    "reversed=true,powered=true": {
+      "model": "spellgems:block/astral_barrier_reversed"
+    }
+  }
+}

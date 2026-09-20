@@ -27,6 +27,7 @@
   "block.spellgems.spell_enchanting_table": "Spell Enchanting Table",
   "block.spellgems.spell_dispenser": "Spell Dispenser",
   "block.spellgems.gem_forge": "Gem Forge",
+  "block.spellgems.astral_barrier": "Astral Barrier",
   "block.spellgems.mana_root": "Mana Root",
 
   "tooltip.spellgems.spell_dispenser.cooldown": "Cooldown: %s",
@@ -46,6 +47,8 @@
   "key.category.spellgems.spellgems": "Spellgems",
 
   "tooltip.spellgems.shift_hint": "Hold Shift for details",
+  "tooltip.spellgems.astral_barrier.wither_proof": "Wither Proof",
+  "tooltip.spellgems.astral_barrier.description": "Permeable for players but not mobs; apply redstone pulse to reverse",
   "tooltip.spellgems.equipped_gems.empty": "No spell gems equipped",
   "tooltip.spellgems.spell_gem.wand_cost": "%s Wand cost",
   "tooltip.spellgems.spell_gem.dispenser_cooldown": "%s Dispenser cooldown",
