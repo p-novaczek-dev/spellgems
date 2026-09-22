@@ -1,7 +1,6 @@
 package net.pnovaczek.spellgems.spell.enchantment;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.Identifier;
@@ -31,6 +30,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.particle.ModParticles;
 import net.pnovaczek.spellgems.entity.AstralArrow;
 import net.pnovaczek.spellgems.entity.FrostbiteCloud;
 import net.pnovaczek.spellgems.entity.InfernoCloud;
@@ -72,18 +72,18 @@ public final class StrikeEffects {
     private static final Map<Identifier, StrikeEffect> BY_ID = new HashMap<>();
 
     static {
-        register(StrikeEnchantments.POISON, statusEffect(MobEffects.POISON, 0x339933, ParticleTypes.GLOW_SQUID_INK, 0.35D));
-        register(StrikeEnchantments.FLAME, ignite(0xFF5500, ParticleTypes.FLAME, 0.6D));
-        register(StrikeEnchantments.FROST, freeze(0x88DDFF, ParticleTypes.SNOWFLAKE, 0.4D));
-        register(StrikeEnchantments.SLOW, statusEffect(MobEffects.SLOWNESS, 0x5555FF, ParticleTypes.CLOUD, 0.3D));
-        register(StrikeEnchantments.LEVITATE, statusEffect(MobEffects.LEVITATION, 0xAA88FF, ParticleTypes.END_ROD, 0.25D));
+        register(StrikeEnchantments.POISON, statusEffect(MobEffects.POISON, 0x4E9331, ModParticles.tintedEffect(0x4E9331), 0.35D));
+        register(StrikeEnchantments.FLAME, ignite(0xFFDB0F, ModParticles.FLAME_MOTE, 0.6D));
+        register(StrikeEnchantments.FROST, freeze(0xFFFFFF, ModParticles.tintedSnowflake(0xFFFFFF), 0.4D));
+        register(StrikeEnchantments.SLOW, statusEffect(MobEffects.SLOWNESS, 0x8BAFE0, ModParticles.tintedEffect(0x8BAFE0), 0.3D));
+        register(StrikeEnchantments.LEVITATE, statusEffect(MobEffects.LEVITATION, 0xC3C7C1, ModParticles.GUST_MOTE, 0.25D));
         register(StrikeEnchantments.WEAKEN, statusEffect(
                 MobEffects.WEAKNESS,
                 0x484D48,
-                ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, 0xFF484D48),
+                ModParticles.tintedEffect(0x484D48),
                 0.35D
         ));
-        register(StrikeEnchantments.GLOW, statusEffect(MobEffects.GLOWING, 0x66FFFF, ParticleTypes.GLOW, 0.35D));
+        register(StrikeEnchantments.GLOW, statusEffect(MobEffects.GLOWING, 0x94A061, ModParticles.tintedSpark(0x94A061), 0.35D));
         register(StrikeEnchantments.SHATTER, new StrikeEffect() {
             private static final float FREEZE_RADIUS = 6.0F;
 
@@ -125,19 +125,19 @@ public final class StrikeEffects {
                 spawnNovaBurstParticles(
                         level,
                         pos.add(0.0, target.getBbHeight() * 0.5, 0.0),
-                        ParticleTypes.SNOWFLAKE,
+                        ModParticles.tintedSnowflake(0xD6F6FC),
                         null
                 );
             }
 
             @Override
             public int tintColor() {
-                return 0x66BBDD;
+                return 0xD6F6FC;
             }
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.SNOWFLAKE, 0.4D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ModParticles.tintedSnowflake(0xD6F6FC), 0.4D, x, y, z, random, dx, dy, dz);
             }
         });
         register(StrikeEnchantments.COMBUST, new StrikeEffect() {
@@ -181,19 +181,19 @@ public final class StrikeEffects {
                 spawnNovaBurstParticles(
                         level,
                         pos.add(0.0, target.getBbHeight() * 0.5, 0.0),
-                        ParticleTypes.FLAME,
+                        ModParticles.FLAME_MOTE,
                         null
                 );
             }
 
             @Override
             public int tintColor() {
-                return 0xCC3300;
+                return 0xD32A2A;
             }
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.FLAME, 0.6D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ModParticles.FLAME_MOTE, 0.6D, x, y, z, random, dx, dy, dz);
             }
         });
         register(StrikeEnchantments.JUDGEMENT, new StrikeEffect() {
@@ -227,7 +227,7 @@ public final class StrikeEffects {
                 spawnNovaBurstParticles(
                         level,
                         pos.add(0.0, target.getBbHeight() * 0.5, 0.0),
-                        ParticleTypes.ELECTRIC_SPARK,
+                        ModParticles.tintedSpark(0xFFFFE0),
                         null
                 );
                 level.playSound(
@@ -242,50 +242,50 @@ public final class StrikeEffects {
 
             @Override
             public int tintColor() {
-                return 0xFFEE88;
+                return 0xFFFFE0;
             }
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.ELECTRIC_SPARK, 0.3D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ModParticles.tintedSpark(0xFFFFE0), 0.3D, x, y, z, random, dx, dy, dz);
             }
         });
 
         register(StrikeEnchantments.INFERNO, conditionalCloud(
-                0xCC3300,
-                ParticleTypes.FLAME,
+                0xFF0F0C,
+                ModParticles.FLAME_MOTE,
                 0.6D,
                 (living, caster) -> living.getRemainingFireTicks() > 0 || living.hasEffect(MobEffects.WITHER),
                 (level, pos, caster) -> new InfernoCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster),
                 SoundEvents.FIRECHARGE_USE
         ));
         register(StrikeEnchantments.FROSTBITE, conditionalCloud(
-                0x66BBDD,
-                ParticleTypes.SNOWFLAKE,
+                0x87CEEB,
+                ModParticles.tintedSnowflake(0x87CEEB),
                 0.4D,
                 (living, caster) -> living.getTicksFrozen() > 0 || living.hasEffect(MobEffects.WITHER),
                 (level, pos, caster) -> new FrostbiteCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster),
                 SoundEvents.POWDER_SNOW_BREAK
         ));
         register(StrikeEnchantments.PLAGUE, conditionalCloud(
-                0x227722,
-                ParticleTypes.GLOW_SQUID_INK,
+                0x484D48,
+                ModParticles.INFEST_MOTE,
                 0.35D,
                 (living, caster) -> living.hasEffect(MobEffects.POISON) || living.hasEffect(MobEffects.WITHER),
                 (level, pos, caster) -> new PlagueCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster),
                 SoundEvents.WITHER_AMBIENT
         ));
         register(StrikeEnchantments.ROOT, conditionalCloud(
-                0x484D48,
-                ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, 0xFF484D48),
+                0x736156,
+                ModParticles.tintedEffect(0x736156),
                 0.35D,
                 (living, caster) -> living.hasEffect(MobEffects.WEAKNESS),
                 (level, pos, caster) -> new RootCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster),
                 SoundEvents.ROOTED_DIRT_BREAK
         ));
         register(StrikeEnchantments.VAMPIRIC_MIST, conditionalCloud(
-                0x8B0000,
-                ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, 0xFF8B0000),
+                0xDE4058,
+                ModParticles.RAID_OMEN_MOTE,
                 0.35D,
                 (living, caster) -> living.hasEffect(MobEffects.WEAKNESS),
                 (level, pos, caster) -> new VampiricMistCloud(level, pos.x(), pos.y() + 0.1F, pos.z(), caster),
@@ -316,12 +316,12 @@ public final class StrikeEffects {
 
             @Override
             public int tintColor() {
-                return 0xFFEE77;
+                return 0xFFFFFF;
             }
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.ELECTRIC_SPARK, 0.2D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ModParticles.tintedSpark(0xFFFFFF), 0.2D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -351,12 +351,12 @@ public final class StrikeEffects {
 
             @Override
             public int tintColor() {
-                return 0xFFAA00;
+                return 0x333333;
             }
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.SMOKE, 0.5D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ModParticles.tintedSnowflake(0x333333), 0.5D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -371,12 +371,12 @@ public final class StrikeEffects {
 
             @Override
             public int tintColor() {
-                return 0xCC2222;
+                return 0xDE4058;
             }
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.SCULK_SOUL, 0.3D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ModParticles.RAID_OMEN_MOTE, 0.3D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -399,12 +399,12 @@ public final class StrikeEffects {
 
             @Override
             public int tintColor() {
-                return 0xEEFFEE;
+                return 0x6AF6FB;
             }
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.SOUL_FIRE_FLAME, 0.3D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ModParticles.SOUL_FIRE_MOTE, 0.3D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -452,12 +452,12 @@ public final class StrikeEffects {
 
             @Override
             public int tintColor() {
-                return 0x77AAFF;
+                return 0x7777FF;
             }
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.CRIT, 0.3D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ModParticles.tintedCrit(0x7777FF), 0.3D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -476,12 +476,12 @@ public final class StrikeEffects {
 
             @Override
             public int tintColor() {
-                return 0xFF4444;
+                return 0xB22222;
             }
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.CRIT, 0.1D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ModParticles.tintedCrit(0xB22222), 0.1D, x, y, z, random, dx, dy, dz);
             }
         });
 
@@ -515,12 +515,12 @@ public final class StrikeEffects {
 
             @Override
             public int tintColor() {
-                return 0xC8E8FF;
+                return 0xC3C7C1;
             }
 
             @Override
             public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.SMALL_GUST, 0.4D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ModParticles.GUST_MOTE, 0.4D, x, y, z, random, dx, dy, dz);
             }
         });
     }
@@ -588,7 +588,7 @@ public final class StrikeEffects {
 
         @Override
         public void addParticle(Level level, @Nullable Entity exceptViewer, double x, double y, double z, RandomSource random, double dx, double dy, double dz) {
-                particles(level, exceptViewer, ParticleTypes.DUST_PLUME, 0.1D, x, y, z, random, dx, dy, dz);
+                particles(level, exceptViewer, ModParticles.DUST_PLUME_MOTE, 0.1D, x, y, z, random, dx, dy, dz);
         }
     };
 

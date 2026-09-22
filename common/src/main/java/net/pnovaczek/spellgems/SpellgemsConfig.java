@@ -239,8 +239,8 @@ public class SpellgemsConfig {
         public float pullDistance = 1.0F;
         public float pullStrength = 1.0F;
         public float expandRadiusMultiplier = 1.5F;
-        public int particleCount = 30;
-        public float particleSpeed = 0.3F;
+        public int particleCount = 60;
+        public float particleSpeed = 0.5F;
 
         public VortexSpellConfig() {
             damage = 0.0F;

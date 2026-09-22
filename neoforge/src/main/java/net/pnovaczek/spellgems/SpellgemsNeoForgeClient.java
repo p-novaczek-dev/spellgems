@@ -1,5 +1,11 @@
 package net.pnovaczek.spellgems;
 
+import java.util.function.Function;
+
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -7,8 +13,10 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyEvent;
 import net.pnovaczek.spellgems.client.SpellgemsClientBootstrap;
+import net.pnovaczek.spellgems.client.particle.SpellMoteParticleProviders;
 import net.pnovaczek.spellgems.client.renderer.item.properties.numeric.AstralBowPull;
 import net.pnovaczek.spellgems.client.screen.AstralBowScreen;
 import net.pnovaczek.spellgems.client.screen.GemForgeScreen;
@@ -32,6 +40,7 @@ public class SpellgemsNeoForgeClient {
         modBus.addListener(this::onRegisterMenus);
         modBus.addListener(this::onRegisterRangeSelect);
         modBus.addListener(this::onRegisterEntityRenderers);
+        modBus.addListener(this::onRegisterParticles);
 
         // Keys/tooltips/ticks only — not entity renderers (ModEntities still null here).
         SpellgemsClientBootstrap.initializeClient();
@@ -57,5 +66,17 @@ public class SpellgemsNeoForgeClient {
     private void onRegisterEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         // Entity types are registered by the time this event fires.
         SpellgemsClientBootstrap.registerEntityRenderers();
+    }
+
+    private void onRegisterParticles(RegisterParticleProvidersEvent event) {
+        SpellMoteParticleProviders.register(new SpellMoteParticleProviders.Registrar() {
+            @Override
+            public <T extends ParticleOptions> void register(
+                    ParticleType<T> type,
+                    Function<SpriteSet, ParticleProvider<T>> factory
+            ) {
+                event.registerSpriteSet(type, factory::apply);
+            }
+        });
     }
 }

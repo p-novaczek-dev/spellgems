@@ -13,6 +13,7 @@ import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.ModMenuTypes;
 import net.pnovaczek.spellgems.ModRecipeTypes;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.particle.ModParticles;
 import net.pnovaczek.spellgems.platform.Platform;
 
 import java.util.HashSet;
@@ -36,6 +37,7 @@ import java.util.Set;
  *   <li>{@link ModRecipeTypes} (types + serializers)</li>
  *   <li>{@link ModCreativeModeTabs}</li>
  *   <li>{@link ModEntityDataSerializers}</li>
+ *   <li>{@link ModParticles}</li>
  * </ol>
  */
 public final class ModRegistries {
@@ -63,6 +65,7 @@ public final class ModRegistries {
         registerOnce("recipe_serializer", ModRecipeTypes::registerSerializers);
         registerOnce("creative_mode_tab", ModCreativeModeTabs::register);
         registerOnce("entity_data_serializer", ModEntityDataSerializers::register);
+        registerOnce("particle_type", ModParticles::register);
         allRegistered = true;
     }
 
@@ -88,6 +91,8 @@ public final class ModRegistries {
             registerOnce("recipe_serializer", ModRecipeTypes::registerSerializers);
         } else if (registryKey.equals(Registries.CREATIVE_MODE_TAB)) {
             registerOnce("creative_mode_tab", ModCreativeModeTabs::register);
+        } else if (registryKey.equals(Registries.PARTICLE_TYPE)) {
+            registerOnce("particle_type", ModParticles::register);
         } else {
             var edsKey = Platform.registries().entityDataSerializerRegistryKey();
             if (edsKey != null && registryKey.equals(edsKey)) {
@@ -104,7 +109,8 @@ public final class ModRegistries {
                 && DONE.contains("recipe_type")
                 && DONE.contains("recipe_serializer")
                 && DONE.contains("creative_mode_tab")
-                && DONE.contains("entity_data_serializer")) {
+                && DONE.contains("entity_data_serializer")
+                && DONE.contains("particle_type")) {
             allRegistered = true;
         }
     }

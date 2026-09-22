@@ -9,11 +9,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.ModEntities;
 import net.pnovaczek.spellgems.ModEntityDataSerializers;
+import net.pnovaczek.spellgems.particle.ModParticles;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.spell.ProjectileHitHandler;
 import net.pnovaczek.spellgems.spell.SpellContext;
@@ -27,7 +27,7 @@ import java.util.UUID;
 
 public class SpellProjectile extends AbstractHurtingProjectile {
 
-    public static final int TRANSMUTE_TINT = 0xFFB6FF;
+    public static final int TRANSMUTE_TINT = 0xFFDAFF;
     private static final double COMBAT_SPEED = 1.8;
     private static final double TRANSMUTE_SPEED = 0.9;
     private static final double COMBAT_ACCELERATION = 0.06;
@@ -198,7 +198,7 @@ public class SpellProjectile extends AbstractHurtingProjectile {
         if (data == null) return;
 
         if (isTransmute(data)) {
-            this.level().addParticle(ParticleTypes.ELECTRIC_SPARK, getX(), getY(), getZ(),
+            this.level().addParticle(ModParticles.tintedSpark(TRANSMUTE_TINT), getX(), getY(), getZ(),
                     (random.nextDouble() - 0.5) * 0.2,
                     (random.nextDouble() - 0.5) * 0.2,
                     (random.nextDouble() - 0.5) * 0.2);
@@ -232,7 +232,7 @@ public class SpellProjectile extends AbstractHurtingProjectile {
         if (isTransmute(data)) {
             for (int i = 0; i < 12; i++) {
                 this.level().addParticle(
-                        ParticleTypes.ELECTRIC_SPARK,
+                        ModParticles.tintedSpark(TRANSMUTE_TINT),
                         getX(), getY(), getZ(),
                         (random.nextDouble() - 0.5) * 0.4,
                         (random.nextDouble() - 0.5) * 0.4,

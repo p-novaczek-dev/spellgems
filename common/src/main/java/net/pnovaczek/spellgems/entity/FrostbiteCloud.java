@@ -1,12 +1,12 @@
 package net.pnovaczek.spellgems.entity;
 
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.pnovaczek.spellgems.ModEntities;
+import net.pnovaczek.spellgems.particle.ModParticles;
 
 public class FrostbiteCloud extends SpellAreaEffectCloud {
 
@@ -18,7 +18,7 @@ public class FrostbiteCloud extends SpellAreaEffectCloud {
         super(entityType, level);
         this.setRadius(CLOUD_RADIUS);
         this.setDuration(CLOUD_DURATION);
-        this.setCustomParticle(ParticleTypes.SNOWFLAKE);
+        this.setCustomParticle(ModParticles.tintedSnowflake(0x87CEEB));
     }
 
     /**

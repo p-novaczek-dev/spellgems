@@ -1,18 +1,15 @@
 package net.pnovaczek.spellgems.entity;
 
-import net.minecraft.core.particles.ColorParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.pnovaczek.spellgems.ModEntities;
+import net.pnovaczek.spellgems.particle.ModParticles;
 import net.pnovaczek.spellgems.Spellgems;
 
 public class VampiricMistCloud extends SpellAreaEffectCloud {
-
-    private static final int PARTICLE_COLOR = 0xFF8B0000;
 
     /**
      * Required for entity registration in ModEntities.
@@ -22,7 +19,7 @@ public class VampiricMistCloud extends SpellAreaEffectCloud {
         super(entityType, level);
         this.setRadius(CLOUD_RADIUS);
         this.setDuration(CLOUD_DURATION);
-        this.setCustomParticle(ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, PARTICLE_COLOR));
+        this.setCustomParticle(ModParticles.RAID_OMEN_MOTE);
     }
 
     /**

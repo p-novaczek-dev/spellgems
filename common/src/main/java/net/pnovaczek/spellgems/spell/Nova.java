@@ -1,6 +1,5 @@
 package net.pnovaczek.spellgems.spell;
 
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -10,6 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.particle.ModParticles;
 import net.pnovaczek.spellgems.SpellgemsConfig;
 import net.pnovaczek.spellgems.item.GreaterSpellGems;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
@@ -133,7 +133,7 @@ public class Nova extends AbstractSpell {
         if (dustColor == 0xFFFFFF) {
             dustColor = DEFAULT_DUST_COLOR;
         }
-        var dustOptions = new DustParticleOptions(dustColor, 1.0F);
+        var dustOptions = ModParticles.tintedDust(dustColor);
 
         for (int i = 0; i < particleCount; i++) {
             Vec3 pos = randomPointInSphere(center, radius, random);
