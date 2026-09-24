@@ -172,6 +172,12 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 
                 TransmuteRecipeBuilder.create(Ingredient.of(Blocks.TINTED_GLASS), ModBlocks.ASTRAL_BARRIER)
                         .save(exporter, "tinted_glass_to_astral_barrier");
+                TransmuteRecipeBuilder.create(Ingredient.of(Blocks.OBSIDIAN), Blocks.CRYING_OBSIDIAN)
+                        .save(exporter, "obsidian_to_crying_obsidian");
+                TransmuteRecipeBuilder.create(Ingredient.of(Blocks.SOUL_SAND), Blocks.SOUL_SOIL)
+                        .save(exporter, "soul_sand_to_soul_soil");
+                TransmuteRecipeBuilder.create(Ingredient.of(Blocks.GLOWSTONE), Blocks.SHROOMLIGHT)
+                        .save(exporter, "glowstone_to_shroomlight");
 
                 // Wand: 1 stick + 1 shimmersteel (shimmersteel above stick)
                 shaped(RecipeCategory.TOOLS, ModItems.WAND)

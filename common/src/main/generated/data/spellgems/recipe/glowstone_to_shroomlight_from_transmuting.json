@@ -1,0 +1,7 @@
+{
+  "type": "spellgems:transmuting",
+  "ingredient": "minecraft:glowstone",
+  "result": {
+    "id": "minecraft:shroomlight"
+  }
+}

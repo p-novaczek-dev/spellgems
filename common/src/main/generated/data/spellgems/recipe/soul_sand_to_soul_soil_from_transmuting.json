@@ -1,0 +1,7 @@
+{
+  "type": "spellgems:transmuting",
+  "ingredient": "minecraft:soul_sand",
+  "result": {
+    "id": "minecraft:soul_soil"
+  }
+}
