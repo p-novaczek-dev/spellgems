@@ -34,6 +34,7 @@ import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.screen.SpellDispenserMenu;
 import net.pnovaczek.spellgems.spell.Spell;
 import net.pnovaczek.spellgems.spell.SpellContext;
+import net.pnovaczek.spellgems.spell.SpellIds;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -84,7 +85,9 @@ public class SpellDispenserBlockEntity extends BlockEntity implements WorldlyCon
             syncData();
             setChanged();
         }
-        absorbItemsAtFront(level, pos, state);
+        if (hasMagnetGem()) {
+            absorbItemsAtFront(level, pos, state);
+        }
     }
 
     public void tryCastFromRedstone() {
@@ -146,6 +149,16 @@ public class SpellDispenserBlockEntity extends BlockEntity implements WorldlyCon
 
         syncData();
         setChanged();
+    }
+
+    /** Magnet gem makes the dispenser collect item entities in front of it, like a hopper. */
+    private boolean hasMagnetGem() {
+        ItemStack gemStack = getItem(SLOT_SPELL_GEM);
+        if (!isSpellGem(gemStack)) {
+            return false;
+        }
+        SpellGemData gemData = SpellGemItem.getSpellData(gemStack);
+        return gemData != null && SpellIds.MAGNET.equals(gemData.spellId());
     }
 
     private void absorbItemsAtFront(Level level, BlockPos pos, BlockState state) {

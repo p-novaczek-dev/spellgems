@@ -17,8 +17,6 @@ import java.util.List;
 
 public class Feed extends AbstractSpell {
 
-    private static final int AREA_RADIUS = 8;
-
     @Override
     public Identifier id() {
         return SpellIds.FEED;
@@ -58,11 +56,12 @@ public class Feed extends AbstractSpell {
         Vec3 origin = context.origin();
         double px = origin.x;
         double pz = origin.z;
-        AABB searchBox = new AABB(origin, origin).inflate(AREA_RADIUS, 4.0, AREA_RADIUS);
+        float range = Spellgems.CONFIG.spells.feed.range;
+        AABB searchBox = new AABB(origin, origin).inflate(range, 4.0, range);
         return context.level().getEntitiesOfClass(Animal.class, searchBox, animal ->
                 animal.isAlive()
-                        && Math.abs(animal.getX() - px) <= AREA_RADIUS
-                        && Math.abs(animal.getZ() - pz) <= AREA_RADIUS
+                        && Math.abs(animal.getX() - px) <= range
+                        && Math.abs(animal.getZ() - pz) <= range
                         && ((isReadyToLove(animal) && animal.canFallInLove()) || animal.canAgeUp())
         );
     }

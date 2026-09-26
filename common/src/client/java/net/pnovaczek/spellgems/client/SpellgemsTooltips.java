@@ -30,6 +30,7 @@ import net.pnovaczek.spellgems.spell.Spell;
 import net.pnovaczek.spellgems.spell.SpellIds;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
+import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantments;
 import net.pnovaczek.spellgems.wand.WandDepletion;
 import net.pnovaczek.spellgems.wand.WandSpellCaster;
 import net.pnovaczek.spellgems.wand.WandSpellLabels;
@@ -222,6 +223,7 @@ public class SpellgemsTooltips {
 
         if (shiftDown) {
             appendDamageStat(data, lines);
+            appendUtilityStats(data, lines);
             if (includeCastStats) {
                 appendCastStats(data, lines);
             }
@@ -243,10 +245,76 @@ public class SpellgemsTooltips {
         if (damage <= 0.0F) {
             return;
         }
-        String formatted = damage == (int) damage
-                ? Integer.toString((int) damage)
-                : String.format(java.util.Locale.ROOT, "%.1f", damage);
-        appendIndentedStat(lines, Component.translatable("tooltip.spellgems.spell_gem.damage", formatted));
+        appendIndentedStat(lines, Component.translatable("tooltip.spellgems.spell_gem.damage", formatStatNumber(damage)));
+    }
+
+    /** Range, area, and jump count for utility gems. Shown above wand cost and dispenser cooldown. */
+    private static void appendUtilityStats(SpellGemData data, List<Component> lines) {
+        Identifier spellId = data.spellId();
+        boolean extended = data.utilityEffects().stream().anyMatch(effect -> effect.is(UtilityEnchantments.EXTEND));
+        if (spellId.equals(SpellIds.BLINK)) {
+            SpellgemsConfig.BlinkSpellConfig blink = Spellgems.CONFIG.spells.blink;
+            if (blink == null) {
+                return;
+            }
+            double range = extended ? blink.maxDistance * blink.extendMultiplier : blink.maxDistance;
+            appendRangeStat(lines, range);
+        } else if (spellId.equals(SpellIds.MAGNET)) {
+            SpellgemsConfig.MagnetSpellConfig magnet = Spellgems.CONFIG.spells.magnet;
+            if (magnet == null) {
+                return;
+            }
+            double range = extended ? magnet.range * magnet.extendMultiplier : magnet.range;
+            appendRangeStat(lines, range);
+        } else if (spellId.equals(SpellIds.HARVEST)) {
+            appendConfiguredArea(lines, Spellgems.CONFIG.spells.harvest);
+        } else if (spellId.equals(SpellIds.PLANT)) {
+            appendConfiguredArea(lines, Spellgems.CONFIG.spells.plant);
+        } else if (spellId.equals(SpellIds.GROW)) {
+            appendConfiguredArea(lines, Spellgems.CONFIG.spells.grow);
+        } else if (spellId.equals(SpellIds.FEED)) {
+            SpellgemsConfig.FeedSpellConfig feed = Spellgems.CONFIG.spells.feed;
+            if (feed != null) {
+                appendRangeStat(lines, feed.range);
+            }
+        } else if (spellId.equals(SpellIds.GEODE_RESONANCE)) {
+            SpellgemsConfig.GeodeResonanceSpellConfig geode = Spellgems.CONFIG.spells.geodeResonance;
+            if (geode == null) {
+                return;
+            }
+            appendIndentedStat(lines, Component.translatable(
+                    "tooltip.spellgems.spell_gem.jumps",
+                    Integer.toString(geode.jumpCount)
+            ));
+            appendRangeStat(lines, geode.searchRadius);
+        }
+    }
+
+    private static void appendRangeStat(List<Component> lines, double range) {
+        appendIndentedStat(lines, Component.translatable("tooltip.spellgems.spell_gem.range", formatStatNumber(range)));
+    }
+
+    private static void appendConfiguredArea(List<Component> lines, SpellgemsConfig.AreaSpellConfig config) {
+        if (config != null) {
+            appendAreaStat(lines, config.areaRadius);
+        }
+    }
+
+    private static void appendConfiguredArea(List<Component> lines, SpellgemsConfig.GrowSpellConfig config) {
+        if (config != null) {
+            appendAreaStat(lines, config.areaRadius);
+        }
+    }
+
+    private static void appendAreaStat(List<Component> lines, int radius) {
+        int side = radius * 2 + 1;
+        appendIndentedStat(lines, Component.translatable("tooltip.spellgems.spell_gem.area", side, side));
+    }
+
+    private static String formatStatNumber(double value) {
+        return value == (int) value
+                ? Integer.toString((int) value)
+                : String.format(java.util.Locale.ROOT, "%.1f", value);
     }
 
     private static void appendCastStats(SpellGemData data, List<Component> lines) {

@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantments;
 
@@ -21,8 +22,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class Harvest extends AbstractSpell {
-
-    private static final int AREA_RADIUS = 4;
 
     @Override
     public Identifier id() {
@@ -42,9 +41,10 @@ public class Harvest extends AbstractSpell {
         List<UtilityEnchantment> utilities = (context.data() != null) ? context.data().utilityEffects() : List.of();
         boolean hasSmelt = utilities.stream().anyMatch(u -> u.is(UtilityEnchantments.SMELT));
         Entity breaker = context.caster();
+        int areaRadius = Spellgems.CONFIG.spells.harvest.areaRadius;
 
-        for (int dx = -AREA_RADIUS; dx <= AREA_RADIUS; dx++) {
-            for (int dz = -AREA_RADIUS; dz <= AREA_RADIUS; dz++) {
+        for (int dx = -areaRadius; dx <= areaRadius; dx++) {
+            for (int dz = -areaRadius; dz <= areaRadius; dz++) {
                 BlockPos base = center.offset(dx, 0, dz);
                 if (tryHarvestCrop(level, base, breaker, hasSmelt) || tryHarvestCrop(level, base.above(), breaker, hasSmelt)) {
                     harvestedAny = true;

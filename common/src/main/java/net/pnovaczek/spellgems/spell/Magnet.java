@@ -1,8 +1,6 @@
 package net.pnovaczek.spellgems.spell;
 
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -15,12 +13,10 @@ import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantments;
 
 import java.util.List;
-import org.jspecify.annotations.Nullable;
 
 public class Magnet extends AbstractSpell {
 
     private static final float PULL_SPEED = 0.65F;
-    private static final int PARTICLE_COUNT = 12;
 
     @Override
     public Identifier id() {
@@ -28,8 +24,16 @@ public class Magnet extends AbstractSpell {
     }
 
     @Override
+    protected void performPredictedFx(SpellContext context) {
+        // No local FX. The default would run the pull on the client.
+    }
+
+    @Override
     protected boolean performCast(SpellContext context) {
         var level = context.level();
+        if (!(level instanceof ServerLevel serverLevel)) {
+            return false;
+        }
 
         float baseRange = Spellgems.CONFIG.spells.magnet.range;
         List<UtilityEnchantment> utilities = (context.data() != null) ? context.data().utilityEffects() : List.of();
@@ -39,19 +43,6 @@ public class Magnet extends AbstractSpell {
                 : baseRange;
 
         Vec3 pullTarget = magnetPullTarget(context);
-
-        if (level.isClientSide()) {
-            // Local prediction; server broadcasts for other players.
-            spawnParticles(level, pullTarget, null);
-            return false;
-        }
-
-        if (!(level instanceof ServerLevel serverLevel)) {
-            return false;
-        }
-
-        // Always broadcast from server (multiplayer + dispenser). Skip caster if they predicted.
-        spawnParticles(level, pullTarget, SpellParticles.predictionExcept(context));
 
         AABB searchBox = new AABB(pullTarget, pullTarget).inflate(range);
         double rangeSqr = range * range;
@@ -104,29 +95,5 @@ public class Magnet extends AbstractSpell {
             return caster.position().add(0.0, caster.getEyeHeight() * 0.5, 0.0);
         }
         return context.origin();
-    }
-
-    private static void spawnParticles(
-            net.minecraft.world.level.Level level,
-            Vec3 center,
-            @Nullable Entity exceptViewer
-    ) {
-        var random = level.getRandom();
-        for (int i = 0; i < PARTICLE_COUNT; i++) {
-            double x = center.x + (random.nextDouble() - 0.5) * 2.0;
-            double y = center.y + random.nextDouble() * 2.0;
-            double z = center.z + (random.nextDouble() - 0.5) * 2.0;
-            SpellParticles.add(
-                    level,
-                    exceptViewer,
-                    ParticleTypes.ENCHANT,
-                    x,
-                    y,
-                    z,
-                    (center.x - x) * 0.15,
-                    (center.y - y) * 0.15,
-                    (center.z - z) * 0.15
-            );
-        }
     }
 }

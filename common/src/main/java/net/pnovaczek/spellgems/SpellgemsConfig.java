@@ -70,8 +70,8 @@ public class SpellgemsConfig {
         // Additional spell configs (for uniform access and to host wandDurabilityCost etc.)
         public SpellConfig placeBlock = new SpellConfig();
         public SpellConfig breakBlock = new SpellConfig();
-        public SpellConfig harvest = new SpellConfig();
-        public SpellConfig plant = new SpellConfig();
+        public AreaSpellConfig harvest = new AreaSpellConfig();
+        public AreaSpellConfig plant = new AreaSpellConfig();
         public SpellConfig transmute = new SpellConfig();
         public GeodeResonanceSpellConfig geodeResonance = new GeodeResonanceSpellConfig();
 
@@ -118,13 +118,17 @@ public class SpellgemsConfig {
             if (vortex != null) vortex.validate();
             if (blink != null) blink.validate();
             if (magnet != null) magnet.validate();
-            if (feed != null) feed.validate();
-            if (grow != null) grow.validate();
+            if (feed == null) feed = new FeedSpellConfig();
+            feed.validate();
+            if (grow == null) grow = new GrowSpellConfig();
+            grow.validate();
             if (potion != null) potion.validate();
             if (placeBlock != null) placeBlock.validate();
             if (breakBlock != null) breakBlock.validate();
-            if (harvest != null) harvest.validate();
-            if (plant != null) plant.validate();
+            if (harvest == null) harvest = new AreaSpellConfig();
+            harvest.validate();
+            if (plant == null) plant = new AreaSpellConfig();
+            plant.validate();
             if (transmute != null) transmute.validate();
             if (geodeResonance == null) geodeResonance = new GeodeResonanceSpellConfig();
             geodeResonance.validate();
@@ -135,6 +139,7 @@ public class SpellgemsConfig {
         public int jumpCount = 4;
         public int jumpDelayTicks = 8;
         public float growthChance = 0.2F;
+        public int searchRadius = 5;
 
         @Override
         public void validate() {
@@ -142,6 +147,18 @@ public class SpellgemsConfig {
             jumpCount = Math.max(1, jumpCount);
             jumpDelayTicks = Math.max(0, jumpDelayTicks);
             growthChance = Math.max(0f, Math.min(1f, growthChance));
+            if (searchRadius < 1) searchRadius = 5;
+        }
+    }
+
+    /** Square area around the caster. Side length shown in tooltips is {@code areaRadius * 2 + 1}. */
+    public static class AreaSpellConfig extends SpellConfig {
+        public int areaRadius = 4;
+
+        @Override
+        public void validate() {
+            super.validate();
+            if (areaRadius < 1) areaRadius = 4;
         }
     }
 
@@ -237,19 +254,24 @@ public class SpellgemsConfig {
 
     public static class FeedSpellConfig extends SpellConfig {
         public boolean requireFeedItems = true;
+        /** Horizontal reach from the caster, in blocks. */
+        public float range = 8.0F;
 
         @Override
         public void validate() {
             super.validate();
+            if (range < 0.5F) range = 8.0F;
         }
     }
 
     public static class GrowSpellConfig extends SpellConfig {
         public boolean requireBoneMeal = true;
+        public int areaRadius = 4;
 
         @Override
         public void validate() {
             super.validate();
+            if (areaRadius < 1) areaRadius = 4;
         }
     }
 

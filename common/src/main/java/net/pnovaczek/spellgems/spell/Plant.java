@@ -10,10 +10,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.FarmlandBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.pnovaczek.spellgems.Spellgems;
 
 public class Plant extends AbstractSpell {
-
-    private static final int AREA_RADIUS = 4;
 
     @Override
     public Identifier id() {
@@ -34,9 +33,10 @@ public class Plant extends AbstractSpell {
         var level = context.level();
         BlockPos center = context.originBlockPos();
         boolean plantedAny = false;
+        int areaRadius = Spellgems.CONFIG.spells.plant.areaRadius;
 
-        for (int dx = -AREA_RADIUS; dx <= AREA_RADIUS; dx++) {
-            for (int dz = -AREA_RADIUS; dz <= AREA_RADIUS; dz++) {
+        for (int dx = -areaRadius; dx <= areaRadius; dx++) {
+            for (int dz = -areaRadius; dz <= areaRadius; dz++) {
                 for (int dy = -2; dy <= 2; dy++) {
                     BlockPos farmlandPos = center.offset(dx, dy, dz);
                     if (!(level.getBlockState(farmlandPos).getBlock() instanceof FarmlandBlock)) {

@@ -13,8 +13,6 @@ import org.jspecify.annotations.Nullable;
 
 public class Grow extends AbstractSpell {
 
-    private static final int AREA_RADIUS = 4;
-
     @Override
     public Identifier id() {
         return SpellIds.GROW;
@@ -41,11 +39,12 @@ public class Grow extends AbstractSpell {
 
         var level = context.level();
         boolean requireBoneMeal = Spellgems.CONFIG.spells.grow.requireBoneMeal;
+        int areaRadius = Spellgems.CONFIG.spells.grow.areaRadius;
         BlockPos center = context.originBlockPos();
         boolean grewAny = false;
 
-        for (int dx = -AREA_RADIUS; dx <= AREA_RADIUS; dx++) {
-            for (int dz = -AREA_RADIUS; dz <= AREA_RADIUS; dz++) {
+        for (int dx = -areaRadius; dx <= areaRadius; dx++) {
+            for (int dz = -areaRadius; dz <= areaRadius; dz++) {
                 BlockPos base = center.offset(dx, 0, dz);
                 if (tryGrowAt(level, base, context, requireBoneMeal)) {
                     grewAny = true;
@@ -69,9 +68,10 @@ public class Grow extends AbstractSpell {
     private static boolean hasGrowableCrop(SpellContext context) {
         BlockPos center = context.originBlockPos();
         var level = context.level();
+        int areaRadius = Spellgems.CONFIG.spells.grow.areaRadius;
 
-        for (int dx = -AREA_RADIUS; dx <= AREA_RADIUS; dx++) {
-            for (int dz = -AREA_RADIUS; dz <= AREA_RADIUS; dz++) {
+        for (int dx = -areaRadius; dx <= areaRadius; dx++) {
+            for (int dz = -areaRadius; dz <= areaRadius; dz++) {
                 BlockPos base = center.offset(dx, 0, dz);
                 if (isGrowableTarget(level, base) || isGrowableTarget(level, base.above())) {
                     return true;

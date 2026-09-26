@@ -35,8 +35,6 @@ import java.util.function.Supplier;
  */
 public class GeodeResonance extends AbstractSpell {
 
-    private static final int SEARCH_RADIUS = 5;
-
     private static final List<Block> VANILLA_STAGES = List.of(
             Blocks.SMALL_AMETHYST_BUD,
             Blocks.MEDIUM_AMETHYST_BUD,
@@ -185,7 +183,7 @@ public class GeodeResonance extends AbstractSpell {
     }
 
     private static @Nullable BlockPos findRandomBud(ServerLevel level, BlockPos center, Set<BlockPos> visited) {
-        int radius = SEARCH_RADIUS;
+        int radius = Spellgems.CONFIG.spells.geodeResonance.searchRadius;
         long radiusSqr = (long) radius * radius;
         List<BlockPos> candidates = new ArrayList<>();
         BlockPos min = center.offset(-radius, -radius, -radius);
