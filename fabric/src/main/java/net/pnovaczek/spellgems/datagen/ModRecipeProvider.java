@@ -170,6 +170,12 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
                         .save(exporter);
 
+                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_GEODE_RESONANCE)
+                        .requires(ModItems.RAW_SPELL_GEM)
+                        .requires(Items.QUARTZ)
+                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
+                        .save(exporter);
+
                 TransmuteRecipeBuilder.create(Ingredient.of(Blocks.TINTED_GLASS), ModBlocks.ASTRAL_BARRIER)
                         .save(exporter, "tinted_glass_to_astral_barrier");
                 TransmuteRecipeBuilder.create(Ingredient.of(Blocks.OBSIDIAN), Blocks.CRYING_OBSIDIAN)

@@ -20,4 +20,5 @@ public class SpellIds {
     public static final Identifier GROW = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "grow");
     public static final Identifier POTION = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "potion");
     public static final Identifier TRANSMUTE = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "transmute");
+    public static final Identifier GEODE_RESONANCE = Identifier.fromNamespaceAndPath(Spellgems.MOD_ID, "geode_resonance");
 }

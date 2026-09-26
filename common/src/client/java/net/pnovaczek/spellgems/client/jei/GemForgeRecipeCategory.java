@@ -73,6 +73,7 @@ public class GemForgeRecipeCategory implements IRecipeCategory<RecipeHolder<GemF
     }
 
     @Override
+    @SuppressWarnings("deprecation") // Ingredient.items() is the only item listing both loaders share. NeoForge's getValues() is not on Fabric.
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<GemForgeRecipe> recipeHolder, IFocusGroup focuses) {
         GemForgeRecipe recipe = recipeHolder.value();
         var input1 = builder.addSlot(RecipeIngredientRole.INPUT, 3, 3);

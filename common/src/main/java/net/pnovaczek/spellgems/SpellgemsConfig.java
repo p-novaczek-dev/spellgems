@@ -73,6 +73,7 @@ public class SpellgemsConfig {
         public SpellConfig harvest = new SpellConfig();
         public SpellConfig plant = new SpellConfig();
         public SpellConfig transmute = new SpellConfig();
+        public GeodeResonanceSpellConfig geodeResonance = new GeodeResonanceSpellConfig();
 
         public SpellConfigs() {
             // Provide the canonical default wand durability costs here.
@@ -83,9 +84,11 @@ public class SpellgemsConfig {
             blink.wandDurabilityCost = 48;
             placeBlock.wandDurabilityCost = 0;
             magnet.wandDurabilityCost = 0;
-            potion.wandDurabilityCost = 128;
+            potion.wandDurabilityCost = 192;
             transmute.wandDurabilityCost = 4;
             transmute.dispenserCooldownTicks = 1;
+            geodeResonance.wandDurabilityCost = 128;
+            geodeResonance.dispenserCooldownTicks = 40;
         }
 
         /** Returns a spell-specific config by ID (for more uniform access). */
@@ -103,6 +106,7 @@ public class SpellgemsConfig {
             if (spellId.equals(SpellIds.HARVEST)) return harvest;
             if (spellId.equals(SpellIds.PLANT)) return plant;
             if (spellId.equals(SpellIds.TRANSMUTE)) return transmute;
+            if (spellId.equals(SpellIds.GEODE_RESONANCE)) return geodeResonance;
 
             // Unknown spell: return a fresh default (cost=1)
             return new SpellConfig();
@@ -122,6 +126,22 @@ public class SpellgemsConfig {
             if (harvest != null) harvest.validate();
             if (plant != null) plant.validate();
             if (transmute != null) transmute.validate();
+            if (geodeResonance == null) geodeResonance = new GeodeResonanceSpellConfig();
+            geodeResonance.validate();
+        }
+    }
+
+    public static class GeodeResonanceSpellConfig extends SpellConfig {
+        public int jumpCount = 4;
+        public int jumpDelayTicks = 8;
+        public float growthChance = 0.2F;
+
+        @Override
+        public void validate() {
+            super.validate();
+            jumpCount = Math.max(1, jumpCount);
+            jumpDelayTicks = Math.max(0, jumpDelayTicks);
+            growthChance = Math.max(0f, Math.min(1f, growthChance));
         }
     }
 
