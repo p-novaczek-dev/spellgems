@@ -57,7 +57,7 @@ public class ModBlocks {
         GEM_FORGE = register(
                 "gem_forge",
                 GemForgeBlock::new,
-                BlockBehaviour.Properties.ofFullCopy(Blocks.DISPENSER)
+                BlockBehaviour.Properties.ofFullCopy(Blocks.SMITHING_TABLE)
         );
         ASTRAL_BARRIER = register(
                 "astral_barrier",

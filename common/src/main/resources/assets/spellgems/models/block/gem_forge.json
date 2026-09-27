@@ -1,8 +1,12 @@
 {
   "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "top": "spellgems:block/gem_forge_top",
-    "bottom": "spellgems:block/gem_forge_bottom",
-    "side": "spellgems:block/gem_forge_side"
+    "down": "spellgems:block/gem_forge_bottom",
+    "east": "spellgems:block/gem_forge_side",
+    "north": "spellgems:block/gem_forge_front",
+    "particle": "spellgems:block/gem_forge_front",
+    "south": "spellgems:block/gem_forge_front",
+    "up": "spellgems:block/gem_forge_top",
+    "west": "spellgems:block/gem_forge_side"
   }
 }

@@ -67,6 +67,10 @@ public class SpellgemsTooltips {
                 tooltip.addLineDetail("tooltip.spellgems.astral_barrier.description");
             }
 
+            if (stack.is(ModItems.SPELL_DISPENSER)) {
+                tooltip.addLineDetail("tooltip.spellgems.spell_dispenser.muffle");
+            }
+
             if (stack.is(ModItems.WAND) || stack.is(ModItems.ASTRAL_BOW)) {
                 stripVanillaContainerLines(lines);
             }

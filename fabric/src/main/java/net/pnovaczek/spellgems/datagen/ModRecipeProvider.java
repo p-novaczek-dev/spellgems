@@ -9,6 +9,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -206,13 +207,13 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
                         .save(exporter);
 
-                // Gem Forge: 2 shimmersteel above a 2x2 of cobblestone
+                // Gem Forge: 2 shimmersteel above a 2x2 of any wood planks
                 shaped(RecipeCategory.DECORATIONS, ModBlocks.GEM_FORGE)
                         .pattern("SS")
                         .pattern("CC")
                         .pattern("CC")
                         .define('S', ModItems.SHIMMERSTEEL_INGOT)
-                        .define('C', Blocks.COBBLESTONE)
+                        .define('C', ItemTags.PLANKS)
                         .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
                         .save(exporter);
 

@@ -71,11 +71,6 @@
             "name": "astral barrier",
             "description": "Translucent barrier similar to tinted glass. By default players can walk through and mobs cannot; a redstone pulse flips a connected group of these blocks so mobs can pass and players cannot.",
             "mechanics": "No crafting recipe; available in creative and with commands. Immune to explosions, including the Wither."
-        },
-        {
-            "name": "enchantment augmentation table",
-            "description": "Machine for safely upgrading or removing existing enchantments on tools, armor, and books.",
-            "mechanics": "The player selects one enchantment on the item, then either raises it by one level (up to the vanilla maximum) or removes it entirely. Costs experience and lapis. Does not increase prior-work penalty. Applying or combining new enchantments still happens at the vanilla enchanting table and anvil."
         }
     ],
     "spell_gems": {
@@ -243,7 +238,7 @@
                 {
                     "name": "extend",
                     "description": "Increases Blink range.",
-                    "compatible_spells": ["blink"]
+                    "compatible_spells": ["blink", "magnet"]
                 },
                 {
                     "name": "potion effect",

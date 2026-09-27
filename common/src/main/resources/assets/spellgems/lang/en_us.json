@@ -31,6 +31,7 @@
   "block.spellgems.astral_barrier": "Astral Barrier",
   "block.spellgems.mana_root": "Mana Root",
 
+  "tooltip.spellgems.spell_dispenser.muffle": "Place next to wool to muffle spell sounds",
   "tooltip.spellgems.spell_dispenser.cooldown": "Cooldown: %s",
   "tooltip.spellgems.spell_dispenser.burnout": "Disabled: %s",
   "tooltip.spellgems.spell_dispenser.ready": "Ready",
