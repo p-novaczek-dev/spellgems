@@ -275,6 +275,10 @@ public class SpellProjectile extends AbstractHurtingProjectile {
         return data.getTintColor();
     }
 
+    public boolean muffledCast() {
+        return this.spellContext != null && this.spellContext.muffled();
+    }
+
     private static boolean isTransmute(@Nullable SpellContext context) {
         return context != null && isTransmute(context.data());
     }

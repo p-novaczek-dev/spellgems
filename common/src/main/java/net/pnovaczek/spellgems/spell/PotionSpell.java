@@ -32,7 +32,7 @@ public class PotionSpell extends AbstractSpell {
     @Override
     protected void performSelfTargetDispenserFx(SpellContext context) {
         for (PotionEnchantment enchantment : context.data().potionEffects()) {
-            PotionDelivery.playEffectsAt(context.level(), context.origin(), enchantment);
+            PotionDelivery.playEffectsAt(context.level(), context.origin(), enchantment, context.muffled());
         }
     }
 

@@ -59,7 +59,7 @@
             "mechanics": {
                 "operation": "Holds one spell gem and an internal inventory. On a redstone pulse, it casts toward the block it faces.",
                 "limitation": "Each spell has a cooldown. Triggering it again too soon still fires, then the dispenser burns out and stays disabled for a while.",
-                "spell_behavior": "Self-only spells (such as blink and non-splash potion) play effects but do nothing else. Spells that consume player inventory items draw from the dispenser's inventory instead. Magnet pulls nearby items to the block in front of the dispenser, then absorbs them into its inventory."
+                "spell_behavior": "Self-only spells (such as blink and non-splash potion) play effects but do nothing else. Spells that consume player inventory items draw from the dispenser's inventory instead. Magnet pulls nearby items to the block in front of the dispenser, then absorbs them into its inventory. Wool against any side muffles the dispenser's spell sounds, including a transmute's chime and a greater gem's follow-up. Breaking blocks, harvesting crops, and explosions or lightning from spell enchantments still play their usual sounds."
             }
         },
         {

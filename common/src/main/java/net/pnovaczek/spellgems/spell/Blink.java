@@ -45,16 +45,14 @@ public class Blink extends AbstractSpell {
         Vec3 target = SpellTargeting.resolveCastCenter(context, maxDistance);
         // Dispenser: no client prediction; full server broadcast.
         spawnParticles(context.level(), origin, target, null);
-        if (!context.level().isClientSide() && context.level() instanceof ServerLevel serverLevel) {
-            serverLevel.playSound(
-                    null,
-                    origin.x, origin.y, origin.z,
-                    SoundEvents.PLAYER_TELEPORT,
-                    SoundSource.PLAYERS,
-                    0.5F,
-                    1.0F
-            );
-        }
+        SpellSounds.play(
+                context,
+                origin,
+                SoundEvents.PLAYER_TELEPORT,
+                SoundSource.PLAYERS,
+                0.5F,
+                1.0F
+        );
     }
 
     @Override
@@ -72,7 +70,7 @@ public class Blink extends AbstractSpell {
             if (safePosition.isPresent()) {
                 spawnParticles(context.level(), caster.position(), safePosition.get(), null);
             } else {
-                playFailSound(context.level(), caster.position(), null);
+                playFailSound(context, caster.position(), null);
             }
             return false;
         }
@@ -83,31 +81,31 @@ public class Blink extends AbstractSpell {
 
         Vec3 origin = caster.position();
         if (safePosition.isEmpty()) {
-            playFailSound(serverLevel, origin, SpellParticles.predictionExcept(context));
+            playFailSound(context, origin, SpellParticles.predictionExcept(context));
             return false;
         }
 
         Vec3 destination = safePosition.get();
 
         if (!teleportCaster(serverLevel, caster, destination)) {
-            playFailSound(serverLevel, origin, SpellParticles.predictionExcept(context));
+            playFailSound(context, origin, SpellParticles.predictionExcept(context));
             return false;
         }
 
         // Multiplayer-visible FX; skip caster if they already predicted.
         spawnParticles(serverLevel, origin, destination, SpellParticles.predictionExcept(context));
 
-        serverLevel.playSound(
-                null,
-                origin.x, origin.y, origin.z,
+        SpellSounds.play(
+                context,
+                origin,
                 SoundEvents.PLAYER_TELEPORT,
                 SoundSource.PLAYERS,
                 0.75F,
                 1.0F
         );
-        serverLevel.playSound(
-                null,
-                destination.x, destination.y, destination.z,
+        SpellSounds.play(
+                context,
+                destination,
                 SoundEvents.PLAYER_TELEPORT,
                 SoundSource.PLAYERS,
                 0.75F,
@@ -153,30 +151,18 @@ public class Blink extends AbstractSpell {
         return true;
     }
 
-    private static void playFailSound(Level level, Vec3 pos, @Nullable Entity exceptViewer) {
-        if (level instanceof ServerLevel serverLevel) {
-            Player except = exceptViewer instanceof Player player ? player : null;
-            serverLevel.playSound(
-                    except,
-                    pos.x,
-                    pos.y,
-                    pos.z,
-                    SoundEvents.PLAYER_TELEPORT,
-                    SoundSource.PLAYERS,
-                    FAIL_SOUND_VOLUME,
-                    FAIL_SOUND_PITCH
-            );
-            return;
-        }
-        level.playLocalSound(
+    private static void playFailSound(SpellContext context, Vec3 pos, @Nullable Entity exceptViewer) {
+        Player except = exceptViewer instanceof Player player ? player : null;
+        SpellSounds.playExcept(
+                context,
+                except,
                 pos.x,
                 pos.y,
                 pos.z,
                 SoundEvents.PLAYER_TELEPORT,
                 SoundSource.PLAYERS,
                 FAIL_SOUND_VOLUME,
-                FAIL_SOUND_PITCH,
-                false
+                FAIL_SOUND_PITCH
         );
     }
 

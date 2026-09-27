@@ -106,9 +106,9 @@ public class Vortex extends AbstractSpell {
             }
         }
 
-        level.playSound(
-                null,
-                center.x, center.y, center.z,
+        SpellSounds.play(
+                context,
+                center,
                 SoundEvents.SHULKER_SHOOT,
                 SoundSource.PLAYERS,
                 0.6F,

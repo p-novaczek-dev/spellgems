@@ -54,10 +54,9 @@ public class Transmute extends AbstractSpell {
         SpellProjectile projectile = new SpellProjectile(context, direction, handler);
         level.addFreshEntity(projectile);
 
-        Vec3 soundPos = context.eyeOrigin();
-        level.playSound(
-                null,
-                soundPos.x, soundPos.y, soundPos.z,
+        SpellSounds.play(
+                context,
+                context.eyeOrigin(),
                 SoundEvents.ALLAY_THROW,
                 SoundSource.PLAYERS,
                 0.6F,
@@ -95,14 +94,16 @@ public class Transmute extends AbstractSpell {
 
         serverLevel.setBlock(pos, output, 3);
         serverLevel.gameEvent(projectile.getOwner(), GameEvent.BLOCK_CHANGE, pos);
-        serverLevel.playSound(
-                null,
-                pos,
-                SoundEvents.AMETHYST_BLOCK_HIT,
-                SoundSource.BLOCKS,
-                1.0F,
-                0.8F + serverLevel.getRandom().nextFloat() * 0.4F
-        );
+        if (!projectile.muffledCast()) {
+            serverLevel.playSound(
+                    null,
+                    pos,
+                    SoundEvents.AMETHYST_BLOCK_HIT,
+                    SoundSource.BLOCKS,
+                    1.0F,
+                    0.8F + serverLevel.getRandom().nextFloat() * 0.4F
+            );
+        }
         spawnGlowParticles(serverLevel, pos);
     }
 

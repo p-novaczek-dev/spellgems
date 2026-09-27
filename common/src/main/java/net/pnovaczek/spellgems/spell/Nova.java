@@ -104,9 +104,9 @@ public class Nova extends AbstractSpell {
             GreaterSpellGems.onDirectHit(context, target);
         }
 
-        level.playSound(
-                null,
-                center.x, center.y, center.z,
+        SpellSounds.play(
+                context,
+                center,
                 SoundEvents.DRAGON_FIREBALL_EXPLODE,
                 SoundSource.PLAYERS,
                 0.5F,

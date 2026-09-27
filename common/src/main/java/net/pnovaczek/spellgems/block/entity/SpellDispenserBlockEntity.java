@@ -2,6 +2,7 @@ package net.pnovaczek.spellgems.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -124,7 +125,7 @@ public class SpellDispenserBlockEntity extends BlockEntity implements WorldlyCon
                 origin,
                 look,
                 materialView
-        );
+        ).withMuffled(isMuffledByWool(serverLevel));
 
         if (!spell.canCast(context)) {
             playFailSound(serverLevel);
@@ -242,6 +243,16 @@ public class SpellDispenserBlockEntity extends BlockEntity implements WorldlyCon
         );
         // Smoke puffs like a burned-out redstone torch
         level.levelEvent(1502, worldPosition, 0);
+    }
+
+    /** Wool against any face silences spell-owned sounds for this cast. */
+    private boolean isMuffledByWool(Level level) {
+        for (Direction direction : Direction.values()) {
+            if (level.getBlockState(worldPosition.relative(direction)).is(BlockTags.WOOL)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Direction getFacing() {

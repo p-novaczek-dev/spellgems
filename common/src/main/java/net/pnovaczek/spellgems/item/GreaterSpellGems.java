@@ -128,7 +128,8 @@ public final class GreaterSpellGems {
                 return;
             }
             SpellContext followContext = SpellContext.forFollowUp(
-                    serverLevel, caster, castingItem, followData, living);
+                    serverLevel, caster, castingItem, followData, living
+            ).withMuffled(context.muffled());
             if (spell.canCast(followContext)) {
                 spell.cast(followContext);
             }

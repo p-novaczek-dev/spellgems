@@ -32,7 +32,7 @@ public final class PotionDelivery {
         switch (enchantment.delivery()) {
             case DRINK -> {
                 if (caster != null) {
-                    applyDrink(level, caster, enchantment);
+                    applyDrink(level, caster, enchantment, context.muffled());
                 }
             }
             case SPLASH -> applySplashAt(level, caster, origin, enchantment);
@@ -43,7 +43,7 @@ public final class PotionDelivery {
     /** Compatibility overload when only a living caster is available. */
     public static void apply(ServerLevel level, LivingEntity caster, PotionEnchantment enchantment) {
         switch (enchantment.delivery()) {
-            case DRINK -> applyDrink(level, caster, enchantment);
+            case DRINK -> applyDrink(level, caster, enchantment, false);
             case SPLASH -> applySplashAt(level, caster, caster.position(), enchantment);
             case LINGERING -> applyLingeringAt(level, caster, caster.position(), enchantment);
         }
@@ -76,9 +76,11 @@ public final class PotionDelivery {
         }
     }
 
-    private static void applyDrink(ServerLevel level, LivingEntity caster, PotionEnchantment enchantment) {
+    private static void applyDrink(ServerLevel level, LivingEntity caster, PotionEnchantment enchantment, boolean muffled) {
         enchantment.contents().applyToLivingEntity(caster, 1.0F);
-        playDrinkSound(level, caster.position());
+        if (!muffled) {
+            playDrinkSound(level, caster.position());
+        }
     }
 
     private static void applyDrinkToTarget(ServerLevel level, LivingEntity target, PotionEnchantment enchantment) {
@@ -190,7 +192,7 @@ public final class PotionDelivery {
     }
 
     public static void playClientEffects(SpellContext context, PotionEnchantment enchantment) {
-        playEffectsAt(context.level(), context.origin(), enchantment);
+        playEffectsAt(context.level(), context.origin(), enchantment, context.muffled());
     }
 
     /** Compatibility overload when only a living caster is available. */
@@ -200,9 +202,19 @@ public final class PotionDelivery {
 
     /** Plays drink sound or splash-style level event at a position (client or server). */
     public static void playEffectsAt(Level level, Vec3 pos, PotionEnchantment enchantment) {
+        playEffectsAt(level, pos, enchantment, false);
+    }
+
+    /**
+     * Same as {@link #playEffectsAt(Level, Vec3, PotionEnchantment)}.
+     * A muffled cast skips the drink sound. Splash and lingering still use the vanilla level event.
+     */
+    public static void playEffectsAt(Level level, Vec3 pos, PotionEnchantment enchantment, boolean muffled) {
         PotionContents contents = enchantment.contents();
         if (enchantment.delivery() == PotionDeliveryType.DRINK) {
-            playDrinkSound(level, pos);
+            if (!muffled) {
+                playDrinkSound(level, pos);
+            }
             return;
         }
 

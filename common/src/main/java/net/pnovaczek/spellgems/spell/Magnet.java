@@ -71,11 +71,9 @@ public class Magnet extends AbstractSpell {
         }
 
         if (pulledAny) {
-            serverLevel.playSound(
-                    null,
-                    pullTarget.x,
-                    pullTarget.y,
-                    pullTarget.z,
+            SpellSounds.play(
+                    context,
+                    pullTarget,
                     SoundEvents.EXPERIENCE_ORB_PICKUP,
                     SoundSource.PLAYERS,
                     0.35F,

@@ -115,10 +115,9 @@ public class Projectile extends AbstractSpell {
         SpellProjectile projectile = new SpellProjectile(context, direction, handler);
         level.addFreshEntity(projectile);
 
-        Vec3 soundPos = context.eyeOrigin();
-        level.playSound(
-                null,
-                soundPos.x, soundPos.y, soundPos.z,
+        SpellSounds.play(
+                context,
+                context.eyeOrigin(),
                 SoundEvents.ENDER_DRAGON_SHOOT,
                 SoundSource.PLAYERS,
                 0.5F,

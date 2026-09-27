@@ -14,6 +14,7 @@ import org.jspecify.annotations.Nullable;
  * Immutable cast parameters for a single spell invocation.
  * Geometry ({@link #origin}, {@link #lookDirection}) and optional {@link #itemSource}
  * are explicit so non-player casters (e.g. spell dispenser) can reuse the same pipeline.
+ * {@code muffled} silences spell-owned sounds for a dispenser with wool against any side.
  */
 public record SpellContext(
         Level level,
@@ -23,7 +24,8 @@ public record SpellContext(
         CastSource source,
         Vec3 origin,
         Vec3 lookDirection,
-        @Nullable Container itemSource
+        @Nullable Container itemSource,
+        boolean muffled
 ) {
     public SpellContext {
         if (origin == null) {
@@ -63,7 +65,8 @@ public record SpellContext(
                 CastSource.WEAPON,
                 target.position(),
                 player.getLookAngle(),
-                null
+                null,
+                false
         );
     }
 
@@ -84,7 +87,26 @@ public record SpellContext(
                 CastSource.FOLLOW_UP,
                 target.position(),
                 look,
-                null
+                null,
+                false
+        );
+    }
+
+    /** Same cast, with spell-owned sounds silenced or restored. */
+    public SpellContext withMuffled(boolean muffled) {
+        if (this.muffled == muffled) {
+            return this;
+        }
+        return new SpellContext(
+                level,
+                caster,
+                castingItem,
+                data,
+                source,
+                origin,
+                lookDirection,
+                itemSource,
+                muffled
         );
     }
 
@@ -109,7 +131,8 @@ public record SpellContext(
                 CastSource.DISPENSER,
                 origin,
                 lookDirection,
-                itemSource
+                itemSource,
+                false
         );
     }
 
@@ -129,7 +152,8 @@ public record SpellContext(
                 source,
                 player.position(),
                 player.getLookAngle(),
-                itemSource
+                itemSource,
+                false
         );
     }
 

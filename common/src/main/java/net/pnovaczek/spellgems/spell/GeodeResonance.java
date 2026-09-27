@@ -79,7 +79,8 @@ public class GeodeResonance extends AbstractSpell {
                 new HashSet<>(),
                 config.jumpCount,
                 config.jumpDelayTicks,
-                config.growthChance
+                config.growthChance,
+                context.muffled()
         );
         return true;
     }
@@ -91,7 +92,8 @@ public class GeodeResonance extends AbstractSpell {
             Set<BlockPos> visited,
             int jumpsLeft,
             int delayTicks,
-            float growthChance
+            float growthChance,
+            boolean muffled
     ) {
         if (jumpsLeft <= 0 || level.getServer() == null) {
             return;
@@ -108,26 +110,34 @@ public class GeodeResonance extends AbstractSpell {
             return;
         }
         visited.add(next);
-        resonate(level, caster, next, growthChance);
+        resonate(level, caster, next, growthChance, muffled);
 
         if (jumpsLeft <= 1) {
             return;
         }
         int tick = level.getServer().getTickCount();
         SpellBurstScheduler.scheduleServer(tick, delayTicks, () -> continueWave(
-                level, caster, next, visited, jumpsLeft - 1, delayTicks, growthChance
+                level, caster, next, visited, jumpsLeft - 1, delayTicks, growthChance, muffled
         ));
     }
 
-    private static void resonate(ServerLevel level, @Nullable Entity caster, BlockPos budPos, float growthChance) {
-        level.playSound(
-                null,
-                budPos,
-                SoundEvents.AMETHYST_BLOCK_RESONATE,
-                SoundSource.BLOCKS,
-                0.6F,
-                1.0F
-        );
+    private static void resonate(
+            ServerLevel level,
+            @Nullable Entity caster,
+            BlockPos budPos,
+            float growthChance,
+            boolean muffled
+    ) {
+        if (!muffled) {
+            level.playSound(
+                    null,
+                    budPos,
+                    SoundEvents.AMETHYST_BLOCK_RESONATE,
+                    SoundSource.BLOCKS,
+                    0.6F,
+                    1.0F
+            );
+        }
         spawnSparkParticles(level, budPos);
 
         BlockState budState = level.getBlockState(budPos);
