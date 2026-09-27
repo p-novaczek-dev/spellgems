@@ -6,6 +6,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -175,6 +176,13 @@ public class Vortex extends AbstractSpell {
             living.knockback(pullStrength, dx, dz);
             // Players ignore needsSync; hurtMarked sends motion to the client.
             living.hurtMarked = true;
+        } else if (entity instanceof ItemEntity item) {
+            // Same motion as Magnet: set a velocity toward the center and let the item glide.
+            if (pullStrength <= 0.0F) {
+                return;
+            }
+            item.setDeltaMovement(offset.normalize().scale(pullStrength));
+            item.needsSync = true;
         } else {
             Vec3 delta = offset.normalize().scale(pullDistance);
             entity.setPos(entity.getX() + delta.x, entity.getY() + delta.y, entity.getZ() + delta.z);
@@ -194,6 +202,9 @@ public class Vortex extends AbstractSpell {
     private static boolean isVortexTarget(Entity entity, @Nullable LivingEntity caster) {
         if (entity == caster || !entity.isAlive() || entity.isSpectator()) {
             return false;
+        }
+        if (entity instanceof ItemEntity item) {
+            return !item.getItem().isEmpty();
         }
         return entity instanceof LivingEntity || entity instanceof Projectile;
     }
