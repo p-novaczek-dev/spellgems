@@ -15,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import net.pnovaczek.spellgems.ModBlocks;
 import net.pnovaczek.spellgems.ModItems;
@@ -83,99 +84,37 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                     .unlockedBy("has_iron_ingot", has(net.minecraft.world.item.Items.IRON_INGOT))
                     .save(exporter, "shimmersteel_ingot");
 
-                // Raw Spellgem: amethyst_shard (infused) + lapis (infusing) + 8 mana essence
+                // Raw spell gem and every finished spell gem share this mana cost and time.
+                int gemMana = 8;
+                int gemTime = 200;
+
+                // Raw Spellgem: amethyst_shard (infused) + lapis (infusing)
                 ManaInfuserRecipeBuilder.create(
                         Ingredient.of(Items.AMETHYST_SHARD),
                         Ingredient.of(Items.LAPIS_LAZULI),
                         ModItems.RAW_SPELL_GEM,
-                        8)
+                        1,
+                        gemMana,
+                        gemTime)
                     .unlockedBy("has_amethyst_shard", has(Items.AMETHYST_SHARD))
                     .save(exporter, "raw_spell_gem");
 
-                // Spell gems from raw + specific item (shapeless, per blueprint)
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_PROJECTILE)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.ARROW)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_NOVA)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.GUNPOWDER)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_VORTEX)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.SLIME_BALL)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_BLINK)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.ENDER_PEARL)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_MAGNET)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.REDSTONE)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_PLACE_BLOCK)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.COBBLESTONE)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_BREAK_BLOCK)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.OBSIDIAN)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_PLANT)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.WHEAT_SEEDS)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_HARVEST)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.WHEAT)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_FEED)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.HAY_BLOCK)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_GROW)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.BONE_MEAL)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_POTION)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.GLASS_BOTTLE)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter, "spell_gem_potion");
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_TRANSMUTE)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.AMETHYST_SHARD)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
-
-                shapeless(RecipeCategory.MISC, ModItems.SPELL_GEM_GEODE_RESONANCE)
-                        .requires(ModItems.RAW_SPELL_GEM)
-                        .requires(Items.QUARTZ)
-                        .unlockedBy("has_raw_spell_gem", has(ModItems.RAW_SPELL_GEM))
-                        .save(exporter);
+                // Spell gems: raw spell gem infused by the spell's item.
+                spellGem(exporter, ModItems.SPELL_GEM_PROJECTILE, Items.ARROW, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_NOVA, Items.GUNPOWDER, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_VORTEX, Items.SLIME_BALL, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_BLINK, Items.ENDER_PEARL, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_MAGNET, Items.REDSTONE, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_PLACE_BLOCK, Items.COBBLESTONE, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_BREAK_BLOCK, Items.OBSIDIAN, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_PLANT, Items.WHEAT_SEEDS, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_HARVEST, Items.WHEAT, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_FEED, Items.HAY_BLOCK, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_GROW, Items.BONE_MEAL, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_POTION, Items.GLASS_BOTTLE, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_TRANSMUTE, Items.AMETHYST_SHARD, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_GEODE_RESONANCE, Items.QUARTZ, gemMana, gemTime);
+                spellGem(exporter, ModItems.SPELL_GEM_ITEM_TRANSPORT, Items.CHEST, gemMana, gemTime);
 
                 TransmuteRecipeBuilder.create(Ingredient.of(Blocks.TINTED_GLASS), ModBlocks.ASTRAL_BARRIER)
                         .save(exporter, "tinted_glass_to_astral_barrier");
@@ -340,8 +279,35 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         "recipe.spellgems.extend.description",
                         "spellgems:extend")
                         .save(exporter, "extend");
+
+                SpellEnchantingRecipeBuilder.utility(
+                        new SpellEnchantingRecipe.SpellEnchantInput(
+                                Optional.of(BuiltInRegistries.ITEM.getKey(ModItems.SPELL_GEM_ITEM_TRANSPORT)),
+                                Optional.empty(),
+                                Optional.empty()),
+                        lapisCatalyst,
+                        10,
+                        27,
+                        "recipe.spellgems.item_transport_void.description",
+                        "spellgems:void")
+                        .save(exporter, "item_transport_void");
             }
         };
+    }
+
+    /**
+     * Infuses a raw spell gem with {@code infusingItem}. Mana and time match the raw spell gem recipe.
+     */
+    private static void spellGem(RecipeOutput exporter, ItemLike result, ItemLike infusingItem, int mana, int time) {
+        String name = BuiltInRegistries.ITEM.getKey(result.asItem()).getPath();
+        ManaInfuserRecipeBuilder.create(
+                        Ingredient.of(ModItems.RAW_SPELL_GEM),
+                        Ingredient.of(infusingItem),
+                        result,
+                        1,
+                        mana,
+                        time)
+                .save(exporter, name);
     }
 
     /**

@@ -8,8 +8,10 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.pnovaczek.spellgems.ModComponents;
+import net.pnovaczek.spellgems.spell.ItemTransport;
 import net.pnovaczek.spellgems.spell.Spell;
 import net.pnovaczek.spellgems.spell.SpellContext;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
@@ -23,8 +25,16 @@ public class SpellGemItem extends Item {
     }
 
     @Override
+    public InteractionResult useOn(UseOnContext context) {
+        return ItemTransport.useOn(context);
+    }
+
+    @Override
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        if (ItemTransport.clearBinding(player, stack)) {
+            return InteractionResult.SUCCESS;
+        }
         SpellGemData spellData = getSpellData(stack);
         Spell spell = getSpell(spellData);
         if (spell != null) {

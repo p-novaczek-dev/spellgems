@@ -21,6 +21,7 @@
   "item.spellgems.spell_gem_grow": "Spell Gem",
   "item.spellgems.spell_gem_potion": "Spell Gem",
   "item.spellgems.spell_gem_transmute": "Spell Gem",
+  "item.spellgems.spell_gem_item_transport": "Spell Gem",
   "item.spellgems.greater_spell_gem": "Greater Spell Gem",
   "item.spellgems.spell_tome": "Spell Tome",
 
@@ -58,6 +59,9 @@
   "tooltip.spellgems.spell_gem.range": "%s Range",
   "tooltip.spellgems.spell_gem.area": "%s×%s Area",
   "tooltip.spellgems.spell_gem.jumps": "%s Jumps",
+  "tooltip.spellgems.spell_gem.stacks": "%s Stacks",
+  "tooltip.spellgems.spell_gem.bound": "Bound to %s, %s, %s",
+  "tooltip.spellgems.spell_gem.bound_dimension": "Bound to %s %s, %s, %s",
   "tooltip.spellgems.error": "ERROR",
   "tooltip.spellgems.spell_tome.description": "Can be applied to spell gems in a Gem Forge",
   "tooltip.spellgems.wand.depleted": "Cannot cast spells while depleted",
@@ -100,6 +104,9 @@
   "tooltip.spellgems.spell.potion.description": "Can be enchanted with any potion",
   "tooltip.spellgems.spell.transmute.name": "Transmute",
   "tooltip.spellgems.spell.transmute.description": "Turns specific blocks into other blocks",
+  "tooltip.spellgems.spell.item_transport.name": "Item Transport",
+  "tooltip.spellgems.spell.item_transport.description": "Moves items from the targeted inventory into a bound inventory",
+  "tooltip.spellgems.spell.item_transport.bind": "Sneak right-click an inventory to bind. Sneak right-click air to clear.",
   "tooltip.spellgems.spell_gem_potion.astral_bow": "Can be used in an Astral Bow for a tipped arrow effect",
 
   "tooltip.spellgems.spell_enchantment.chaining.name": "Chaining",
@@ -166,6 +173,8 @@
   "tooltip.spellgems.spell_enchantment.silk_touch.description": "Drops blocks intact",
   "tooltip.spellgems.spell_enchantment.extend.name": "Extend",
   "tooltip.spellgems.spell_enchantment.extend.description": "Increases range",
+  "tooltip.spellgems.spell_enchantment.void.name": "Void",
+  "tooltip.spellgems.spell_enchantment.void.description": "Destroys items that do not fit in the bound inventory",
 
   "enchantment.spellgems.recharge": "Recharge",
   "enchantment.spellgems.recharge.desc": "Passively restores wand durability over time.",
@@ -177,6 +186,7 @@
   "recipe.spellgems.break_block_silk_touch.description": "Silk touch",
   "recipe.spellgems.smelt.description": "Smelt",
   "recipe.spellgems.extend.description": "Extend",
+  "recipe.spellgems.item_transport_void.description": "Void",
 
   "container.spellgems.wand": "Wand",
   "container.spellgems.astral_bow": "Astral Bow",

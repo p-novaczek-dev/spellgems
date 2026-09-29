@@ -44,5 +44,6 @@ public final class ModSpells {
         register(SpellIds.POTION, new PotionSpell());
         register(SpellIds.TRANSMUTE, new Transmute());
         register(SpellIds.GEODE_RESONANCE, new GeodeResonance());
+        register(SpellIds.ITEM_TRANSPORT, new ItemTransport());
     }
 }

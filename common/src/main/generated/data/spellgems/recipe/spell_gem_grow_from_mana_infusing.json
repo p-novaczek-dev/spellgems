@@ -1,0 +1,10 @@
+{
+  "type": "spellgems:mana_infusing",
+  "infused_item": "spellgems:raw_spell_gem",
+  "infusing_item": "minecraft:bone_meal",
+  "mana_cost": 8,
+  "processing_time": 200,
+  "result": {
+    "id": "spellgems:spell_gem_grow"
+  }
+}

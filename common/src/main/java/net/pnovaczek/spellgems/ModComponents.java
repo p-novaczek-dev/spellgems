@@ -4,6 +4,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.pnovaczek.spellgems.item.data.AstralBowData;
+import net.pnovaczek.spellgems.item.data.InventoryBinding;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.TomeData;
 import net.pnovaczek.spellgems.item.data.WandData;
@@ -20,6 +21,7 @@ public final class ModComponents {
     public static DataComponentType<TomeData> TOME_DATA;
     public static DataComponentType<WandData> WAND_DATA;
     public static DataComponentType<AstralBowData> ASTRAL_BOW_DATA;
+    public static DataComponentType<InventoryBinding> INVENTORY_BINDING;
 
     private ModComponents() {
     }
@@ -48,6 +50,12 @@ public final class ModComponents {
                 builder -> builder
                         .persistent(AstralBowData.CODEC)
                         .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(AstralBowData.CODEC))
+        );
+        INVENTORY_BINDING = register(
+                "inventory_binding",
+                builder -> builder
+                        .persistent(InventoryBinding.CODEC)
+                        .networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(InventoryBinding.CODEC))
         );
     }
 

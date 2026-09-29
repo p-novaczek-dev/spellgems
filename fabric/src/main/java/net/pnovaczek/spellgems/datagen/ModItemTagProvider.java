@@ -40,7 +40,8 @@ public class ModItemTagProvider extends FabricTagsProvider.ItemTagsProvider {
                 .add(ModItems.keyOfItem("spell_gem_grow"))
                 .add(ModItems.keyOfItem("spell_gem_potion"))
                 .add(ModItems.keyOfItem("spell_gem_transmute"))
-                .add(ModItems.keyOfItem("spell_gem_geode_resonance"));
+                .add(ModItems.keyOfItem("spell_gem_geode_resonance"))
+                .add(ModItems.keyOfItem("spell_gem_item_transport"));
 
         builder(ModTags.SPELL_GEMS)
                 .addTag(ModTags.COMBAT_SPELL_GEMS)

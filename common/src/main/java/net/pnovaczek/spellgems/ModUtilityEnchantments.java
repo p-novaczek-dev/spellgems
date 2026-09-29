@@ -28,5 +28,6 @@ public class ModUtilityEnchantments {
         register(UtilityEnchantments.SMELT, new UtilityEnchantment(UtilityEnchantments.SMELT));
         register(UtilityEnchantments.SILK_TOUCH, new UtilityEnchantment(UtilityEnchantments.SILK_TOUCH));
         register(UtilityEnchantments.EXTEND, new UtilityEnchantment(UtilityEnchantments.EXTEND));
+        register(UtilityEnchantments.VOID, new UtilityEnchantment(UtilityEnchantments.VOID));
     }
 }

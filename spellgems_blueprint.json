@@ -16,7 +16,7 @@
         },
         {
             "name": "raw spell gem",
-            "description": "Unformed magical crystal made in the mana infuser. Combined with a spell-specific item to create a functional spell gem."
+            "description": "Unformed magical crystal made in the mana infuser. Infusing it there with a spell-specific item creates a functional spell gem."
         },
         {
             "name": "shimmersteel",
@@ -46,7 +46,7 @@
         {
             "name": "mana infuser",
             "description": "Machine that infuses vanilla items with mana essence.",
-            "mechanics": "Works similarly to a furnace or brewing stand. Mana essence is the fuel. Used to create raw spell gems, shimmersteel, and other infused materials."
+            "mechanics": "Works similarly to a furnace or brewing stand. Mana essence is the fuel. Used to create raw spell gems, finished spell gems, shimmersteel, and other infused materials."
         },
         {
             "name": "spell enchanting table",
@@ -76,7 +76,7 @@
     "spell_gems": {
         "use": "Cast by using the gem directly, from a wand, from an astral bow (potion gems), or from a spell dispenser.",
         "tooltip": "Shows applied spell enchantments. Holding shift also shows short descriptions of the spell and its enchantments.",
-        "crafting": "Made in two steps: create a raw spell gem in the mana infuser, then combine it with a spell-specific item.",
+        "crafting": "Made in the mana infuser by infusing a raw spell gem with a spell-specific item. The raw spell gem is made in the mana infuser first.",
         "combat": {
             "spells": [
                 {
@@ -142,6 +142,10 @@
                 {
                     "name": "transmute",
                     "description": "Shoots a slower purple projectile. Hitting a block that has a transmute recipe changes it into the result block."
+                },
+                {
+                    "name": "item transport",
+                    "description": "Binds to an inventory, then moves items from the targeted inventory into that one. A wand casts at the block the player is looking at, and a spell dispenser casts at the block in front of it. The void enchantment destroys items that do not fit."
                 }
             ]
         }
@@ -239,6 +243,11 @@
                     "name": "extend",
                     "description": "Increases Blink range.",
                     "compatible_spells": ["blink", "magnet"]
+                },
+                {
+                    "name": "void",
+                    "description": "Destroys items that do not fit in the bound inventory.",
+                    "compatible_spells": ["item transport"]
                 },
                 {
                     "name": "potion effect",

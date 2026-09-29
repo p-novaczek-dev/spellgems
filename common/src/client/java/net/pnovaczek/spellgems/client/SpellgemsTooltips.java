@@ -1,6 +1,7 @@
 package net.pnovaczek.spellgems.client;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.CommonComponents;
@@ -23,6 +24,7 @@ import net.pnovaczek.spellgems.item.SpellGemItem;
 import net.pnovaczek.spellgems.item.SpellTomeItem;
 import net.pnovaczek.spellgems.item.WeaponSocketing;
 import net.pnovaczek.spellgems.item.data.AstralBowData;
+import net.pnovaczek.spellgems.item.data.InventoryBinding;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.WandData;
 import net.pnovaczek.spellgems.platform.client.ClientPlatform;
@@ -131,9 +133,9 @@ public class SpellgemsTooltips {
                 }
             }
             else if (stack.getItem() instanceof SpellGemItem) {
-                appendGreaterOrSingleGemTooltip(stack.get(ModComponents.SPELL_GEM_DATA), lines, tooltipContext, true);
+                appendGreaterOrSingleGemTooltip(stack.get(ModComponents.SPELL_GEM_DATA), lines, tooltipContext, true, stack);
             } else {
-                appendGreaterOrSingleGemTooltip(WeaponSocketing.getSocketedGem(stack), lines, tooltipContext, false);
+                appendGreaterOrSingleGemTooltip(WeaponSocketing.getSocketedGem(stack), lines, tooltipContext, false, ItemStack.EMPTY);
             }
         });
     }
@@ -142,17 +144,18 @@ public class SpellgemsTooltips {
             SpellGemData data,
             List<Component> lines,
             net.minecraft.world.item.Item.TooltipContext tooltipContext,
-            boolean includeCastStats
+            boolean includeCastStats,
+            ItemStack stack
     ) {
         if (data == null) {
             return;
         }
         boolean shiftDown = Minecraft.getInstance().hasShiftDown();
         if (data.followUp().isPresent()) {
-            appendSpellGemTooltip(data.withoutFollowUp(), lines, tooltipContext, false);
-            appendSpellGemTooltip(data.followUp().get(), lines, tooltipContext, false);
+            appendSpellGemTooltip(data.withoutFollowUp(), lines, tooltipContext, false, ItemStack.EMPTY);
+            appendSpellGemTooltip(data.followUp().get(), lines, tooltipContext, false, ItemStack.EMPTY);
         } else {
-            appendSpellGemTooltip(data, lines, tooltipContext, includeCastStats);
+            appendSpellGemTooltip(data, lines, tooltipContext, includeCastStats, stack);
         }
         if (!shiftDown) {
             lines.add(Component.translatable("tooltip.spellgems.shift_hint").withStyle(ChatFormatting.DARK_GRAY));
@@ -165,7 +168,8 @@ public class SpellgemsTooltips {
             SpellGemData data,
             List<Component> lines,
             net.minecraft.world.item.Item.TooltipContext tooltipContext,
-            boolean includeCastStats
+            boolean includeCastStats,
+            ItemStack stack
     ) {
         if (data == null) {
             return;
@@ -186,6 +190,9 @@ public class SpellgemsTooltips {
                 lines.add(Component.translatable("tooltip.spellgems.spell_gem_potion.astral_bow").withStyle(ChatFormatting.DARK_GRAY));
             } else {
                 lines.add(Component.translatable(spell.tooltipDescriptionKey()).withStyle(ChatFormatting.DARK_GRAY));
+            }
+            if (spell.id().equals(SpellIds.ITEM_TRANSPORT)) {
+                lines.add(Component.translatable("tooltip.spellgems.spell.item_transport.bind").withStyle(ChatFormatting.DARK_GRAY));
             }
         }
 
@@ -227,7 +234,7 @@ public class SpellgemsTooltips {
 
         if (shiftDown) {
             appendDamageStat(data, lines);
-            appendUtilityStats(data, lines);
+            appendUtilityStats(data, lines, stack);
             if (includeCastStats) {
                 appendCastStats(data, lines);
             }
@@ -253,7 +260,7 @@ public class SpellgemsTooltips {
     }
 
     /** Range, area, and jump count for utility gems. Shown above wand cost and dispenser cooldown. */
-    private static void appendUtilityStats(SpellGemData data, List<Component> lines) {
+    private static void appendUtilityStats(SpellGemData data, List<Component> lines, ItemStack stack) {
         Identifier spellId = data.spellId();
         boolean extended = data.utilityEffects().stream().anyMatch(effect -> effect.is(UtilityEnchantments.EXTEND));
         if (spellId.equals(SpellIds.BLINK)) {
@@ -291,6 +298,44 @@ public class SpellgemsTooltips {
                     Integer.toString(geode.jumpCount)
             ));
             appendRangeStat(lines, geode.searchRadius);
+        } else if (spellId.equals(SpellIds.ITEM_TRANSPORT)) {
+            SpellgemsConfig.ItemTransportSpellConfig transport = Spellgems.CONFIG.spells.itemTransport;
+            if (transport != null) {
+                appendIndentedStat(lines, Component.translatable(
+                        "tooltip.spellgems.spell_gem.stacks",
+                        Integer.toString(transport.maxStacks)
+                ));
+            }
+            appendBoundStat(lines, stack);
+        }
+    }
+
+    private static void appendBoundStat(List<Component> lines, ItemStack stack) {
+        if (stack.isEmpty()) {
+            return;
+        }
+        InventoryBinding binding = stack.get(ModComponents.INVENTORY_BINDING);
+        if (binding == null) {
+            return;
+        }
+        BlockPos pos = binding.pos();
+        var level = Minecraft.getInstance().level;
+        boolean otherDimension = level == null || !level.dimension().equals(binding.dimension());
+        if (otherDimension) {
+            appendIndentedStat(lines, Component.translatable(
+                    "tooltip.spellgems.spell_gem.bound_dimension",
+                    Component.translatable(binding.dimension().identifier().toLanguageKey("dimension")),
+                    Integer.toString(pos.getX()),
+                    Integer.toString(pos.getY()),
+                    Integer.toString(pos.getZ())
+            ));
+        } else {
+            appendIndentedStat(lines, Component.translatable(
+                    "tooltip.spellgems.spell_gem.bound",
+                    Integer.toString(pos.getX()),
+                    Integer.toString(pos.getY()),
+                    Integer.toString(pos.getZ())
+            ));
         }
     }
 

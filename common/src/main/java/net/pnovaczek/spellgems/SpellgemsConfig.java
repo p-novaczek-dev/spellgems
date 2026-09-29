@@ -74,6 +74,7 @@ public class SpellgemsConfig {
         public AreaSpellConfig plant = new AreaSpellConfig();
         public SpellConfig transmute = new SpellConfig();
         public GeodeResonanceSpellConfig geodeResonance = new GeodeResonanceSpellConfig();
+        public ItemTransportSpellConfig itemTransport = new ItemTransportSpellConfig();
 
         public SpellConfigs() {
             // Provide the canonical default wand durability costs here.
@@ -89,6 +90,8 @@ public class SpellgemsConfig {
             transmute.dispenserCooldownTicks = 1;
             geodeResonance.wandDurabilityCost = 128;
             geodeResonance.dispenserCooldownTicks = 40;
+            itemTransport.wandDurabilityCost = 32;
+            itemTransport.dispenserCooldownTicks = 1;
         }
 
         /** Returns a spell-specific config by ID (for more uniform access). */
@@ -107,6 +110,7 @@ public class SpellgemsConfig {
             if (spellId.equals(SpellIds.PLANT)) return plant;
             if (spellId.equals(SpellIds.TRANSMUTE)) return transmute;
             if (spellId.equals(SpellIds.GEODE_RESONANCE)) return geodeResonance;
+            if (spellId.equals(SpellIds.ITEM_TRANSPORT)) return itemTransport;
 
             // Unknown spell: return a fresh default (cost=1)
             return new SpellConfig();
@@ -132,6 +136,24 @@ public class SpellgemsConfig {
             if (transmute != null) transmute.validate();
             if (geodeResonance == null) geodeResonance = new GeodeResonanceSpellConfig();
             geodeResonance.validate();
+            if (itemTransport == null) itemTransport = new ItemTransportSpellConfig();
+            itemTransport.validate();
+        }
+    }
+
+    public static class ItemTransportSpellConfig extends SpellConfig {
+        /** Maximum number of source stacks moved in one cast. */
+        public int maxStacks = 27;
+
+        public ItemTransportSpellConfig() {
+            wandDurabilityCost = 32;
+            dispenserCooldownTicks = 1;
+        }
+
+        @Override
+        public void validate() {
+            super.validate();
+            maxStacks = Math.max(1, maxStacks);
         }
     }
 
