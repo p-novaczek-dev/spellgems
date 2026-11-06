@@ -29,7 +29,7 @@
                 "durability": "Casting consumes durability. When it runs out, the wand becomes a depleted wand (like a broken elytra) and cannot cast until repaired.",
                 "repair": "Repaired with shimmersteel. Mending also works.",
                 "enchantments": "Can take Unbreaking, Mending, and the wand-exclusive Recharge enchantment, which slowly restores durability over time.",
-                "spell_slots": "Holds a set of spell gems. The player can open a small inventory on the wand to insert, remove, or rearrange gems, cycle the selected gem, and quick-cast from individual slots."
+                "spell_slots": "Holds a set of spell gems. The player can open a small inventory on the wand to insert, remove, or rearrange gems, click a slot number or cycle to select a gem, and quick-cast from individual slots."
             }
         },
         {
@@ -95,7 +95,7 @@
         },
         "greater": {
             "name": "greater spell gem",
-            "description": "Two different combat gems combined at the gem forge. Casting uses the first spell; each living target it hits directly then takes the second spell after a short delay. Wand cost and dispenser cooldown are the sum of both spells. Valid pairings are projectile then nova, projectile then vortex, and vortex then nova."
+            "description": "Two different combat gems combined at the gem forge. Casting uses the first spell; each living target it hits directly then takes the second spell after a short delay. Wand cost and dispenser cooldown are the sum of both spells. Valid pairings are projectile then nova, projectile then vortex, and vortex then nova. Affixes belong to the finished gem and are applied after combining."
         },
         "utility": {
             "spells": [
@@ -152,7 +152,7 @@
     },
     "catalyst_books": {
         "name": "spell tome",
-        "description": "Books that hold a spell enchantment. Applied to spell gems at the gem forge if the gem does not already have an enchantment of the same type (modifier or strike)."
+        "description": "Books that hold a spell enchantment or combat affixes. Enchantment tomes are applied to spell gems at the gem forge if the gem does not already have an enchantment of the same type (modifier or strike). Affix tomes merge with each other and apply onto combat gems."
     },
     "spell_enchantments": {
         "combat": {
@@ -225,6 +225,40 @@
                     { "name": "wind charge", "description": "On hit, creates a wind-charge burst on the target." }
                 ]
             }
+        },
+        "affix": {
+            "application": "Chosen onto a book at the spell enchanting table, then merged and applied to combat gems at the gem forge. A gem can carry affixes together with a modifier and a strike. Affixes do not count as the gem being enchanted, and they do not add wand durability cost. Shown in gold under the strike on a spell gem, and once after both spells on a greater gem. They are left off the wand and astral bow cycle line.",
+            "compatible_spells": ["projectile", "nova", "vortex"],
+            "enchantments": [
+                {
+                    "name": "looting",
+                    "description": "Increases mob item drops the same way vanilla Looting does. Can be leveled. Exclusive with No Loot."
+                },
+                {
+                    "name": "no loot",
+                    "description": "The mob drops no loot-table items. Heads from Decapitate and gear from Scavenge still drop. Exclusive with Looting."
+                },
+                {
+                    "name": "xp boost",
+                    "description": "Increases experience dropped by the mob. Can be leveled. Exclusive with No XP."
+                },
+                {
+                    "name": "no xp",
+                    "description": "The mob drops no experience. Exclusive with XP Boost."
+                },
+                {
+                    "name": "decapitate",
+                    "description": "Guarantees a head from mobs whose death loot can include one. Charged creepers still drop creeper heads on their own."
+                },
+                {
+                    "name": "scavenge",
+                    "description": "The mob always drops armor it is wearing and weapons or tools it is holding."
+                },
+                {
+                    "name": "magnet",
+                    "description": "Pulls the kill's item and experience drops toward the caster, the same way the magnet spell does."
+                }
+            ]
         },
         "utility": {
             "application": "Applied deterministically at the spell enchanting table, often with a matching catalyst.",

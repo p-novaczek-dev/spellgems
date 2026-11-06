@@ -1,0 +1,7 @@
+{
+  "type": "spellgems:gem_forging",
+  "ingredient_1": "#spellgems:catalyst_books",
+  "ingredient_2": "#spellgems:catalyst_books",
+  "operation": "merge_affix_tomes",
+  "xp_cost": 0
+}

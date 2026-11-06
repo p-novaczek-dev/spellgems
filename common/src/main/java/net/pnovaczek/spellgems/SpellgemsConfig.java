@@ -20,6 +20,8 @@ public class SpellgemsConfig {
     public final AstralBowConfig astralBow = new AstralBowConfig();
     /** Spell dispenser machine settings (cooldown is per-spell; burnout is global). */
     public final SpellDispenserConfig spellDispenser = new SpellDispenserConfig();
+    /** Combat-gem affix tuning. Not final: Gson leaves a missing object null and validate() replaces it. */
+    public AffixConfig affixes = new AffixConfig();
     public int strikeEffectDuration = 120;
     public float strikeCloudDamage = 2.0F;
     public float drainHealPerTarget = 2.0F;
@@ -218,6 +220,30 @@ public class SpellgemsConfig {
         }
     }
 
+    public static class AffixConfig {
+        /** XP charged for the first affix weight when a tome is applied to a gem. */
+        public int baseXpCost = 7;
+        public int maxLootingLevel = 5;
+        public int maxXpBoostLevel = 5;
+        /** Added to the experience multiplier per XP Boost level. Level 1 is 1 + this value. */
+        public double xpBoostPerLevel = 0.5;
+
+        public void validate() {
+            if (baseXpCost < 1) {
+                baseXpCost = 7;
+            }
+            if (maxLootingLevel < 1) {
+                maxLootingLevel = 5;
+            }
+            if (maxXpBoostLevel < 1) {
+                maxXpBoostLevel = 5;
+            }
+            if (xpBoostPerLevel < 0) {
+                xpBoostPerLevel = 0.5;
+            }
+        }
+    }
+
     public static class SpellCombatConfig extends SpellConfig {
         public float damage = 2.0F;
         public float powerDamageMultiplier = 4.0F;
@@ -386,6 +412,10 @@ public class SpellgemsConfig {
         if (astralBow != null) astralBow.validate();
         if (spells != null) spells.validate();
         if (spellDispenser != null) spellDispenser.validate();
+        if (affixes == null) {
+            affixes = new AffixConfig();
+        }
+        affixes.validate();
     }
 
     /** Per-spell dispenser cooldown in ticks (default 20). */

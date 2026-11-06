@@ -26,6 +26,7 @@ import net.pnovaczek.spellgems.recipe.ManaInfuserRecipeBuilder;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipeBuilder;
 import net.pnovaczek.spellgems.recipe.TransmuteRecipeBuilder;
+import net.pnovaczek.spellgems.spell.enchantment.SpellAffixes;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -177,6 +178,19 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                                 5345)
                         .save(exporter, "greater_spell_gem");
 
+                GemForgeRecipeBuilder.mergeAffixTomes(ingredientFromTag(ModTags.CATALYST_BOOKS), 0)
+                        .save(exporter, "merge_affix_tomes");
+
+                GemForgeRecipeBuilder.applyAffix(
+                                Ingredient.of(
+                                        ModItems.SPELL_GEM_PROJECTILE,
+                                        ModItems.SPELL_GEM_NOVA,
+                                        ModItems.SPELL_GEM_VORTEX,
+                                        ModItems.GREATER_SPELL_GEM),
+                                ingredientFromTag(ModTags.CATALYST_BOOKS),
+                                0)
+                        .save(exporter, "apply_affix");
+
                 // Spell Enchanting Table: 1 book + 2 shimmersteel + 4 obsidian
                 shaped(RecipeCategory.DECORATIONS, ModBlocks.SPELL_ENCHANTING_TABLE)
                         .pattern(" B ")
@@ -233,6 +247,21 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         0,
                         1)
                         .save(exporter, "combat_tome_strike");
+
+                var emeraldCatalyst = new SpellEnchantingRecipe.CatalystDefinition(
+                        BuiltInRegistries.ITEM.getKey(Items.EMERALD),
+                        1);
+                var bookInput = new SpellEnchantingRecipe.SpellEnchantInput(
+                        Optional.of(BuiltInRegistries.ITEM.getKey(Items.BOOK)),
+                        Optional.empty(),
+                        Optional.empty());
+                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.LOOTING, "looting");
+                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.NO_LOOT, "no_loot");
+                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.XP_BOOST, "xp_boost");
+                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.NO_XP, "no_xp");
+                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.DECAPITATE, "decapitate", 40, 1525);
+                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.SCAVENGE, "scavenge", 40, 1525);
+                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.MAGNET, "magnet");
 
                 SpellEnchantingRecipeBuilder.potionEnchant(
                         10,
@@ -293,6 +322,35 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .save(exporter, "item_transport_void");
             }
         };
+    }
+
+    private static void saveAffixTome(
+            RecipeOutput exporter,
+            SpellEnchantingRecipe.SpellEnchantInput book,
+            SpellEnchantingRecipe.CatalystDefinition emerald,
+            Identifier affixId,
+            String path
+    ) {
+        saveAffixTome(exporter, book, emerald, affixId, path, 8, 112);
+    }
+
+    private static void saveAffixTome(
+            RecipeOutput exporter,
+            SpellEnchantingRecipe.SpellEnchantInput book,
+            SpellEnchantingRecipe.CatalystDefinition emerald,
+            Identifier affixId,
+            String path,
+            int levelRequirement,
+            int xpCost
+    ) {
+        SpellEnchantingRecipeBuilder.affix(
+                        book,
+                        emerald,
+                        levelRequirement,
+                        xpCost,
+                        "recipe.spellgems.tome_affix_" + path + ".description",
+                        affixId)
+                .save(exporter, "tome_affix_" + path);
     }
 
     /**

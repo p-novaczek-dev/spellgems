@@ -1,6 +1,8 @@
 package net.pnovaczek.spellgems;
 
 import net.pnovaczek.spellgems.item.WeaponSocketing;
+import net.pnovaczek.spellgems.spell.affix.AffixDrops;
+import net.pnovaczek.spellgems.spell.affix.AffixKills;
 import net.pnovaczek.spellgems.loot.VillageManaRootLoot;
 import net.pnovaczek.spellgems.network.ModNetworking;
 import net.pnovaczek.spellgems.platform.Platform;
@@ -57,5 +59,18 @@ public final class Spellgems {
 		Platform.lifecycle().onModifyLootTable((key, tableBuilder, builtin, registries) ->
 				VillageManaRootLoot.tryInject(key, tableBuilder, builtin));
 		Platform.lifecycle().onPlayerAttackLiving(WeaponSocketing::onPlayerAttackLiving);
+		Platform.lifecycle().onServerTickEnd(AffixKills::onServerTickEnd);
+		Platform.lifecycle().onLivingDamagePre(AffixKills::beforeDamage);
+		Platform.lifecycle().onLivingDeath((entity, source) -> AffixKills.storeEquipment(entity));
+		Platform.lifecycle().onLivingDrops((entity, source, drops) -> {
+			if (!AffixDrops.shouldRewrite(entity)) {
+				AffixKills.scheduleMagnet(entity);
+				return;
+			}
+			var rewritten = AffixDrops.rewrite(entity, (net.minecraft.server.level.ServerLevel) entity.level(), drops);
+			drops.clear();
+			drops.addAll(rewritten);
+			AffixKills.scheduleMagnet(entity);
+		});
 	}
 }

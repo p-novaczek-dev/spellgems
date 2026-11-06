@@ -44,7 +44,7 @@ public class SpellEnchantingRecipeBuilder implements RecipeBuilder {
                 new SpellEnchantingRecipe.SpellEnchantResult(
                         modifiers > 0 ? Optional.of(modifiers) : Optional.empty(),
                         strikes > 0 ? Optional.of(strikes) : Optional.empty(),
-                        Optional.empty(), false));
+                        Optional.empty(), false, Optional.empty()));
     }
 
     public static SpellEnchantingRecipeBuilder utility(SpellEnchantingRecipe.SpellEnchantInput input,
@@ -54,7 +54,7 @@ public class SpellEnchantingRecipeBuilder implements RecipeBuilder {
                                                        String utilityEnchant) {
         return new SpellEnchantingRecipeBuilder("utility", input, catalyst, levelRequirement, xpCost, descriptionKey,
                 new SpellEnchantingRecipe.SpellEnchantResult(Optional.empty(), Optional.empty(),
-                        Optional.of(Identifier.parse(utilityEnchant)), false));
+                        Optional.of(Identifier.parse(utilityEnchant)), false, Optional.empty()));
     }
 
     public static SpellEnchantingRecipeBuilder potionEnchant(int levelRequirement, int xpCost, String descriptionKey) {
@@ -71,8 +71,18 @@ public class SpellEnchantingRecipeBuilder implements RecipeBuilder {
                 levelRequirement,
                 xpCost,
                 descriptionKey,
-                new SpellEnchantingRecipe.SpellEnchantResult(Optional.empty(), Optional.empty(), Optional.empty(), true)
+                new SpellEnchantingRecipe.SpellEnchantResult(Optional.empty(), Optional.empty(), Optional.empty(), true, Optional.empty())
         );
+    }
+
+    public static SpellEnchantingRecipeBuilder affix(SpellEnchantingRecipe.SpellEnchantInput input,
+                                                     SpellEnchantingRecipe.CatalystDefinition catalyst,
+                                                     int levelRequirement, int xpCost,
+                                                     String descriptionKey,
+                                                     Identifier affixId) {
+        return new SpellEnchantingRecipeBuilder("affix", input, catalyst, levelRequirement, xpCost, descriptionKey,
+                new SpellEnchantingRecipe.SpellEnchantResult(
+                        Optional.empty(), Optional.empty(), Optional.empty(), false, Optional.of(affixId)));
     }
 
     @Override

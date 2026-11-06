@@ -1,20 +1,26 @@
 package net.pnovaczek.spellgems.screen;
 
+import net.minecraft.network.protocol.game.ClientboundSetPlayerInventoryPacket;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.ModMenuTypes;
 import net.pnovaczek.spellgems.ModTags;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.inventory.WandBackedContainer;
 import net.pnovaczek.spellgems.inventory.WandContainer;
+import net.pnovaczek.spellgems.item.data.WandData;
 import org.jspecify.annotations.Nullable;
 
 public class WandMenu extends AbstractContainerMenu {
@@ -35,6 +41,7 @@ public class WandMenu extends AbstractContainerMenu {
 
     private final Container wandSlots;
     private final @Nullable InteractionHand wandHand;
+    private final DataSlot selectedSlot = DataSlot.standalone();
 
     @SuppressWarnings("this-escape")
     public WandMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
@@ -43,6 +50,7 @@ public class WandMenu extends AbstractContainerMenu {
         this.wandSlots = new WandBackedContainer(playerInventory.player, hand);
         addWandSlots();
         addPlayerInventory(playerInventory);
+        trackSelectedSlot(playerInventory.player);
     }
 
     @SuppressWarnings("this-escape")
@@ -52,6 +60,70 @@ public class WandMenu extends AbstractContainerMenu {
         this.wandSlots = new SimpleContainer(WandContainer.SIZE);
         addWandSlots();
         addPlayerInventory(playerInventory);
+        trackSelectedSlot(playerInventory.player);
+    }
+
+    public int getSelectedSlot() {
+        return Mth.clamp(this.selectedSlot.get(), 0, GEM_SLOT_COUNT - 1);
+    }
+
+    @Override
+    public boolean clickMenuButton(Player player, int id) {
+        if (id < 0 || id >= GEM_SLOT_COUNT || this.selectedSlot.get() == id) {
+            return false;
+        }
+        // The client menu has no hand. Predicting here lets the number update before the server answers.
+        if (this.wandHand == null) {
+            this.selectedSlot.set(id);
+            return true;
+        }
+        ItemStack wand = player.getItemInHand(this.wandHand);
+        if (!wand.is(ModItems.WAND)) {
+            return false;
+        }
+        wand.set(ModComponents.WAND_DATA, new WandData(id));
+        this.selectedSlot.set(id);
+        syncHand(player, this.wandHand, wand);
+        return true;
+    }
+
+    private static void syncHand(Player player, InteractionHand hand, ItemStack stack) {
+        if (!(player instanceof ServerPlayer serverPlayer)) {
+            return;
+        }
+        int slot = hand == InteractionHand.OFF_HAND
+                ? Inventory.SLOT_OFFHAND
+                : serverPlayer.getInventory().getSelectedSlot();
+        serverPlayer.connection.send(new ClientboundSetPlayerInventoryPacket(slot, stack));
+    }
+
+    private void trackSelectedSlot(Player player) {
+        this.selectedSlot.set(readSelectedSlot(player, this.wandHand));
+        this.addDataSlot(this.selectedSlot);
+    }
+
+    private static int readSelectedSlot(Player player, @Nullable InteractionHand hand) {
+        if (hand != null) {
+            return selectedSlotOf(player.getItemInHand(hand));
+        }
+        for (InteractionHand candidate : InteractionHand.values()) {
+            ItemStack stack = player.getItemInHand(candidate);
+            if (stack.is(ModItems.WAND)) {
+                return selectedSlotOf(stack);
+            }
+        }
+        return 0;
+    }
+
+    private static int selectedSlotOf(ItemStack stack) {
+        if (!stack.is(ModItems.WAND)) {
+            return 0;
+        }
+        return Mth.clamp(
+                stack.getOrDefault(ModComponents.WAND_DATA, WandData.DEFAULT).selectedSlot(),
+                0,
+                GEM_SLOT_COUNT - 1
+        );
     }
 
     @SuppressWarnings("this-escape")

@@ -2,6 +2,7 @@ package net.pnovaczek.spellgems.client.screen;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -39,10 +40,17 @@ public class WandScreen extends AbstractContainerScreen<WandMenu> {
     public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         super.extractContents(graphics, mouseX, mouseY, delta);
 
-        int selectedSlot = SelectedGemSlotIndicator.getWandSelectedSlot(this.minecraft);
         graphics.pose().pushMatrix();
         graphics.pose().translate(this.leftPos, this.topPos);
-        SelectedGemSlotIndicator.render(graphics, this.font, selectedSlot);
+        SelectedGemSlotIndicator.render(graphics, this.font, this.menu.getSelectedSlot());
         graphics.pose().popMatrix();
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (SelectedGemSlotIndicator.mouseClicked(this.menu, event, this.leftPos, this.topPos, this.minecraft)) {
+            return true;
+        }
+        return super.mouseClicked(event, doubleClick);
     }
 }

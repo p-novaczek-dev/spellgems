@@ -7,6 +7,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.Identifier;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
+import net.pnovaczek.spellgems.spell.enchantment.SpellAffix;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantment;
 
@@ -19,6 +20,7 @@ public record SpellGemData(
         List<StrikeEnchantment> strikeEffects,
         List<UtilityEnchantment> utilityEffects,
         List<PotionEnchantment> potionEffects,
+        List<SpellAffix> affixes,
         Optional<SpellGemData> followUp
 ) {
 
@@ -30,10 +32,22 @@ public record SpellGemData(
                             StrikeEnchantment.CODEC.listOf().fieldOf("strikes").forGetter(SpellGemData::strikeEffects),
                             UtilityEnchantment.CODEC.listOf().fieldOf("utilities").forGetter(SpellGemData::utilityEffects),
                             PotionEnchantment.CODEC.listOf().fieldOf("potions").forGetter(SpellGemData::potionEffects),
+                            SpellAffix.CODEC.listOf().optionalFieldOf("affixes", List.of()).forGetter(SpellGemData::affixes),
                             self.optionalFieldOf("follow_up").forGetter(SpellGemData::followUp)
                     ).apply(instance, SpellGemData::new)
             )
     );
+
+    public SpellGemData {
+        modifierEffects = copy(modifierEffects);
+        strikeEffects = copy(strikeEffects);
+        utilityEffects = copy(utilityEffects);
+        potionEffects = copy(potionEffects);
+        affixes = copy(affixes);
+        if (followUp == null) {
+            followUp = Optional.empty();
+        }
+    }
 
     public SpellGemData(
             Identifier spellId,
@@ -42,16 +56,36 @@ public record SpellGemData(
             List<UtilityEnchantment> utilityEffects,
             List<PotionEnchantment> potionEffects
     ) {
-        this(spellId, modifierEffects, strikeEffects, utilityEffects, potionEffects, Optional.empty());
+        this(spellId, modifierEffects, strikeEffects, utilityEffects, potionEffects, List.of(), Optional.empty());
     }
 
     public static SpellGemData create(Identifier identifier) {
-        return new SpellGemData(identifier, List.of(), List.of(), List.of(), List.of(), Optional.empty());
+        return new SpellGemData(identifier, List.of(), List.of(), List.of(), List.of());
+    }
+
+    public SpellGemData withModifiers(List<ModifierEnchantment> modifiers) {
+        return new SpellGemData(spellId, modifiers, strikeEffects, utilityEffects, potionEffects, affixes, followUp);
+    }
+
+    public SpellGemData withStrikes(List<StrikeEnchantment> strikes) {
+        return new SpellGemData(spellId, modifierEffects, strikes, utilityEffects, potionEffects, affixes, followUp);
+    }
+
+    public SpellGemData withUtilities(List<UtilityEnchantment> utilities) {
+        return new SpellGemData(spellId, modifierEffects, strikeEffects, utilities, potionEffects, affixes, followUp);
+    }
+
+    public SpellGemData withPotions(List<PotionEnchantment> potions) {
+        return new SpellGemData(spellId, modifierEffects, strikeEffects, utilityEffects, potions, affixes, followUp);
+    }
+
+    public SpellGemData withAffixes(List<SpellAffix> affixes) {
+        return new SpellGemData(spellId, modifierEffects, strikeEffects, utilityEffects, potionEffects, affixes, followUp);
     }
 
     public SpellGemData withFollowUp(SpellGemData followUp) {
         return new SpellGemData(
-                spellId, modifierEffects, strikeEffects, utilityEffects, potionEffects, Optional.of(followUp));
+                spellId, modifierEffects, strikeEffects, utilityEffects, potionEffects, affixes, Optional.of(followUp));
     }
 
     public SpellGemData withoutFollowUp() {
@@ -59,7 +93,11 @@ public record SpellGemData(
             return this;
         }
         return new SpellGemData(
-                spellId, modifierEffects, strikeEffects, utilityEffects, potionEffects, Optional.empty());
+                spellId, modifierEffects, strikeEffects, utilityEffects, potionEffects, affixes, Optional.empty());
+    }
+
+    private static <T> List<T> copy(List<T> list) {
+        return list == null ? List.of() : List.copyOf(list);
     }
 
     public boolean isEnchanted() {

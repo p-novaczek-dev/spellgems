@@ -31,6 +31,8 @@ import net.pnovaczek.spellgems.platform.client.ClientPlatform;
 import net.pnovaczek.spellgems.spell.Spell;
 import net.pnovaczek.spellgems.spell.SpellIds;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
+import net.pnovaczek.spellgems.spell.enchantment.SpellAffix;
+import net.pnovaczek.spellgems.spell.enchantment.SpellAffixes;
 import net.pnovaczek.spellgems.spell.enchantment.PotionEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.UtilityEnchantments;
 import net.pnovaczek.spellgems.wand.WandDepletion;
@@ -117,13 +119,18 @@ public class SpellgemsTooltips {
                 var data = SpellTomeItem.getTomeData(stack);
 
                 if (data != null && data.isEnchanted()) {
-                    tooltip.addLineAttribute(data.tooltipNameKey());
-                    if (Minecraft.getInstance().hasShiftDown()) {
-                        tooltip.addLineDetail(
-                                data.tooltipDescriptionKey(),
-                                enchantmentDescriptionArgs(data.enchantmentId())
-                        );
-                    } else {
+                    boolean shiftDown = Minecraft.getInstance().hasShiftDown();
+                    if (data.enchantmentId() != null) {
+                        tooltip.addLineAttribute(data.tooltipNameKey());
+                        if (shiftDown) {
+                            tooltip.addLineDetail(
+                                    data.tooltipDescriptionKey(),
+                                    enchantmentDescriptionArgs(data.enchantmentId())
+                            );
+                        }
+                    }
+                    appendAffixLines(data.affixes(), lines, shiftDown);
+                    if (!shiftDown) {
                         tooltip.addLineHoldShift();
                     }
                 } else if (Minecraft.getInstance().hasShiftDown()) {
@@ -152,10 +159,11 @@ public class SpellgemsTooltips {
         }
         boolean shiftDown = Minecraft.getInstance().hasShiftDown();
         if (data.followUp().isPresent()) {
-            appendSpellGemTooltip(data.withoutFollowUp(), lines, tooltipContext, false, ItemStack.EMPTY);
-            appendSpellGemTooltip(data.followUp().get(), lines, tooltipContext, false, ItemStack.EMPTY);
+            appendSpellGemTooltip(data.withoutFollowUp(), lines, tooltipContext, false, ItemStack.EMPTY, false);
+            appendSpellGemTooltip(data.followUp().get(), lines, tooltipContext, false, ItemStack.EMPTY, false);
+            appendAffixLines(data.affixes(), lines, shiftDown);
         } else {
-            appendSpellGemTooltip(data, lines, tooltipContext, includeCastStats, stack);
+            appendSpellGemTooltip(data, lines, tooltipContext, includeCastStats, stack, true);
         }
         if (!shiftDown) {
             lines.add(Component.translatable("tooltip.spellgems.shift_hint").withStyle(ChatFormatting.DARK_GRAY));
@@ -169,7 +177,8 @@ public class SpellgemsTooltips {
             List<Component> lines,
             net.minecraft.world.item.Item.TooltipContext tooltipContext,
             boolean includeCastStats,
-            ItemStack stack
+            ItemStack stack,
+            boolean includeAffixes
     ) {
         if (data == null) {
             return;
@@ -213,6 +222,10 @@ public class SpellgemsTooltips {
             }
         }
 
+        if (includeAffixes) {
+            appendAffixLines(data.affixes(), lines, shiftDown);
+        }
+
         for (var effect : data.utilityEffects()) {
             lines.add(Component.translatable(effect.tooltipNameKey()).withStyle(ChatFormatting.GRAY));
             if (shiftDown) {
@@ -237,6 +250,21 @@ public class SpellgemsTooltips {
             appendUtilityStats(data, lines, stack);
             if (includeCastStats) {
                 appendCastStats(data, lines);
+            }
+        }
+    }
+
+    private static void appendAffixLines(List<SpellAffix> affixes, List<Component> lines, boolean shiftDown) {
+        if (affixes == null || affixes.isEmpty()) {
+            return;
+        }
+        for (SpellAffix affix : affixes) {
+            lines.add(SpellAffixes.displayName(affix));
+            if (shiftDown) {
+                String description = SpellAffixes.descriptionKey(affix.id());
+                if (description != null) {
+                    lines.add(Component.translatable(description).withStyle(ChatFormatting.DARK_GRAY));
+                }
             }
         }
     }

@@ -3,6 +3,7 @@ package net.pnovaczek.spellgems.recipe;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeManager;
+import net.pnovaczek.spellgems.spell.enchantment.SpellAffixes;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -37,7 +38,12 @@ public final class SpellEnchantingRecipeLookup {
             }
         }
 
-        matches.sort(Comparator.comparing(holder -> holder.id().identifier().toString()));
+        matches.sort(Comparator
+                .comparing((RecipeHolder<SpellEnchantingRecipe> holder) -> holder.value().getResult().affix().isPresent())
+                .thenComparingInt(holder -> holder.value().getResult().affix()
+                        .map(SpellAffixes::displayIndex)
+                        .orElse(0))
+                .thenComparing(holder -> holder.id().identifier().toString()));
         return matches;
     }
 

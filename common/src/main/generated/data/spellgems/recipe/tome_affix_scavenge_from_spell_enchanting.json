@@ -1,0 +1,16 @@
+{
+  "type": "spellgems:spell_enchanting",
+  "catalyst": {
+    "item": "minecraft:emerald"
+  },
+  "category": "affix",
+  "description_key": "recipe.spellgems.tome_affix_scavenge.description",
+  "input": {
+    "item": "minecraft:book"
+  },
+  "level_requirement": 40,
+  "result": {
+    "affix": "spellgems:scavenge"
+  },
+  "xp_cost": 1525
+}

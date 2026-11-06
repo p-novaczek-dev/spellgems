@@ -8,6 +8,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.spell.affix.AffixKills;
+import net.pnovaczek.spellgems.spell.affix.SpellDamage;
+import net.pnovaczek.spellgems.spell.affix.SpellKillCredit;
 
 public abstract class SpellAreaEffectCloud extends AreaEffectCloud {
 
@@ -16,9 +19,14 @@ public abstract class SpellAreaEffectCloud extends AreaEffectCloud {
     protected static int EFFECT_DURATION = Spellgems.CONFIG.strikeEffectDuration;
     protected static float CLOUD_DAMAGE = Spellgems.CONFIG.strikeCloudDamage;
 
+    /** Affixes from the cast that spawned this cloud. Not saved; a reloaded cloud carries none. */
+    private final SpellKillCredit affixCredit;
+
     @SuppressWarnings("this-escape")
     public SpellAreaEffectCloud(EntityType<? extends SpellAreaEffectCloud> entityType, Level level) {
         super(entityType, level);
+        SpellKillCredit current = AffixKills.current();
+        this.affixCredit = current == null ? SpellKillCredit.NONE : current;
         this.setWaitTime(0);
         this.setRadiusPerTick(0.0F);
     }
@@ -113,7 +121,11 @@ public abstract class SpellAreaEffectCloud extends AreaEffectCloud {
             DamageSource source = (owner != null)
                     ? this.damageSources().indirectMagic(this, owner)
                     : this.damageSources().magic();
-            target.hurtServer(serverLevel, source, damage);
+            SpellDamage.hurt(target, serverLevel, source, damage, this.affixCredit);
         }
+    }
+
+    protected SpellKillCredit affixCredit() {
+        return this.affixCredit;
     }
 }

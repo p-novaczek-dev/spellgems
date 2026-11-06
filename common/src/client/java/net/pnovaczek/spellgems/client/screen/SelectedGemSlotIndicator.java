@@ -3,13 +3,8 @@ package net.pnovaczek.spellgems.client.screen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.ItemStack;
-import net.pnovaczek.spellgems.ModComponents;
-import net.pnovaczek.spellgems.ModItems;
-import net.pnovaczek.spellgems.item.data.AstralBowData;
-import net.pnovaczek.spellgems.item.data.WandData;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 
 public final class SelectedGemSlotIndicator {
 
@@ -21,33 +16,50 @@ public final class SelectedGemSlotIndicator {
     private static final int SLOT_NUMBER_COLOR = 0xFFAAAAAA;
     private static final int SELECTED_SLOT_NUMBER_COLOR = 0xFF000000;
     private static final int SLOT_NUMBER_Y_OFFSET = -11;
+    private static final int NUMBER_HIT_TOP = GEM_SLOT_Y + SLOT_NUMBER_Y_OFFSET - 4;
+    private static final int NUMBER_HIT_BOTTOM = GEM_SLOT_Y - 1;
 
     private SelectedGemSlotIndicator() {
     }
 
-    public static int getWandSelectedSlot(Minecraft client) {
-        return getSelectedSlot(client, ModItems.WAND,
-                stack -> stack.getOrDefault(ModComponents.WAND_DATA, WandData.DEFAULT).selectedSlot());
-    }
-
-    public static int getAstralBowSelectedSlot(Minecraft client) {
-        return getSelectedSlot(client, ModItems.ASTRAL_BOW,
-                stack -> stack.getOrDefault(ModComponents.ASTRAL_BOW_DATA, AstralBowData.DEFAULT).selectedSlot());
-    }
-
-    private static int getSelectedSlot(Minecraft client, net.minecraft.world.item.Item item, SlotReader reader) {
-        if (client.player == null) {
-            return 0;
+    /**
+     * @return slot index whose number contains the point, or -1. Coordinates are relative to the GUI.
+     */
+    public static int hoveredSlot(double relativeX, double relativeY) {
+        if (relativeY < NUMBER_HIT_TOP || relativeY >= NUMBER_HIT_BOTTOM) {
+            return -1;
         }
-
-        for (InteractionHand hand : InteractionHand.values()) {
-            ItemStack stack = client.player.getItemInHand(hand);
-            if (stack.is(item)) {
-                return Mth.clamp(reader.read(stack), 0, GEM_SLOT_COUNT - 1);
+        for (int slot = 0; slot < GEM_SLOT_COUNT; slot++) {
+            int left = GEM_SLOT_X + slot * GEM_SLOT_STEP + 1;
+            if (relativeX >= left && relativeX < left + GEM_SLOT_STEP - 2) {
+                return slot;
             }
         }
+        return -1;
+    }
 
-        return 0;
+    /**
+     * @return true when the click selected a slot number and should not reach the slots
+     */
+    public static boolean mouseClicked(
+            AbstractContainerMenu menu,
+            MouseButtonEvent event,
+            int leftPos,
+            int topPos,
+            Minecraft minecraft
+    ) {
+        if (event.button() != 0 || minecraft.player == null || minecraft.gameMode == null) {
+            return false;
+        }
+        int slot = hoveredSlot(event.x() - leftPos, event.y() - topPos);
+        if (slot < 0) {
+            return false;
+        }
+        if (menu.clickMenuButton(minecraft.player, slot)) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, slot);
+            return true;
+        }
+        return false;
     }
 
     public static void render(GuiGraphicsExtractor graphics, Font font, int selectedSlot) {
@@ -59,10 +71,5 @@ public final class SelectedGemSlotIndicator {
             String number = String.valueOf(slot + 1);
             graphics.text(font, number, centerX - font.width(number) / 2, numberY, color, false);
         }
-    }
-
-    @FunctionalInterface
-    private interface SlotReader {
-        int read(ItemStack stack);
     }
 }

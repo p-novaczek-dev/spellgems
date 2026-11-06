@@ -194,18 +194,21 @@ public class SpellEnchantingRecipe implements Recipe<SpellEnchantingRecipeInput>
     }
 
     public record SpellEnchantResult(Optional<Integer> modifiers, Optional<Integer> strikes,
-                                     Optional<Identifier> utility, boolean potion) {
+                                     Optional<Identifier> utility, boolean potion,
+                                     Optional<Identifier> affix) {
         public static final Codec<SpellEnchantResult> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.INT.optionalFieldOf("modifiers").forGetter(SpellEnchantResult::modifiers),
                 Codec.INT.optionalFieldOf("strikes").forGetter(SpellEnchantResult::strikes),
                 Identifier.CODEC.optionalFieldOf("utility").forGetter(SpellEnchantResult::utility),
-                Codec.BOOL.optionalFieldOf("potion", false).forGetter(SpellEnchantResult::potion)
+                Codec.BOOL.optionalFieldOf("potion", false).forGetter(SpellEnchantResult::potion),
+                Identifier.CODEC.optionalFieldOf("affix").forGetter(SpellEnchantResult::affix)
         ).apply(instance, SpellEnchantResult::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, SpellEnchantResult> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.optional(ByteBufCodecs.INT), SpellEnchantResult::modifiers,
                 ByteBufCodecs.optional(ByteBufCodecs.INT), SpellEnchantResult::strikes,
                 ByteBufCodecs.optional(Identifier.STREAM_CODEC), SpellEnchantResult::utility,
                 ByteBufCodecs.BOOL, SpellEnchantResult::potion,
+                ByteBufCodecs.optional(Identifier.STREAM_CODEC), SpellEnchantResult::affix,
                 SpellEnchantResult::new);
     }
 }

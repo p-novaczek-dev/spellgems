@@ -55,6 +55,14 @@ public class GemForgeRecipeBuilder implements RecipeBuilder {
         return new GemForgeRecipeBuilder(first, second, null, GemForgeRecipe.Operation.COMBINE_GREATER, xpCost);
     }
 
+    public static GemForgeRecipeBuilder mergeAffixTomes(Ingredient tomes, int xpCost) {
+        return new GemForgeRecipeBuilder(tomes, tomes, null, GemForgeRecipe.Operation.MERGE_AFFIX_TOMES, xpCost);
+    }
+
+    public static GemForgeRecipeBuilder applyAffix(Ingredient gems, Ingredient tomes, int xpCost) {
+        return new GemForgeRecipeBuilder(gems, tomes, null, GemForgeRecipe.Operation.APPLY_AFFIX, xpCost);
+    }
+
     @Override
     public GemForgeRecipeBuilder unlockedBy(String name, Criterion<?> criterion) {
         return this;
@@ -77,6 +85,8 @@ public class GemForgeRecipeBuilder implements RecipeBuilder {
             case SOCKET_WEAPON -> GemForgeRecipe.socketWeapon(ingredient1, ingredient2, xpCost);
             case UNSOCKET_WEAPON -> GemForgeRecipe.unsocketWeapon(ingredient1, xpCost);
             case COMBINE_GREATER -> GemForgeRecipe.combineGreater(ingredient1, ingredient2, xpCost);
+            case MERGE_AFFIX_TOMES -> GemForgeRecipe.mergeAffixTomes(ingredient1, xpCost);
+            case APPLY_AFFIX -> GemForgeRecipe.applyAffix(ingredient1, ingredient2, xpCost);
             case STATIC -> GemForgeRecipe.staticResult(ingredient1, ingredient2, result, xpCost);
         };
         output.accept(location, recipe, null);

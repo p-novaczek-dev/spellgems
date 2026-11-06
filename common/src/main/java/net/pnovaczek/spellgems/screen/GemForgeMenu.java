@@ -77,7 +77,7 @@ public class GemForgeMenu extends ItemCombinerMenu {
         ));
 
         int cost = this.xpCost.get();
-        if (!player.hasInfiniteMaterials() && cost > 0) {
+        if (!player.hasInfiniteMaterials() && cost != 0) {
             player.giveExperiencePoints(-cost);
         }
 
@@ -130,7 +130,10 @@ public class GemForgeMenu extends ItemCombinerMenu {
             }
             this.resultSlots.setRecipeUsed(holder);
             this.resultSlots.setItem(0, result);
-            this.xpCost.set(holder.value().getXpCost());
+            this.xpCost.set(holder.value().resolveXpCost(
+                    this.inputSlots.getItem(INPUT_SLOT_1),
+                    this.inputSlots.getItem(INPUT_SLOT_2)
+            ));
         }, this::clearResult);
     }
 

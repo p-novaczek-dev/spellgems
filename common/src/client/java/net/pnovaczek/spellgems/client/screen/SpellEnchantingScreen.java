@@ -122,7 +122,9 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
 
             String reqText = String.valueOf(req);
             int leftPosText = btnX + 20;
-            int textWidth = 86 - this.font.width(reqText);
+            // Full-width buttons keep the vanilla 2px inset (108 - 2 - 20 = 86). Narrowed buttons move with the scrollbar.
+            int levelColumnWidth = buttonWidth - 22;
+            int textWidth = Math.max(0, levelColumnWidth - this.font.width(reqText));
             EnchantmentNames.getInstance().initSeed(this.minecraft.player.getEnchantmentSeed() + recipeIndex);
             FormattedText glyphName = EnchantmentNames.getInstance().getRandomName(this.font, textWidth);
 
@@ -139,7 +141,7 @@ public class SpellEnchantingScreen extends AbstractContainerScreen<SpellEnchanti
                 );
             }
 
-            int reqX = leftPosText + 86 - this.font.width(reqText);
+            int reqX = leftPosText + levelColumnWidth - this.font.width(reqText);
             int col = !canAfford ? -12550384 : (hovered ? -128 : -8323296);
             graphics.text(this.font, reqText, reqX, btnY + 9, col);
         }

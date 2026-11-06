@@ -12,8 +12,11 @@ Spellgems - spell gems, wands, and enchanting for Minecraft.
 '''
 logoFile = "assets/spellgems/icon.png"
 
-# Common mixins JSON is empty on purpose; anvil uses AnvilUpdateEvent on Neo.
+# Experience redirect is shared. Death-drop capture stays Fabric-only so Neo does not rewrite drops twice.
 # Client mixins (scroll cycle, astral bow draw) are shared with Fabric.
+[[mixins]]
+config = "spellgems.mixins.json"
+
 [[mixins]]
 config = "spellgems.client.mixins.json"
 

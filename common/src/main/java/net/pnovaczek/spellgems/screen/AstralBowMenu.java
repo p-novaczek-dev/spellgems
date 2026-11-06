@@ -1,19 +1,25 @@
 package net.pnovaczek.spellgems.screen;
 
+import net.minecraft.network.protocol.game.ClientboundSetPlayerInventoryPacket;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.ModMenuTypes;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.inventory.AstralBowBackedContainer;
 import net.pnovaczek.spellgems.inventory.AstralBowContainer;
+import net.pnovaczek.spellgems.item.data.AstralBowData;
 import org.jspecify.annotations.Nullable;
 
 public class AstralBowMenu extends AbstractContainerMenu {
@@ -34,6 +40,7 @@ public class AstralBowMenu extends AbstractContainerMenu {
 
     private final Container bowSlots;
     private final @Nullable InteractionHand bowHand;
+    private final DataSlot selectedSlot = DataSlot.standalone();
 
     @SuppressWarnings("this-escape")
     public AstralBowMenu(int containerId, Inventory playerInventory, InteractionHand hand) {
@@ -42,6 +49,7 @@ public class AstralBowMenu extends AbstractContainerMenu {
         this.bowSlots = new AstralBowBackedContainer(playerInventory.player, hand);
         addBowSlots();
         addPlayerInventory(playerInventory);
+        trackSelectedSlot(playerInventory.player);
     }
 
     @SuppressWarnings("this-escape")
@@ -51,6 +59,70 @@ public class AstralBowMenu extends AbstractContainerMenu {
         this.bowSlots = new SimpleContainer(AstralBowContainer.SIZE);
         addBowSlots();
         addPlayerInventory(playerInventory);
+        trackSelectedSlot(playerInventory.player);
+    }
+
+    public int getSelectedSlot() {
+        return Mth.clamp(this.selectedSlot.get(), 0, GEM_SLOT_COUNT - 1);
+    }
+
+    @Override
+    public boolean clickMenuButton(Player player, int id) {
+        if (id < 0 || id >= GEM_SLOT_COUNT || this.selectedSlot.get() == id) {
+            return false;
+        }
+        // The client menu has no hand. Predicting here lets the number update before the server answers.
+        if (this.bowHand == null) {
+            this.selectedSlot.set(id);
+            return true;
+        }
+        ItemStack bow = player.getItemInHand(this.bowHand);
+        if (!bow.is(ModItems.ASTRAL_BOW)) {
+            return false;
+        }
+        bow.set(ModComponents.ASTRAL_BOW_DATA, new AstralBowData(id));
+        this.selectedSlot.set(id);
+        syncHand(player, this.bowHand, bow);
+        return true;
+    }
+
+    private static void syncHand(Player player, InteractionHand hand, ItemStack stack) {
+        if (!(player instanceof ServerPlayer serverPlayer)) {
+            return;
+        }
+        int slot = hand == InteractionHand.OFF_HAND
+                ? Inventory.SLOT_OFFHAND
+                : serverPlayer.getInventory().getSelectedSlot();
+        serverPlayer.connection.send(new ClientboundSetPlayerInventoryPacket(slot, stack));
+    }
+
+    private void trackSelectedSlot(Player player) {
+        this.selectedSlot.set(readSelectedSlot(player, this.bowHand));
+        this.addDataSlot(this.selectedSlot);
+    }
+
+    private static int readSelectedSlot(Player player, @Nullable InteractionHand hand) {
+        if (hand != null) {
+            return selectedSlotOf(player.getItemInHand(hand));
+        }
+        for (InteractionHand candidate : InteractionHand.values()) {
+            ItemStack stack = player.getItemInHand(candidate);
+            if (stack.is(ModItems.ASTRAL_BOW)) {
+                return selectedSlotOf(stack);
+            }
+        }
+        return 0;
+    }
+
+    private static int selectedSlotOf(ItemStack stack) {
+        if (!stack.is(ModItems.ASTRAL_BOW)) {
+            return 0;
+        }
+        return Mth.clamp(
+                stack.getOrDefault(ModComponents.ASTRAL_BOW_DATA, AstralBowData.DEFAULT).selectedSlot(),
+                0,
+                GEM_SLOT_COUNT - 1
+        );
     }
 
     @SuppressWarnings("this-escape")

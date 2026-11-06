@@ -1,0 +1,12 @@
+{
+  "type": "spellgems:gem_forging",
+  "ingredient_1": [
+    "spellgems:spell_gem_projectile",
+    "spellgems:spell_gem_nova",
+    "spellgems:spell_gem_vortex",
+    "spellgems:greater_spell_gem"
+  ],
+  "ingredient_2": "#spellgems:catalyst_books",
+  "operation": "apply_affix",
+  "xp_cost": 0
+}

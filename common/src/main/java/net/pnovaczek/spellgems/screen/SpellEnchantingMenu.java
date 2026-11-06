@@ -28,6 +28,8 @@ import net.pnovaczek.spellgems.network.ModNetworking;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipe;
 import net.pnovaczek.spellgems.recipe.SpellEnchantingRecipeLookup;
 import net.pnovaczek.spellgems.spell.SpellIds;
+import net.pnovaczek.spellgems.spell.enchantment.SpellAffix;
+import net.pnovaczek.spellgems.spell.enchantment.SpellAffixes;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
@@ -310,6 +312,10 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
     private TomeData applyTomeRecipe(TomeData data, SpellEnchantingRecipe recipe) {
         var result = recipe.getResult();
 
+        if (result.affix().isPresent() && SpellAffixes.isKnown(result.affix().get())) {
+            return TomeData.affix(new SpellAffix(result.affix().get(), 1));
+        }
+
         if (result.modifiers().orElse(0) > 0) {
             List<Identifier> modifiers = ModifierEnchantments.getAll();
             if (!modifiers.isEmpty()) {
@@ -365,13 +371,10 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
             newPotions.add(potionEnchantment);
         }
 
-        return new SpellGemData(
-                data.spellId(),
-                newModifiers,
-                newStrikes,
-                newUtilities,
-                newPotions
-        );
+        return data.withModifiers(newModifiers)
+                .withStrikes(newStrikes)
+                .withUtilities(newUtilities)
+                .withPotions(newPotions);
     }
 
     private static boolean isEnchantableTarget(ItemStack stack) {
@@ -381,7 +384,7 @@ public class SpellEnchantingMenu extends AbstractContainerMenu {
     }
 
     private static boolean isCatalystItem(ItemStack stack) {
-        return stack.is(Items.LAPIS_LAZULI) || PotionEnchantments.isValidCatalyst(stack);
+        return stack.is(Items.LAPIS_LAZULI) || stack.is(Items.EMERALD) || PotionEnchantments.isValidCatalyst(stack);
     }
 
     @Override

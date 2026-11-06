@@ -50,6 +50,9 @@ public final class GreaterSpellGems {
         if (dataA == null || dataB == null || dataA.followUp().isPresent() || dataB.followUp().isPresent()) {
             return Optional.empty();
         }
+        if (!dataA.affixes().isEmpty() || !dataB.affixes().isEmpty()) {
+            return Optional.empty();
+        }
 
         Combo combo = findCombo(dataA.spellId(), dataB.spellId());
         if (combo == null) {

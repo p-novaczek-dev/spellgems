@@ -7,6 +7,9 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
@@ -66,5 +69,23 @@ public final class NeoForgeLifecycle implements PlatformLifecycle {
                 }
             }
         });
+    }
+
+    @Override
+    public void onLivingDamagePre(LivingDamagePreCallback callback) {
+        NeoForge.EVENT_BUS.addListener((LivingDamageEvent.Pre event) ->
+                callback.beforeDamage(event.getEntity(), event.getSource()));
+    }
+
+    @Override
+    public void onLivingDeath(LivingDeathCallback callback) {
+        NeoForge.EVENT_BUS.addListener((LivingDeathEvent event) ->
+                callback.onDeath(event.getEntity(), event.getSource()));
+    }
+
+    @Override
+    public void onLivingDrops(LivingDropsCallback callback) {
+        NeoForge.EVENT_BUS.addListener((LivingDropsEvent event) ->
+                callback.onDrops(event.getEntity(), event.getSource(), event.getDrops()));
     }
 }

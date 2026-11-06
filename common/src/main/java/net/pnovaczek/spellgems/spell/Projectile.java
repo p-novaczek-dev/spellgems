@@ -11,6 +11,9 @@ import net.minecraft.world.phys.Vec3;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.SpellgemsConfig;
 import net.pnovaczek.spellgems.item.GreaterSpellGems;
+import net.pnovaczek.spellgems.spell.affix.AffixKills;
+import net.pnovaczek.spellgems.spell.affix.SpellDamage;
+import net.pnovaczek.spellgems.spell.affix.SpellKillCredit;
 import net.pnovaczek.spellgems.entity.SpellProjectile;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
@@ -141,12 +144,15 @@ public class Projectile extends AbstractSpell {
             var spellConfig = Spellgems.CONFIG.spells.projectile;
             float damage = getEffectiveDamage(spellConfig, hasPower);
 
-            living.hurtServer(serverLevel, projectile.damageSources().magic(), damage);
+            SpellKillCredit credit = AffixKills.creditFor(context);
+            SpellDamage.hurt(living, serverLevel, projectile.damageSources().magic(), damage, credit);
 
             LivingEntity strikeSource = context.caster() != null ? context.caster() : living;
-            for (var strike : strikes) {
-                strike.applyTo(living, strikeSource);
-            }
+            AffixKills.runWith(credit, () -> {
+                for (var strike : strikes) {
+                    strike.applyTo(living, strikeSource);
+                }
+            });
             GreaterSpellGems.onDirectHit(context, living);
 
             if (remainingSplits > 0) {

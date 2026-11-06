@@ -80,7 +80,7 @@
   "tooltip.spellgems.spell.nova.name": "Nova",
   "tooltip.spellgems.spell.nova.description": "Area damage and knockback",
   "tooltip.spellgems.spell.vortex.name": "Vortex",
-  "tooltip.spellgems.spell.vortex.description": "Pulls entities and loose items toward the target location",
+  "tooltip.spellgems.spell.vortex.description": "Pulls entities toward the target location",
   "tooltip.spellgems.spell.blink.name": "Blink",
   "tooltip.spellgems.spell.blink.description": "Short range teleport",
   "tooltip.spellgems.spell.magnet.name": "Magnet",
@@ -176,6 +176,21 @@
   "tooltip.spellgems.spell_enchantment.void.name": "Void",
   "tooltip.spellgems.spell_enchantment.void.description": "Destroys items that do not fit in the bound inventory",
 
+  "tooltip.spellgems.spell_affix.looting.name": "Looting",
+  "tooltip.spellgems.spell_affix.looting.description": "Increases mob drops the same way as Looting",
+  "tooltip.spellgems.spell_affix.no_loot.name": "No Loot",
+  "tooltip.spellgems.spell_affix.no_loot.description": "Suppresses loot-table drops. Decapitate and Scavenge still drop",
+  "tooltip.spellgems.spell_affix.xp_boost.name": "XP Boost",
+  "tooltip.spellgems.spell_affix.xp_boost.description": "Increases experience dropped by mobs",
+  "tooltip.spellgems.spell_affix.no_xp.name": "No XP",
+  "tooltip.spellgems.spell_affix.no_xp.description": "Prevents mobs from dropping experience",
+  "tooltip.spellgems.spell_affix.decapitate.name": "Decapitate",
+  "tooltip.spellgems.spell_affix.decapitate.description": "Guarantees a head from mobs that can drop one",
+  "tooltip.spellgems.spell_affix.scavenge.name": "Scavenge",
+  "tooltip.spellgems.spell_affix.scavenge.description": "Mobs always drop equipped armor, weapons, and tools",
+  "tooltip.spellgems.spell_affix.magnet.name": "Magnet",
+  "tooltip.spellgems.spell_affix.magnet.description": "Pulls a kill's items and experience toward you",
+
   "enchantment.spellgems.recharge": "Recharge",
   "enchantment.spellgems.recharge.desc": "Passively restores wand durability over time.",
 
@@ -187,6 +202,13 @@
   "recipe.spellgems.smelt.description": "Smelt",
   "recipe.spellgems.extend.description": "Extend",
   "recipe.spellgems.item_transport_void.description": "Void",
+  "recipe.spellgems.tome_affix_looting.description": "Looting",
+  "recipe.spellgems.tome_affix_no_loot.description": "No Loot",
+  "recipe.spellgems.tome_affix_xp_boost.description": "XP Boost",
+  "recipe.spellgems.tome_affix_no_xp.description": "No XP",
+  "recipe.spellgems.tome_affix_decapitate.description": "Decapitate",
+  "recipe.spellgems.tome_affix_scavenge.description": "Scavenge",
+  "recipe.spellgems.tome_affix_magnet.description": "Magnet",
 
   "container.spellgems.wand": "Wand",
   "container.spellgems.astral_bow": "Astral Bow",
@@ -198,5 +220,6 @@
   "container.spellgems.spell_enchanting.catalyst.any_potion": "%s Potion",
 
   "container.spellgems.gem_forge": "Gem Forge",
-  "container.spellgems.gem_forge.level_cost": "Level Cost: %s"
+  "container.spellgems.gem_forge.level_cost": "Level Cost: %s",
+  "container.spellgems.gem_forge.affix_xp": "Scales from %s XP"
 }

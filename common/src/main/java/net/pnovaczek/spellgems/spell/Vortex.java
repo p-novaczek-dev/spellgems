@@ -6,6 +6,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.AABB;
@@ -14,6 +15,9 @@ import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.particle.ModParticles;
 import net.pnovaczek.spellgems.SpellgemsConfig;
 import net.pnovaczek.spellgems.item.GreaterSpellGems;
+import net.pnovaczek.spellgems.spell.affix.AffixKills;
+import net.pnovaczek.spellgems.spell.affix.SpellDamage;
+import net.pnovaczek.spellgems.spell.affix.SpellKillCredit;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
 import org.jspecify.annotations.Nullable;
@@ -95,13 +99,21 @@ public class Vortex extends AbstractSpell {
             displaceTowardCenter(entity, center, config.pullDistance, config.pullStrength);
 
             if (entity instanceof LivingEntity living) {
+                SpellKillCredit credit = AffixKills.creditFor(context);
                 if (damage > 0.0F) {
-                    living.hurtServer(level, level.damageSources().magic(), damage);
+                    SpellDamage.hurt(living, level, level.damageSources().magic(), damage, credit);
+                } else if (!(living instanceof Player) && credit.active()) {
+                    AffixKills.record(living, credit);
+                    if (credit.player() != null) {
+                        living.setLastHurtByPlayer(credit.player(), 100);
+                    }
                 }
                 LivingEntity strikeSource = caster != null ? caster : living;
-                for (StrikeEnchantment strike : strikes) {
-                    strike.applyTo(living, strikeSource);
-                }
+                AffixKills.runWith(credit, () -> {
+                    for (StrikeEnchantment strike : strikes) {
+                        strike.applyTo(living, strikeSource);
+                    }
+                });
                 GreaterSpellGems.onDirectHit(context, living);
             }
         }

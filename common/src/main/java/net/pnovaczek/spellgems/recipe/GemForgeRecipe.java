@@ -20,6 +20,7 @@ import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.item.GreaterSpellGems;
 import net.pnovaczek.spellgems.item.SpellTomeApplier;
 import net.pnovaczek.spellgems.item.WeaponSocketing;
+import net.pnovaczek.spellgems.spell.affix.AffixForge;
 
 import java.util.Optional;
 
@@ -30,7 +31,9 @@ public class GemForgeRecipe implements Recipe<GemForgeRecipeInput> {
         APPLY_TOME,
         SOCKET_WEAPON,
         UNSOCKET_WEAPON,
-        COMBINE_GREATER;
+        COMBINE_GREATER,
+        MERGE_AFFIX_TOMES,
+        APPLY_AFFIX;
 
         public static final Codec<Operation> CODEC = Codec.STRING.xmap(Operation::fromId, Operation::id);
 
@@ -40,6 +43,8 @@ public class GemForgeRecipe implements Recipe<GemForgeRecipeInput> {
                 case "socket_weapon" -> SOCKET_WEAPON;
                 case "unsocket_weapon" -> UNSOCKET_WEAPON;
                 case "combine_greater" -> COMBINE_GREATER;
+                case "merge_affix_tomes" -> MERGE_AFFIX_TOMES;
+                case "apply_affix" -> APPLY_AFFIX;
                 default -> STATIC;
             };
         }
@@ -50,6 +55,8 @@ public class GemForgeRecipe implements Recipe<GemForgeRecipeInput> {
                 case SOCKET_WEAPON -> "socket_weapon";
                 case UNSOCKET_WEAPON -> "unsocket_weapon";
                 case COMBINE_GREATER -> "combine_greater";
+                case MERGE_AFFIX_TOMES -> "merge_affix_tomes";
+                case APPLY_AFFIX -> "apply_affix";
                 case STATIC -> "static";
             };
         }
@@ -122,6 +129,14 @@ public class GemForgeRecipe implements Recipe<GemForgeRecipeInput> {
         return new GemForgeRecipe(ingredient1, Optional.of(ingredient2), Optional.empty(), Operation.COMBINE_GREATER, xpCost);
     }
 
+    public static GemForgeRecipe mergeAffixTomes(Ingredient tomes, int xpCost) {
+        return new GemForgeRecipe(tomes, Optional.of(tomes), Optional.empty(), Operation.MERGE_AFFIX_TOMES, xpCost);
+    }
+
+    public static GemForgeRecipe applyAffix(Ingredient gems, Ingredient tomes, int xpCost) {
+        return new GemForgeRecipe(gems, Optional.of(tomes), Optional.empty(), Operation.APPLY_AFFIX, xpCost);
+    }
+
     @Override
     public boolean matches(GemForgeRecipeInput input, Level level) {
         ItemStack first = input.getItem(0);
@@ -134,6 +149,10 @@ public class GemForgeRecipe implements Recipe<GemForgeRecipeInput> {
                     && WeaponSocketing.trySocket(first, second).isPresent();
             case COMBINE_GREATER -> twoFilled(first, second) && ingredientsMatch(first, second)
                     && GreaterSpellGems.tryCombine(first, second).isPresent();
+            case MERGE_AFFIX_TOMES -> twoFilled(first, second) && ingredientsMatch(first, second)
+                    && AffixForge.tryMergeTomes(first, second).isPresent();
+            case APPLY_AFFIX -> twoFilled(first, second) && ingredientsMatch(first, second)
+                    && AffixForge.tryApplyToGem(first, second).isPresent();
             case STATIC -> twoFilled(first, second) && ingredientsMatch(first, second);
         };
     }
@@ -169,6 +188,8 @@ public class GemForgeRecipe implements Recipe<GemForgeRecipeInput> {
             case SOCKET_WEAPON -> WeaponSocketing.trySocket(first, second).orElse(ItemStack.EMPTY);
             case UNSOCKET_WEAPON -> WeaponSocketing.tryUnsocket(first.isEmpty() ? second : first).orElse(ItemStack.EMPTY);
             case COMBINE_GREATER -> GreaterSpellGems.tryCombine(first, second).orElse(ItemStack.EMPTY);
+            case MERGE_AFFIX_TOMES -> AffixForge.tryMergeTomes(first, second).orElse(ItemStack.EMPTY);
+            case APPLY_AFFIX -> AffixForge.tryApplyToGem(first, second).orElse(ItemStack.EMPTY);
             case STATIC -> staticResult.map(ItemStackTemplate::create).orElse(ItemStack.EMPTY);
         };
     }
@@ -225,6 +246,16 @@ public class GemForgeRecipe implements Recipe<GemForgeRecipeInput> {
     }
 
     public int getXpCost() {
+        return xpCost;
+    }
+
+    /**
+     * Experience the menu charges. Affix application uses the live weight delta; the recipe JSON stays at 0.
+     */
+    public int resolveXpCost(ItemStack first, ItemStack second) {
+        if (operation == Operation.APPLY_AFFIX) {
+            return AffixForge.xpDelta(first, second);
+        }
         return xpCost;
     }
 }

@@ -1,0 +1,15 @@
+{
+	"required": true,
+	"package": "net.pnovaczek.spellgems.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"mixins": [
+		"LivingEntityAffixLootMixin",
+		"EntityAffixSpawnMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

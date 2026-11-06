@@ -8,6 +8,7 @@ import net.minecraft.world.level.Level;
 import net.pnovaczek.spellgems.ModEntities;
 import net.pnovaczek.spellgems.particle.ModParticles;
 import net.pnovaczek.spellgems.Spellgems;
+import net.pnovaczek.spellgems.spell.affix.SpellDamage;
 
 public class VampiricMistCloud extends SpellAreaEffectCloud {
 
@@ -77,7 +78,7 @@ public class VampiricMistCloud extends SpellAreaEffectCloud {
             if (dx * dx + dz * dz > radius * radius) {
                 continue;
             }
-            if (target.hurtServer(serverLevel, source, damage) && owner != null && heal > 0.0F) {
+            if (SpellDamage.hurt(target, serverLevel, source, damage, affixCredit()) && owner != null && heal > 0.0F) {
                 owner.heal(heal);
             }
         }

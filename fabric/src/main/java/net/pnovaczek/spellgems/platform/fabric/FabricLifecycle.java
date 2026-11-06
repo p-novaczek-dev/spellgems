@@ -1,5 +1,6 @@
 package net.pnovaczek.spellgems.platform.fabric;
 
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
@@ -41,5 +42,23 @@ public final class FabricLifecycle implements PlatformLifecycle {
             }
             return InteractionResult.PASS;
         });
+    }
+
+    @Override
+    public void onLivingDamagePre(LivingDamagePreCallback callback) {
+        ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+            callback.beforeDamage(entity, source);
+            return true;
+        });
+    }
+
+    @Override
+    public void onLivingDeath(LivingDeathCallback callback) {
+        // Equipment is snapshotted at the start of dropAllDeathLoot by the Fabric mixin.
+    }
+
+    @Override
+    public void onLivingDrops(LivingDropsCallback callback) {
+        // Drops are captured by the Fabric mixin. NeoForge edits LivingDropsEvent instead.
     }
 }

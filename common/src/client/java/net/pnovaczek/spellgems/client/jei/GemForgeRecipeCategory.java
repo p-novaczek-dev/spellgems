@@ -16,11 +16,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.pnovaczek.spellgems.ModBlocks;
 import net.pnovaczek.spellgems.ModComponents;
+import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.item.GreaterSpellGems;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.recipe.GemForgeRecipe;
 import net.pnovaczek.spellgems.spell.SpellIds;
+import net.pnovaczek.spellgems.spell.affix.AffixForge;
 import org.jspecify.annotations.Nullable;
 
 public class GemForgeRecipeCategory implements IRecipeCategory<RecipeHolder<GemForgeRecipe>> {
@@ -76,6 +78,18 @@ public class GemForgeRecipeCategory implements IRecipeCategory<RecipeHolder<GemF
     @SuppressWarnings("deprecation") // Ingredient.items() is the only item listing both loaders share. NeoForge's getValues() is not on Fabric.
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<GemForgeRecipe> recipeHolder, IFocusGroup focuses) {
         GemForgeRecipe recipe = recipeHolder.value();
+        if (recipe.getOperation() == GemForgeRecipe.Operation.MERGE_AFFIX_TOMES) {
+            builder.addSlot(RecipeIngredientRole.INPUT, 3, 3).add(AffixForge.lootingTome(1));
+            builder.addSlot(RecipeIngredientRole.INPUT, 39, 3).add(AffixForge.lootingTome(1));
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 93, 3).add(AffixForge.lootingTome(2));
+            return;
+        }
+        if (recipe.getOperation() == GemForgeRecipe.Operation.APPLY_AFFIX) {
+            builder.addSlot(RecipeIngredientRole.INPUT, 3, 3).add(new ItemStack(ModItems.SPELL_GEM_PROJECTILE));
+            builder.addSlot(RecipeIngredientRole.INPUT, 39, 3).add(AffixForge.lootingTome(1));
+            builder.addSlot(RecipeIngredientRole.OUTPUT, 93, 3).add(AffixForge.lootingProjectileGem(1));
+            return;
+        }
         var input1 = builder.addSlot(RecipeIngredientRole.INPUT, 3, 3);
         if (recipe.getOperation() == GemForgeRecipe.Operation.UNSOCKET_WEAPON) {
             recipe.getIngredient1().items().forEach(holder -> {
@@ -103,7 +117,16 @@ public class GemForgeRecipeCategory implements IRecipeCategory<RecipeHolder<GemF
                      GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
         this.background.draw(guiGraphics);
 
-        int xp = recipeHolder.value().getXpCost();
+        GemForgeRecipe recipe = recipeHolder.value();
+        if (recipe.getOperation() == GemForgeRecipe.Operation.APPLY_AFFIX) {
+            int base = Spellgems.CONFIG != null && Spellgems.CONFIG.affixes != null
+                    ? Spellgems.CONFIG.affixes.baseXpCost
+                    : 7;
+            Component xpCost = Component.translatable("container.spellgems.gem_forge.affix_xp", base);
+            guiGraphics.text(Minecraft.getInstance().font, xpCost, 3, 23, 0xFF8B8B8B, false);
+            return;
+        }
+        int xp = recipe.getXpCost();
         if (xp <= 0) {
             return;
         }

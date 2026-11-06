@@ -12,6 +12,9 @@ import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.particle.ModParticles;
 import net.pnovaczek.spellgems.SpellgemsConfig;
 import net.pnovaczek.spellgems.item.GreaterSpellGems;
+import net.pnovaczek.spellgems.spell.affix.AffixKills;
+import net.pnovaczek.spellgems.spell.affix.SpellDamage;
+import net.pnovaczek.spellgems.spell.affix.SpellKillCredit;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
 
@@ -91,12 +94,15 @@ public class Nova extends AbstractSpell {
                 continue;
             }
 
-            target.hurtServer(level, level.damageSources().magic(), damage);
+            SpellKillCredit credit = AffixKills.creditFor(context);
+            SpellDamage.hurt(target, level, level.damageSources().magic(), damage, credit);
 
             LivingEntity strikeSource = caster != null ? caster : target;
-            for (StrikeEnchantment strike : strikes) {
-                strike.applyTo(target, strikeSource);
-            }
+            AffixKills.runWith(credit, () -> {
+                for (StrikeEnchantment strike : strikes) {
+                    strike.applyTo(target, strikeSource);
+                }
+            });
 
             double dx = center.x - target.getX();
             double dz = center.z - target.getZ();

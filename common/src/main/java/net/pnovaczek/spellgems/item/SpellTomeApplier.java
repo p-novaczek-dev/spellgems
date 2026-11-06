@@ -55,7 +55,7 @@ public final class SpellTomeApplier {
         }
 
         TomeData tomeData = tomeStack.get(ModComponents.TOME_DATA);
-        if (tomeData == null || !tomeData.isEnchanted()) {
+        if (tomeData == null || tomeData.enchantmentId() == null) {
             return Optional.empty();
         }
 
@@ -114,30 +114,12 @@ public final class SpellTomeApplier {
 
     private static SpellGemData applyEnchantment(SpellGemData gemData, Identifier enchantmentId, EnchantmentType type) {
         return switch (type) {
-            case MODIFIER -> new SpellGemData(
-                    gemData.spellId(),
-                    List.of(new ModifierEnchantment(enchantmentId)),
-                    gemData.strikeEffects(),
-                    gemData.utilityEffects(),
-                    gemData.potionEffects()
-            );
-            case STRIKE -> new SpellGemData(
-                    gemData.spellId(),
-                    gemData.modifierEffects(),
-                    List.of(new StrikeEnchantment(enchantmentId)),
-                    gemData.utilityEffects(),
-                    gemData.potionEffects()
-            );
+            case MODIFIER -> gemData.withModifiers(List.of(new ModifierEnchantment(enchantmentId)));
+            case STRIKE -> gemData.withStrikes(List.of(new StrikeEnchantment(enchantmentId)));
             case UTILITY -> {
                 List<UtilityEnchantment> utilities = new ArrayList<>(gemData.utilityEffects());
                 utilities.add(new UtilityEnchantment(enchantmentId));
-                yield new SpellGemData(
-                        gemData.spellId(),
-                        gemData.modifierEffects(),
-                        gemData.strikeEffects(),
-                        utilities,
-                        gemData.potionEffects()
-                );
+                yield gemData.withUtilities(utilities);
             }
             case UNKNOWN -> gemData;
         };

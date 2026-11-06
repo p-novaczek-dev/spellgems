@@ -39,6 +39,8 @@ import net.pnovaczek.spellgems.entity.RootCloud;
 import net.pnovaczek.spellgems.entity.VampiricMistCloud;
 import net.pnovaczek.spellgems.spell.AbstractSpell;
 import net.pnovaczek.spellgems.spell.SpellParticles;
+import net.pnovaczek.spellgems.spell.affix.AffixKills;
+import net.pnovaczek.spellgems.spell.affix.SpellDamage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -98,6 +100,7 @@ public final class StrikeEffects {
                 }
 
                 Vec3 pos = target.position();
+                AffixKills.stampNearby(level, pos, caster);
                 level.explode(
                         caster,
                         null,
@@ -154,6 +157,7 @@ public final class StrikeEffects {
                 }
 
                 Vec3 pos = target.position();
+                AffixKills.stampNearby(level, pos, caster);
                 level.explode(
                         caster,
                         null,
@@ -209,7 +213,13 @@ public final class StrikeEffects {
                     return;
                 }
 
-                target.hurtServer(serverLevel, caster.damageSources().magic(), Spellgems.CONFIG.judgementDamage);
+                SpellDamage.hurt(
+                        target,
+                        serverLevel,
+                        caster.damageSources().magic(),
+                        Spellgems.CONFIG.judgementDamage,
+                        AffixKills.current()
+                );
 
                 Vec3 pos = target.position();
                 AABB searchBox = new AABB(pos, pos).inflate(WEAKNESS_RADIUS);
@@ -307,6 +317,7 @@ public final class StrikeEffects {
                     return;
                 }
                 Vec3 pos = target.position();
+                AffixKills.stampNearby(level, pos, caster);
                 bolt.snapTo(pos.x, pos.y, pos.z);
                 if (caster instanceof ServerPlayer serverPlayer) {
                     bolt.setCause(serverPlayer);
@@ -336,6 +347,7 @@ public final class StrikeEffects {
                     return;
                 }
                 Vec3 pos = target.position();
+                AffixKills.stampNearby(level, pos, caster);
                 level.explode(
                         caster,
                         null,
@@ -391,7 +403,13 @@ public final class StrikeEffects {
                     return;
                 }
                 int duration = Spellgems.CONFIG.strikeEffectDuration;
-                target.hurtServer(serverLevel, caster.damageSources().magic(), Spellgems.CONFIG.strikeCloudDamage);
+                SpellDamage.hurt(
+                        target,
+                        serverLevel,
+                        caster.damageSources().magic(),
+                        Spellgems.CONFIG.strikeCloudDamage,
+                        AffixKills.current()
+                );
                 target.setRemainingFireTicks(duration);
                 target.setTicksFrozen(duration);
                 target.addEffect(new MobEffectInstance(MobEffects.LEVITATION, duration, 0));
@@ -470,7 +488,13 @@ public final class StrikeEffects {
                 }
                 float missingHealth = caster.getMaxHealth() - caster.getHealth();
                 if (missingHealth > 0.0F) {
-                    target.hurtServer(serverLevel, caster.damageSources().magic(), missingHealth);
+                    SpellDamage.hurt(
+                            target,
+                            serverLevel,
+                            caster.damageSources().magic(),
+                            missingHealth,
+                            AffixKills.current()
+                    );
                 }
             }
 
@@ -496,6 +520,7 @@ public final class StrikeEffects {
                     return;
                 }
                 Vec3 pos = target.position().add(0.0, target.getBbHeight() * 0.5, 0.0);
+                AffixKills.stampNearby(level, pos, caster);
                 level.explode(
                         caster,
                         null,
