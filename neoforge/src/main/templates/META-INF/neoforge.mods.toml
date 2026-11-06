@@ -10,7 +10,7 @@ authors = "Me!"
 description = '''
 Spellgems - spell gems, wands, and enchanting for Minecraft.
 '''
-logoFile = "assets/spellgems/icon.png"
+iconFile = "assets/spellgems/icon.png"
 
 # Experience redirect is shared. Death-drop capture stays Fabric-only so Neo does not rewrite drops twice.
 # Client mixins (scroll cycle, astral bow draw) are shared with Fabric.

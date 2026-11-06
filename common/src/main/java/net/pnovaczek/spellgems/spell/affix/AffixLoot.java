@@ -3,7 +3,7 @@ package net.pnovaczek.spellgems.spell.affix;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.zombie.Zombie;
@@ -34,7 +34,7 @@ public final class AffixLoot {
         if (lootingLevel <= 0 || mob.getLootTable().isEmpty()) {
             return List.of();
         }
-        Zombie dummy = EntityType.ZOMBIE.create(level, EntitySpawnReason.TRIGGERED);
+        Zombie dummy = EntityTypes.ZOMBIE.create(level, EntitySpawnReason.TRIGGERED);
         if (dummy == null) {
             return null;
         }

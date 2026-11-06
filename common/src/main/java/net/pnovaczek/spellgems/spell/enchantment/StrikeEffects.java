@@ -15,7 +15,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.hurtingprojectile.windcharge.AbstractWindCharge;
@@ -312,7 +312,7 @@ public final class StrikeEffects {
                 if (!(target.hasEffect(MobEffects.SLOWNESS) || target.hasEffect(MobEffects.LEVITATION))) {
                     return;
                 }
-                LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
+                LightningBolt bolt = EntityTypes.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
                 if (bolt == null) {
                     return;
                 }

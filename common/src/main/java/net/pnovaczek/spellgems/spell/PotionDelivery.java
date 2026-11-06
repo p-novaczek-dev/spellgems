@@ -160,8 +160,8 @@ public final class PotionDelivery {
     ) {
         for (MobEffectInstance effectInstance : mobEffects) {
             Holder<MobEffect> effect = effectInstance.getEffect();
-            if (effect.value().isInstantenous()) {
-                effect.value().applyInstantenousEffect(
+            if (effect.value().isInstantaneous()) {
+                effect.value().applyInstantaneousEffect(
                         level,
                         source,
                         source instanceof LivingEntity living ? living : null,

@@ -2,6 +2,7 @@ package net.pnovaczek.spellgems.spell.affix;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -132,16 +133,16 @@ public final class AffixDrops {
      */
     private static Item headFor(LivingEntity entity) {
         EntityType<?> type = entity.getType();
-        if (type == EntityType.SKELETON) {
+        if (type == EntityTypes.SKELETON) {
             return Items.SKELETON_SKULL;
         }
-        if (type == EntityType.WITHER_SKELETON) {
+        if (type == EntityTypes.WITHER_SKELETON) {
             return Items.WITHER_SKELETON_SKULL;
         }
-        if (type == EntityType.ZOMBIE || type == EntityType.ZOMBIE_VILLAGER) {
+        if (type == EntityTypes.ZOMBIE || type == EntityTypes.ZOMBIE_VILLAGER) {
             return Items.ZOMBIE_HEAD;
         }
-        if (type == EntityType.PIGLIN) {
+        if (type == EntityTypes.PIGLIN) {
             return Items.PIGLIN_HEAD;
         }
         return null;

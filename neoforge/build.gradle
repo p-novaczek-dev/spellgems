@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
 	id 'maven-publish'
-	id 'net.neoforged.moddev' version '2.0.142'
+	id 'net.neoforged.moddev' version '2.0.148'
 }
 
 // Installable jar: spellgems-<version>-neoforge.jar
@@ -35,7 +35,11 @@ sourceSets {
 }
 
 neoForge {
-	version = project.neo_version
+	// 26.2 NeoForm recompile fails javac on HolderSet$1.contents(); use the patched binary.
+	enable {
+		version = project.neo_version
+		disableRecompilation = true
+	}
 
 	runs {
 		client {

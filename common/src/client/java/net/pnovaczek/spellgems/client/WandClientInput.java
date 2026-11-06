@@ -53,7 +53,7 @@ public final class WandClientInput {
             return;
         }
 
-        boolean canQuickCast = client.screen == null && client.player.getMainHandItem().is(ModItems.WAND);
+        boolean canQuickCast = client.gui.screen() == null && client.player.getMainHandItem().is(ModItems.WAND);
         for (int slot = 0; slot < SpellgemsKeyMappings.WAND_QUICK_CAST_SLOT_COUNT; slot++) {
             KeyMapping key = SpellgemsKeyMappings.WAND_QUICK_CAST_KEYS[slot];
             if (key == null) {
@@ -86,7 +86,7 @@ public final class WandClientInput {
         KeyMapping cycleKey = SpellgemsKeyMappings.CYCLE_SPELL_KEY;
         return cycleKey != null
                 && client.player != null
-                && client.screen == null
+                && client.gui.screen() == null
                 && cycleKey.isDown()
                 && (client.player.getMainHandItem().is(ModItems.WAND)
                         || client.player.getMainHandItem().is(ModItems.ASTRAL_BOW));

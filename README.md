@@ -1,6 +1,6 @@
 # Spellgems
 
-Minecraft magic mod for Fabric and NeoForge. Combat and utility spells live on gems you cast manually or automatically.
+Minecraft magic mod for Fabric and NeoForge.
 
 ## Setup
 

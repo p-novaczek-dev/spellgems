@@ -106,7 +106,7 @@ public class Nova extends AbstractSpell {
 
             double dx = center.x - target.getX();
             double dz = center.z - target.getZ();
-            target.knockback(config.knockbackStrength, dx, dz);
+            target.knockback(config.knockbackStrength, dx, dz, level.damageSources().magic(), damage);
             GreaterSpellGems.onDirectHit(context, target);
         }
 
