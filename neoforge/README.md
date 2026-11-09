@@ -1,6 +1,6 @@
 # neoforge
 
-NeoForge loader module (ModDevGradle 2.0.148, NeoForge `26.2.0.93`). Minecraft artifacts skip NeoForm recompilation because the 26.2 decompiled sources fail javac.
+NeoForge loader module (ModDevGradle 2.0.148, NeoForge `26.3.0.101`). Minecraft artifacts skip NeoForm recompilation because the 26.3 decompiled sources fail javac.
 
 ```bash
 ./gradlew :neoforge:runClient

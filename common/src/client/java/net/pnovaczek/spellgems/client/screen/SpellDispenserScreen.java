@@ -154,7 +154,8 @@ public class SpellDispenserScreen extends AbstractContainerScreen<SpellDispenser
                 mouseX,
                 mouseY,
                 new MenuTooltipPositioner(new ScreenRectangle(mouseX, mouseY, 1, 1)),
-                null
+                null,
+                false
         );
     }
 

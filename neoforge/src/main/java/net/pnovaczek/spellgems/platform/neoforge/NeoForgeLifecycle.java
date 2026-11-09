@@ -3,8 +3,6 @@ package net.pnovaczek.spellgems.platform.neoforge;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -44,19 +42,14 @@ public final class NeoForgeLifecycle implements PlatformLifecycle {
         // We implement village inject directly here and still accept the callback for API parity
         // (unused for Neo's load path beyond village inject).
         NeoForge.EVENT_BUS.addListener((LootTableLoadEvent event) -> {
-            String path = event.getName().getPath();
-            if (path.startsWith("chests/village/village_") && path.endsWith("_house")) {
-                try {
-                    event.getTable().addPool(
-                            LootPool.lootPool()
-                                    .add(NestedLootTable.lootTableReference(VillageManaRootLoot.MANA_ROOT_LOOT))
-                                    .build()
-                    );
-                } catch (RuntimeException ignored) {
-                    // Duplicate pool name / frozen table — ignore
-                }
+            if (!VillageManaRootLoot.isVillageHouse(event.getName())) {
+                return;
             }
-            // Note: generic callback expects a Builder; Neo path handles village inject above.
+            try {
+                event.getTable().addPool(VillageManaRootLoot.manaRootPool(event.getRegistries()).build());
+            } catch (RuntimeException ignored) {
+                // Duplicate pool name / frozen table — ignore
+            }
         });
     }
 

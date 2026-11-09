@@ -1,6 +1,5 @@
 package net.pnovaczek.spellgems.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
@@ -25,16 +24,10 @@ import net.pnovaczek.spellgems.screen.SpellEnchantingMenu;
 import org.jspecify.annotations.Nullable;
 
 public class SpellEnchantingTableBlock extends BaseEntityBlock {
-    public static final MapCodec<SpellEnchantingTableBlock> CODEC = simpleCodec(SpellEnchantingTableBlock::new);
     private static final VoxelShape SHAPE = Block.column(16.0, 0.0, 12.0);
 
     public SpellEnchantingTableBlock(Properties properties) {
         super(properties);
-    }
-
-    @Override
-    public MapCodec<SpellEnchantingTableBlock> codec() {
-        return CODEC;
     }
 
     @Override

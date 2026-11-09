@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
   "key": {
     "C": "#minecraft:planks",
     "S": "spellgems:shimmersteel_ingot"

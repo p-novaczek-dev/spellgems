@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "spellgems:spell_dispenser"
+        "recipes": "spellgems:spell_dispenser"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

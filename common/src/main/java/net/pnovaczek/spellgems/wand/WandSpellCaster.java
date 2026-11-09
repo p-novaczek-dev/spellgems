@@ -7,6 +7,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModItems;
 import net.pnovaczek.spellgems.Spellgems;
@@ -58,7 +59,7 @@ public final class WandSpellCaster {
 
         InteractionHand hand = getWandHand(player);
         WandDepletion.applyDurabilityCost(request.context().castingItem(), request.effectiveDurabilityCost(), player);
-        player.swing(hand);
+        player.swingAndResetAttackStrength(hand, SwingAnimation.DEFAULT, true);
         return true;
     }
 

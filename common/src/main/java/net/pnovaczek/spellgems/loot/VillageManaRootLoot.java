@@ -1,5 +1,6 @@
 package net.pnovaczek.spellgems.loot;
 
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -21,16 +22,25 @@ public final class VillageManaRootLoot {
     private VillageManaRootLoot() {
     }
 
-    public static void tryInject(ResourceKey<LootTable> key, LootTable.Builder tableBuilder, boolean builtin) {
-        if (!builtin) {
+    public static void tryInject(
+            ResourceKey<LootTable> key,
+            LootTable.Builder tableBuilder,
+            boolean builtin,
+            HolderGetter.Provider registries
+    ) {
+        if (!builtin || !isVillageHouse(key.identifier())) {
             return;
         }
-        String path = key.identifier().getPath();
-        if (path.startsWith("chests/village/village_") && path.endsWith("_house")) {
-            tableBuilder.withPool(
-                    LootPool.lootPool()
-                            .add(NestedLootTable.lootTableReference(MANA_ROOT_LOOT))
-            );
-        }
+        tableBuilder.withPool(manaRootPool(registries));
+    }
+
+    public static LootPool.Builder manaRootPool(HolderGetter.Provider registries) {
+        return LootPool.lootPool()
+                .add(NestedLootTable.lootTableReference(registries.getOrThrow(MANA_ROOT_LOOT)));
+    }
+
+    public static boolean isVillageHouse(Identifier id) {
+        String path = id.getPath();
+        return path.startsWith("chests/village/village_") && path.endsWith("_house");
     }
 }

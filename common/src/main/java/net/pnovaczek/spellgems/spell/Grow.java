@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.pnovaczek.spellgems.Spellgems;
 import org.jspecify.annotations.Nullable;
@@ -100,12 +101,13 @@ public class Grow extends AbstractSpell {
     private static boolean isGrowableTarget(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         return state.getBlock() instanceof BonemealableBlock block
-                && block.isValidBonemealTarget(level, pos, state);
+                && block.isValidBonemealTarget(level, pos, state, BonemealSource.INTERACTION);
     }
 
     private static boolean applyBoneMeal(Level level, BlockPos pos, @Nullable ItemStack boneMeal, boolean consumeBoneMeal) {
         BlockState state = level.getBlockState(pos);
-        if (!(state.getBlock() instanceof BonemealableBlock block) || !block.isValidBonemealTarget(level, pos, state)) {
+        if (!(state.getBlock() instanceof BonemealableBlock block)
+                || !block.isValidBonemealTarget(level, pos, state, BonemealSource.INTERACTION)) {
             return false;
         }
 
@@ -113,11 +115,11 @@ public class Grow extends AbstractSpell {
             return true;
         }
 
-        if (!block.isBonemealSuccess(level, level.getRandom(), pos, state)) {
+        if (!block.isBonemealSuccess(level, level.getRandom(), pos, state, BonemealSource.INTERACTION)) {
             return false;
         }
 
-        block.performBonemeal(serverLevel, level.getRandom(), pos, state);
+        block.performBonemeal(serverLevel, level.getRandom(), pos, state, BonemealSource.INTERACTION);
         level.levelEvent(1505, pos, 15);
 
         if (consumeBoneMeal && boneMeal != null) {

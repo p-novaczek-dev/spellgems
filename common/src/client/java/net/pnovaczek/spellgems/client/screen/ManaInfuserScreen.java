@@ -88,7 +88,7 @@ public class ManaInfuserScreen extends AbstractContainerScreen<ManaInfuserMenu> 
             var currentScreenRectangle = new ScreenRectangle(mouseX, mouseY, 1, 1);
             var manaTooltipPositioner = new MenuTooltipPositioner(currentScreenRectangle);
             Identifier manaTooltipStyle = null;
-            graphics.tooltip(this.font, manaTooltipTextRows, mouseX, mouseY, manaTooltipPositioner, manaTooltipStyle);
+            graphics.tooltip(this.font, manaTooltipTextRows, mouseX, mouseY, manaTooltipPositioner, manaTooltipStyle, false);
         }
     }
 }

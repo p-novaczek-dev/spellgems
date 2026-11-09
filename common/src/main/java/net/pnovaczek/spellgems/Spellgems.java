@@ -57,7 +57,7 @@ public final class Spellgems {
 		ModNetworking.registerServerReceivers();
 
 		Platform.lifecycle().onModifyLootTable((key, tableBuilder, builtin, registries) ->
-				VillageManaRootLoot.tryInject(key, tableBuilder, builtin));
+				VillageManaRootLoot.tryInject(key, tableBuilder, builtin, registries));
 		Platform.lifecycle().onPlayerAttackLiving(WeaponSocketing::onPlayerAttackLiving);
 		Platform.lifecycle().onServerTickEnd(AffixKills::onServerTickEnd);
 		Platform.lifecycle().onLivingDamagePre(AffixKills::beforeDamage);

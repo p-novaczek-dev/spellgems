@@ -1,6 +1,5 @@
 package net.pnovaczek.spellgems.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -25,19 +24,12 @@ import net.pnovaczek.spellgems.block.entity.ManaInfuserBlockEntity;
 
 public class ManaInfuserBlock extends BaseEntityBlock {
 
-    public static final MapCodec<ManaInfuserBlock> CODEC = simpleCodec(ManaInfuserBlock::new);
-
     @SuppressWarnings("this-escape")
     public ManaInfuserBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(HorizontalDirectionalBlock.FACING, net.minecraft.core.Direction.NORTH)
                 .setValue(BlockStateProperties.LIT, false));
-    }
-
-    @Override
-    public MapCodec<? extends ManaInfuserBlock> codec() {
-        return CODEC;
     }
 
     @Override

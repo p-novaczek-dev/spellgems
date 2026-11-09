@@ -1,6 +1,5 @@
 package net.pnovaczek.spellgems.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -38,7 +37,6 @@ import java.util.Set;
  * every face-adjacent astral barrier in the same connected group.
  */
 public class AstralBarrierBlock extends TransparentBlock {
-    public static final MapCodec<AstralBarrierBlock> CODEC = simpleCodec(AstralBarrierBlock::new);
     public static final BooleanProperty REVERSED = BooleanProperty.create("reversed");
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
@@ -51,11 +49,6 @@ public class AstralBarrierBlock extends TransparentBlock {
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(REVERSED, false)
                 .setValue(POWERED, false));
-    }
-
-    @Override
-    public MapCodec<? extends AstralBarrierBlock> codec() {
-        return CODEC;
     }
 
     @Override

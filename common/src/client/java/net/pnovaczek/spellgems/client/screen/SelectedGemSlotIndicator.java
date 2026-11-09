@@ -1,5 +1,6 @@
 package net.pnovaczek.spellgems.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -48,7 +49,7 @@ public final class SelectedGemSlotIndicator {
             int topPos,
             Minecraft minecraft
     ) {
-        if (event.button() != 0 || minecraft.player == null || minecraft.gameMode == null) {
+        if (event.button() != InputConstants.MOUSE_BUTTON_LEFT || minecraft.player == null || minecraft.gameMode == null) {
             return false;
         }
         int slot = hoveredSlot(event.x() - leftPos, event.y() - topPos);

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "spellgems:mana_essence_from_smelting_mana_root"
+        "recipes": "spellgems:mana_essence_from_smelting_mana_root"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

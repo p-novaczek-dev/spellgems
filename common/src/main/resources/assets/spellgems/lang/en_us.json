@@ -177,7 +177,7 @@
   "tooltip.spellgems.spell_enchantment.void.description": "Destroys items that do not fit in the bound inventory",
 
   "tooltip.spellgems.spell_affix.looting.name": "Looting",
-  "tooltip.spellgems.spell_affix.looting.description": "Increases mob drops the same way as Looting",
+  "tooltip.spellgems.spell_affix.looting.description": "Increases mob drops",
   "tooltip.spellgems.spell_affix.no_loot.name": "No Loot",
   "tooltip.spellgems.spell_affix.no_loot.description": "Suppresses loot-table drops. Decapitate and Scavenge still drop",
   "tooltip.spellgems.spell_affix.xp_boost.name": "XP Boost",
@@ -189,7 +189,7 @@
   "tooltip.spellgems.spell_affix.scavenge.name": "Scavenge",
   "tooltip.spellgems.spell_affix.scavenge.description": "Mobs always drop equipped armor, weapons, and tools",
   "tooltip.spellgems.spell_affix.magnet.name": "Magnet",
-  "tooltip.spellgems.spell_affix.magnet.description": "Pulls a kill's items and experience toward you",
+  "tooltip.spellgems.spell_affix.magnet.description": "Pulls dropped items and experience toward you",
 
   "enchantment.spellgems.recharge": "Recharge",
   "enchantment.spellgems.recharge.desc": "Passively restores wand durability over time.",

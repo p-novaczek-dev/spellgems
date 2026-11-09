@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "spellgems:mana_infuser"
+        "recipes": "spellgems:mana_infuser"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

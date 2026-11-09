@@ -35,7 +35,7 @@ sourceSets {
 }
 
 neoForge {
-	// 26.2 NeoForm recompile fails javac on HolderSet$1.contents(); use the patched binary.
+	// 26.3 NeoForm recompile still fails javac on HolderSet$1.contents(); use the patched binary.
 	enable {
 		version = project.neo_version
 		disableRecompilation = true

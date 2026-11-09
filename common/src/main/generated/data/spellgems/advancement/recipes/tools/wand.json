@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "spellgems:wand"
+        "recipes": "spellgems:wand"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

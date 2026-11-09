@@ -1,6 +1,5 @@
 package net.pnovaczek.spellgems.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
@@ -16,16 +15,10 @@ import net.pnovaczek.spellgems.screen.GemForgeMenu;
 import org.jspecify.annotations.Nullable;
 
 public class GemForgeBlock extends Block {
-    public static final MapCodec<GemForgeBlock> CODEC = simpleCodec(GemForgeBlock::new);
     private static final Component CONTAINER_TITLE = Component.translatable("container.spellgems.gem_forge");
 
     public GemForgeBlock(Properties properties) {
         super(properties);
-    }
-
-    @Override
-    public MapCodec<GemForgeBlock> codec() {
-        return CODEC;
     }
 
     @Override

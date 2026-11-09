@@ -2,7 +2,9 @@ package net.pnovaczek.spellgems.datagen;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -15,6 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import net.pnovaczek.spellgems.ModBlocks;
@@ -39,8 +42,12 @@ public class ModRecipeProvider extends FabricRecipeProvider {
     }
 
     @Override
-    protected @NonNull RecipeProvider createRecipeProvider(HolderLookup.@NonNull Provider registryLookup, @NonNull RecipeOutput exporter) {
-        return new RecipeProvider(registryLookup, exporter) {
+    protected @NonNull RecipeProvider createRecipeProvider(
+            HolderLookup.@NonNull Provider registries,
+            BootstrapContext<Recipe<?>> recipes,
+            BootstrapContext<Advancement> advancements
+    ) {
+        return new RecipeProvider(recipes, advancements) {
             @Override
             public void buildRecipes() {
                 // 8 Cobblestone + 1 Mana Essence → 1 Mana Infuser
@@ -51,7 +58,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .define('#', Blocks.COBBLESTONE)
                         .define('M', ModItems.MANA_ESSENCE)
                         .unlockedBy("has_mana_essence", has(ModItems.MANA_ESSENCE))
-                        .save(exporter);
+                        .save(output);
 
                 // 7 Cobblestone + 1 Redstone + 1 Shimmersteel → Spell Dispenser
                 shaped(RecipeCategory.REDSTONE, ModBlocks.SPELL_DISPENSER)
@@ -62,7 +69,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .define('R', Items.REDSTONE)
                         .define('S', ModItems.SHIMMERSTEEL_INGOT)
                         .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
-                        .save(exporter);
+                        .save(output);
 
                 // Mana Root → Mana Essence (furnace smelting)
                 oreSmelting(
@@ -83,7 +90,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         2,
                         100)
                     .unlockedBy("has_iron_ingot", has(net.minecraft.world.item.Items.IRON_INGOT))
-                    .save(exporter, "shimmersteel_ingot");
+                    .save(output, "shimmersteel_ingot");
 
                 // Raw spell gem and every finished spell gem share this mana cost and time.
                 int gemMana = 8;
@@ -98,33 +105,33 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         gemMana,
                         gemTime)
                     .unlockedBy("has_amethyst_shard", has(Items.AMETHYST_SHARD))
-                    .save(exporter, "raw_spell_gem");
+                    .save(output, "raw_spell_gem");
 
                 // Spell gems: raw spell gem infused by the spell's item.
-                spellGem(exporter, ModItems.SPELL_GEM_PROJECTILE, Items.ARROW, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_NOVA, Items.GUNPOWDER, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_VORTEX, Items.SLIME_BALL, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_BLINK, Items.ENDER_PEARL, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_MAGNET, Items.REDSTONE, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_PLACE_BLOCK, Items.COBBLESTONE, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_BREAK_BLOCK, Items.OBSIDIAN, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_PLANT, Items.WHEAT_SEEDS, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_HARVEST, Items.WHEAT, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_FEED, Items.HAY_BLOCK, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_GROW, Items.BONE_MEAL, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_POTION, Items.GLASS_BOTTLE, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_TRANSMUTE, Items.AMETHYST_SHARD, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_GEODE_RESONANCE, Items.QUARTZ, gemMana, gemTime);
-                spellGem(exporter, ModItems.SPELL_GEM_ITEM_TRANSPORT, Items.CHEST, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_PROJECTILE, Items.ARROW, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_NOVA, Items.GUNPOWDER, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_VORTEX, Items.SLIME_BALL, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_BLINK, Items.ENDER_PEARL, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_MAGNET, Items.REDSTONE, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_PLACE_BLOCK, Items.COBBLESTONE, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_BREAK_BLOCK, Items.OBSIDIAN, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_PLANT, Items.WHEAT_SEEDS, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_HARVEST, Items.WHEAT, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_FEED, Items.HAY_BLOCK, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_GROW, Items.BONE_MEAL, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_POTION, Items.GLASS_BOTTLE, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_TRANSMUTE, Items.AMETHYST_SHARD, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_GEODE_RESONANCE, Items.QUARTZ, gemMana, gemTime);
+                spellGem(output, ModItems.SPELL_GEM_ITEM_TRANSPORT, Items.CHEST, gemMana, gemTime);
 
                 TransmuteRecipeBuilder.create(Ingredient.of(Blocks.TINTED_GLASS), ModBlocks.ASTRAL_BARRIER)
-                        .save(exporter, "tinted_glass_to_astral_barrier");
+                        .save(output, "tinted_glass_to_astral_barrier");
                 TransmuteRecipeBuilder.create(Ingredient.of(Blocks.OBSIDIAN), Blocks.CRYING_OBSIDIAN)
-                        .save(exporter, "obsidian_to_crying_obsidian");
+                        .save(output, "obsidian_to_crying_obsidian");
                 TransmuteRecipeBuilder.create(Ingredient.of(Blocks.SOUL_SAND), Blocks.SOUL_SOIL)
-                        .save(exporter, "soul_sand_to_soul_soil");
+                        .save(output, "soul_sand_to_soul_soil");
                 TransmuteRecipeBuilder.create(Ingredient.of(Blocks.GLOWSTONE), Blocks.SHROOMLIGHT)
-                        .save(exporter, "glowstone_to_shroomlight");
+                        .save(output, "glowstone_to_shroomlight");
 
                 // Wand: 1 stick + 1 shimmersteel (shimmersteel above stick)
                 shaped(RecipeCategory.TOOLS, ModItems.WAND)
@@ -133,7 +140,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .define('S', ModItems.SHIMMERSTEEL_INGOT)
                         .define('|', Items.STICK)
                         .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
-                        .save(exporter);
+                        .save(output);
 
                 // Astral Bow: like vanilla bow but with shimmersteel instead of the middle stick
                 // Pattern: 2 sticks + 1 shimmersteel + 3 string
@@ -145,7 +152,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .define('S', ModItems.SHIMMERSTEEL_INGOT)
                         .define('X', Items.STRING)
                         .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
-                        .save(exporter);
+                        .save(output);
 
                 // Gem Forge: 2 shimmersteel above a 2x2 of any wood planks
                 shaped(RecipeCategory.DECORATIONS, ModBlocks.GEM_FORGE)
@@ -155,31 +162,31 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .define('S', ModItems.SHIMMERSTEEL_INGOT)
                         .define('C', ItemTags.PLANKS)
                         .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
-                        .save(exporter);
+                        .save(output);
 
                 GemForgeRecipeBuilder.applyTome(
                                 ingredientFromTag(ModTags.SPELL_GEMS),
                                 ingredientFromTag(ModTags.CATALYST_BOOKS),
                                 27)
-                        .save(exporter, "apply_spell_tome");
+                        .save(output, "apply_spell_tome");
 
                 GemForgeRecipeBuilder.socketWeapon(
                                 ingredientFromTag(ModTags.SOCKETABLE_WEAPONS),
                                 Ingredient.of(ModItems.SPELL_GEM_NOVA),
                                 1395)
-                        .save(exporter, "socket_nova_weapon");
+                        .save(output, "socket_nova_weapon");
 
                 GemForgeRecipeBuilder.unsocketWeapon(ingredientFromTag(ModTags.SOCKETABLE_WEAPONS), 0)
-                        .save(exporter, "unsocket_weapon");
+                        .save(output, "unsocket_weapon");
 
                 GemForgeRecipeBuilder.combineGreater(
                                 ingredientFromTag(ModTags.COMBAT_SPELL_GEMS),
                                 ingredientFromTag(ModTags.COMBAT_SPELL_GEMS),
                                 5345)
-                        .save(exporter, "greater_spell_gem");
+                        .save(output, "greater_spell_gem");
 
                 GemForgeRecipeBuilder.mergeAffixTomes(ingredientFromTag(ModTags.CATALYST_BOOKS), 0)
-                        .save(exporter, "merge_affix_tomes");
+                        .save(output, "merge_affix_tomes");
 
                 GemForgeRecipeBuilder.applyAffix(
                                 Ingredient.of(
@@ -189,7 +196,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                                         ModItems.GREATER_SPELL_GEM),
                                 ingredientFromTag(ModTags.CATALYST_BOOKS),
                                 0)
-                        .save(exporter, "apply_affix");
+                        .save(output, "apply_affix");
 
                 // Spell Enchanting Table: 1 book + 2 shimmersteel + 4 obsidian
                 shaped(RecipeCategory.DECORATIONS, ModBlocks.SPELL_ENCHANTING_TABLE)
@@ -200,7 +207,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         .define('S', ModItems.SHIMMERSTEEL_INGOT)
                         .define('O', Blocks.OBSIDIAN)
                         .unlockedBy("has_shimmersteel_ingot", has(ModItems.SHIMMERSTEEL_INGOT))
-                        .save(exporter);
+                        .save(output);
 
                 var lapisCatalyst = new SpellEnchantingRecipe.CatalystDefinition(
                         BuiltInRegistries.ITEM.getKey(Items.LAPIS_LAZULI),
@@ -218,7 +225,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         "recipe.spellgems.combat_spell_random.description",
                         1,
                         1)
-                        .save(exporter, "combat_spell_random");
+                        .save(output, "combat_spell_random");
 
                 // Spell tome: 1 random modifier (player chooses this option)
                 SpellEnchantingRecipeBuilder.combat(
@@ -232,7 +239,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         "recipe.spellgems.combat_tome_modifier.description",
                         1,
                         0)
-                        .save(exporter, "combat_tome_modifier");
+                        .save(output, "combat_tome_modifier");
 
                 // Spell tome: 1 random strike (player chooses this option)
                 SpellEnchantingRecipeBuilder.combat(
@@ -246,7 +253,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         "recipe.spellgems.combat_tome_strike.description",
                         0,
                         1)
-                        .save(exporter, "combat_tome_strike");
+                        .save(output, "combat_tome_strike");
 
                 var emeraldCatalyst = new SpellEnchantingRecipe.CatalystDefinition(
                         BuiltInRegistries.ITEM.getKey(Items.EMERALD),
@@ -255,19 +262,19 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         Optional.of(BuiltInRegistries.ITEM.getKey(Items.BOOK)),
                         Optional.empty(),
                         Optional.empty());
-                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.LOOTING, "looting");
-                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.NO_LOOT, "no_loot");
-                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.XP_BOOST, "xp_boost");
-                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.NO_XP, "no_xp");
-                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.DECAPITATE, "decapitate", 40, 1525);
-                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.SCAVENGE, "scavenge", 40, 1525);
-                saveAffixTome(exporter, bookInput, emeraldCatalyst, SpellAffixes.MAGNET, "magnet");
+                saveAffixTome(output, bookInput, emeraldCatalyst, SpellAffixes.LOOTING, "looting");
+                saveAffixTome(output, bookInput, emeraldCatalyst, SpellAffixes.NO_LOOT, "no_loot");
+                saveAffixTome(output, bookInput, emeraldCatalyst, SpellAffixes.XP_BOOST, "xp_boost");
+                saveAffixTome(output, bookInput, emeraldCatalyst, SpellAffixes.NO_XP, "no_xp");
+                saveAffixTome(output, bookInput, emeraldCatalyst, SpellAffixes.DECAPITATE, "decapitate", 40, 1525);
+                saveAffixTome(output, bookInput, emeraldCatalyst, SpellAffixes.SCAVENGE, "scavenge", 40, 1525);
+                saveAffixTome(output, bookInput, emeraldCatalyst, SpellAffixes.MAGNET, "magnet");
 
                 SpellEnchantingRecipeBuilder.potionEnchant(
                         10,
                         27,
                         "recipe.spellgems.potion_spell_enchant.description"
-                ).save(exporter, "potion_spell");
+                ).save(output, "potion_spell");
 
                 // Utility enchantments via spell enchanting table (lapis catalyst)
                 // Break block + lapis -> silk touch
@@ -281,7 +288,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         27,
                         "recipe.spellgems.break_block_silk_touch.description",
                         "spellgems:silk_touch")
-                        .save(exporter, "break_block_silk_touch");
+                        .save(output, "break_block_silk_touch");
 
                 // Smelt (for break block and harvest gems, via tag)
                 SpellEnchantingRecipeBuilder.utility(
@@ -294,7 +301,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         27,
                         "recipe.spellgems.smelt.description",
                         "spellgems:smelt")
-                        .save(exporter, "smelt");
+                        .save(output, "smelt");
 
                 // Extend (for blink and magnet gems, via tag)
                 SpellEnchantingRecipeBuilder.utility(
@@ -307,7 +314,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         27,
                         "recipe.spellgems.extend.description",
                         "spellgems:extend")
-                        .save(exporter, "extend");
+                        .save(output, "extend");
 
                 SpellEnchantingRecipeBuilder.utility(
                         new SpellEnchantingRecipe.SpellEnchantInput(
@@ -319,23 +326,23 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         27,
                         "recipe.spellgems.item_transport_void.description",
                         "spellgems:void")
-                        .save(exporter, "item_transport_void");
+                        .save(output, "item_transport_void");
             }
         };
     }
 
     private static void saveAffixTome(
-            RecipeOutput exporter,
+            RecipeOutput output,
             SpellEnchantingRecipe.SpellEnchantInput book,
             SpellEnchantingRecipe.CatalystDefinition emerald,
             Identifier affixId,
             String path
     ) {
-        saveAffixTome(exporter, book, emerald, affixId, path, 8, 112);
+        saveAffixTome(output, book, emerald, affixId, path, 8, 112);
     }
 
     private static void saveAffixTome(
-            RecipeOutput exporter,
+            RecipeOutput output,
             SpellEnchantingRecipe.SpellEnchantInput book,
             SpellEnchantingRecipe.CatalystDefinition emerald,
             Identifier affixId,
@@ -350,13 +357,13 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         xpCost,
                         "recipe.spellgems.tome_affix_" + path + ".description",
                         affixId)
-                .save(exporter, "tome_affix_" + path);
+                .save(output, "tome_affix_" + path);
     }
 
     /**
      * Infuses a raw spell gem with {@code infusingItem}. Mana and time match the raw spell gem recipe.
      */
-    private static void spellGem(RecipeOutput exporter, ItemLike result, ItemLike infusingItem, int mana, int time) {
+    private static void spellGem(RecipeOutput output, ItemLike result, ItemLike infusingItem, int mana, int time) {
         String name = BuiltInRegistries.ITEM.getKey(result.asItem()).getPath();
         ManaInfuserRecipeBuilder.create(
                         Ingredient.of(ModItems.RAW_SPELL_GEM),
@@ -365,7 +372,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
                         1,
                         mana,
                         time)
-                .save(exporter, name);
+                .save(output, name);
     }
 
     /**

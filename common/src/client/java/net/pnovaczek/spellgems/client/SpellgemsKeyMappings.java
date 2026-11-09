@@ -5,7 +5,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.platform.client.ClientPlatform;
-import org.lwjgl.glfw.GLFW;
 
 public final class SpellgemsKeyMappings {
 
@@ -27,8 +26,7 @@ public final class SpellgemsKeyMappings {
         CYCLE_SPELL_KEY = ClientPlatform.client().registerKeyMapping(
                 new KeyMapping(
                         "key.spellgems.cycle_spell",
-                        InputConstants.Type.KEYSYM,
-                        GLFW.GLFW_KEY_V,
+                        InputConstants.KEY_V,
                         CATEGORY
                 )
         );
@@ -37,7 +35,7 @@ public final class SpellgemsKeyMappings {
             WAND_QUICK_CAST_KEYS[slot] = ClientPlatform.client().registerKeyMapping(
                     new KeyMapping(
                             "key.spellgems.wand_quick_cast." + (slot + 1),
-                            InputConstants.Type.KEYSYM,
+                            InputConstants.Type.KEYBOARD,
                             InputConstants.UNKNOWN.getValue(),
                             CATEGORY,
                             slot + 1

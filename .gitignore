@@ -23,6 +23,7 @@ classes/
 bin/
 .classpath
 .project
+.cache
 
 # macos
 
@@ -41,20 +42,14 @@ replay_*.log
 *.hprof
 *.jfr
 /AGENTS.md
-/code_reference.json
-/bug_tracker.json
+/notes/
 /temp/
 /mcps/
 /terminals/
 /net/
 /agent-tools/
-/code_optimization.json
 /META-INF/
 /com/
 /docs/
 /assets/
 /data/
-/change_requests.json
-/change_log.json
-/features_planned.json
-/feature_ideas.json

@@ -186,8 +186,8 @@ public class Vortex extends AbstractSpell {
             double dx = entity.getX() - center.x;
             double dz = entity.getZ() - center.z;
             living.knockback(pullStrength, dx, dz, living.damageSources().generic(), 0.0F);
-            // Players ignore needsSync; hurtMarked sends motion to the client.
-            living.hurtMarked = true;
+            // Players ignore needsSync; syncVelocity sends motion to the client.
+            living.syncVelocity = true;
         } else if (entity instanceof ItemEntity item) {
             // Same motion as Magnet: set a velocity toward the center and let the item glide.
             if (pullStrength <= 0.0F) {

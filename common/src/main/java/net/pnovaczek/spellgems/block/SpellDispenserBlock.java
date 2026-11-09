@@ -1,6 +1,5 @@
 package net.pnovaczek.spellgems.block;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -32,7 +31,6 @@ import org.jspecify.annotations.Nullable;
 
 public class SpellDispenserBlock extends BaseEntityBlock {
 
-    public static final MapCodec<SpellDispenserBlock> CODEC = simpleCodec(SpellDispenserBlock::new);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
     public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
 
@@ -44,11 +42,6 @@ public class SpellDispenserBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(TRIGGERED, false));
-    }
-
-    @Override
-    public MapCodec<? extends SpellDispenserBlock> codec() {
-        return CODEC;
     }
 
     @Override

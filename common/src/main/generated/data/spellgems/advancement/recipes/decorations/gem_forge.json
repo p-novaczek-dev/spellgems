@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "spellgems:gem_forge"
+        "recipes": "spellgems:gem_forge"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

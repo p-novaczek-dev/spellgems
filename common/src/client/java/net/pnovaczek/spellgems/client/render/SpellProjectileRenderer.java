@@ -53,7 +53,7 @@ public class SpellProjectileRenderer extends EntityRenderer<SpellProjectile, Spe
             final CameraRenderState camera
     ) {
         poseStack.pushPose();
-        poseStack.mulPose(camera.orientation);
+        poseStack.rotate(camera.orientation);
         poseStack.translate(0.0F, 0.0F, 0.05F);
 
         // Tint is stored as RGB; vertex color is ARGB. Alpha 0 is discarded by shader packs.

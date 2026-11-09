@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
 import net.minecraft.advancements.predicates.StatePropertiesPredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
+import net.minecraft.world.level.storage.loot.predicates.MatchBlock;
 import net.pnovaczek.spellgems.ModBlocks;
 import net.pnovaczek.spellgems.ModItems;
 
@@ -22,9 +22,10 @@ public class ModBlockLootTableProvider extends FabricBlockLootSubProvider {
                 ModBlocks.MANA_ROOT,
                 ModItems.MANA_ROOT,
                 ModItems.MANA_ROOT,
-                LootItemBlockStatePropertyCondition
-                        .hasBlockStateProperties(ModBlocks.MANA_ROOT)
-                        .setProperties(StatePropertiesPredicate.Builder.properties()
+                MatchBlock.blockMatches(
+                        this.blocks,
+                        ModBlocks.MANA_ROOT,
+                        StatePropertiesPredicate.Builder.properties()
                                 .hasProperty(CropBlock.AGE, ModBlocks.MANA_ROOT.getMaxAge()))
         ));
 
