@@ -1,5 +1,7 @@
 package net.pnovaczek.spellgems.wand;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -23,6 +25,16 @@ public final class WandSpellCaster {
     private record CastRequest(Spell spell, SpellContext context, int effectiveDurabilityCost) {
     }
 
+    private record CastAttempt(@Nullable CastRequest request, boolean insufficientDurability) {
+        private static CastAttempt fail() {
+            return new CastAttempt(null, false);
+        }
+
+        private static CastAttempt unaffordable() {
+            return new CastAttempt(null, true);
+        }
+    }
+
     private WandSpellCaster() {
     }
 
@@ -32,6 +44,18 @@ public final class WandSpellCaster {
 
     public static boolean canCastFromSlot(Player player, int slot) {
         return prepareCast(player, slot) != null;
+    }
+
+    /**
+     * The selected gem would cast, but the wand is not depleted and cannot pay the durability cost.
+     */
+    public static boolean lacksDurability(Player player, @Nullable Integer slot) {
+        return evaluateCast(player, slot).insufficientDurability();
+    }
+
+    public static void warnInsufficientDurability(Player player) {
+        player.sendOverlayMessage(Component.translatable("message.spellgems.wand.not_enough_durability")
+                .withStyle(ChatFormatting.RED));
     }
 
     public static @Nullable Spell getSelectedSpell(Player player) {
@@ -47,7 +71,11 @@ public final class WandSpellCaster {
      * Server-authoritative cast: spell effects, durability, swing.
      */
     public static boolean tryCastFromSlot(ServerPlayer player, @Nullable Integer slot) {
-        CastRequest request = prepareCast(player, slot);
+        CastAttempt attempt = evaluateCast(player, slot);
+        if (attempt.insufficientDurability()) {
+            warnInsufficientDurability(player);
+        }
+        CastRequest request = attempt.request();
         if (request == null) {
             return false;
         }
@@ -84,9 +112,13 @@ public final class WandSpellCaster {
     }
 
     private static @Nullable CastRequest prepareCast(Player player, @Nullable Integer slotOverride) {
+        return evaluateCast(player, slotOverride).request();
+    }
+
+    private static CastAttempt evaluateCast(Player player, @Nullable Integer slotOverride) {
         ItemStack wand = player.getMainHandItem();
         if (!wand.is(ModItems.WAND) || WandDepletion.isDepleted(wand)) {
-            return null;
+            return CastAttempt.fail();
         }
 
         SimpleContainer slots = new SimpleContainer(WandContainer.SIZE);
@@ -97,27 +129,27 @@ public final class WandSpellCaster {
                 : Mth.clamp(wand.getOrDefault(ModComponents.WAND_DATA, WandData.DEFAULT).selectedSlot(), 0, WandContainer.SIZE - 1);
         ItemStack gemStack = slots.getItem(slot);
         if (gemStack.isEmpty()) {
-            return null;
+            return CastAttempt.fail();
         }
 
         SpellGemData gemData = SpellGemItem.getSpellData(gemStack);
         Spell spell = SpellGemItem.getSpell(gemData);
         if (spell == null) {
-            return null;
+            return CastAttempt.fail();
         }
 
         int nominalCost = getDurabilityCost(spell.id(), gemData);
         int effectiveCost = WandDepletion.resolveEffectiveDurabilityCost(player, wand, nominalCost);
         if (!WandDepletion.canAffordDurabilityCost(wand, effectiveCost)) {
-            return null;
+            return CastAttempt.unaffordable();
         }
 
         SpellContext context = SpellContext.forWand(player.level(), player, wand, gemData);
         if (!spell.canCast(context)) {
-            return null;
+            return CastAttempt.fail();
         }
 
-        return new CastRequest(spell, context, effectiveCost);
+        return new CastAttempt(new CastRequest(spell, context, effectiveCost), false);
     }
 
     public static boolean cycleSelectedSpell(ServerPlayer player, int direction) {
