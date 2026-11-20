@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.pnovaczek.spellgems.ModBlocks;
 import net.pnovaczek.spellgems.ModMenuTypes;
+import net.pnovaczek.spellgems.recipe.GemForgeError;
 import net.pnovaczek.spellgems.recipe.GemForgeRecipe;
 import net.pnovaczek.spellgems.recipe.GemForgeRecipeInput;
 
@@ -33,7 +34,7 @@ public class GemForgeMenu extends ItemCombinerMenu {
 
     private final Level level;
     private final DataSlot xpCost = DataSlot.standalone();
-    private final DataSlot hasRecipeError = DataSlot.standalone();
+    private final DataSlot recipeError = DataSlot.standalone();
 
     public GemForgeMenu(int containerId, Inventory inventory) {
         this(containerId, inventory, ContainerLevelAccess.NULL);
@@ -44,7 +45,7 @@ public class GemForgeMenu extends ItemCombinerMenu {
         super(ModMenuTypes.GEM_FORGE, containerId, inventory, access, createInputSlotDefinitions());
         this.level = inventory.player.level();
         this.addDataSlot(this.xpCost);
-        this.addDataSlot(this.hasRecipeError);
+        this.addDataSlot(this.recipeError);
     }
 
     private static ItemCombinerMenuSlotDefinition createInputSlotDefinitions() {
@@ -98,10 +99,13 @@ public class GemForgeMenu extends ItemCombinerMenu {
     public void slotsChanged(Container container) {
         super.slotsChanged(container);
         if (this.level instanceof ServerLevel) {
-            boolean error = this.getSlot(INPUT_SLOT_1).hasItem()
+            boolean failed = this.getSlot(INPUT_SLOT_1).hasItem()
                     && this.getSlot(INPUT_SLOT_2).hasItem()
                     && !this.getSlot(this.getResultSlot()).hasItem();
-            this.hasRecipeError.set(error ? 1 : 0);
+            GemForgeError error = failed
+                    ? GemForgeError.diagnose(this.inputSlots.getItem(INPUT_SLOT_1), this.inputSlots.getItem(INPUT_SLOT_2))
+                    : GemForgeError.NONE;
+            this.recipeError.set(error.ordinal());
         }
     }
 
@@ -148,6 +152,10 @@ public class GemForgeMenu extends ItemCombinerMenu {
     }
 
     public boolean hasRecipeError() {
-        return this.hasRecipeError.get() > 0;
+        return getRecipeError() != GemForgeError.NONE;
+    }
+
+    public GemForgeError getRecipeError() {
+        return GemForgeError.byId(this.recipeError.get());
     }
 }

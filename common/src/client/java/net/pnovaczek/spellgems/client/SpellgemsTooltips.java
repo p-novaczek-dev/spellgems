@@ -263,7 +263,14 @@ public class SpellgemsTooltips {
             if (shiftDown) {
                 String description = SpellAffixes.descriptionKey(affix.id());
                 if (description != null) {
-                    lines.add(Component.translatable(description).withStyle(ChatFormatting.DARK_GRAY));
+                    MutableComponent line = Component.translatable(description);
+                    if (SpellAffixes.isLeveled(affix.id())) {
+                        line.append(Component.translatable(
+                                "tooltip.spellgems.spell_affix.max_level",
+                                SpellAffixes.maxLevel(affix.id())
+                        ));
+                    }
+                    lines.add(line.withStyle(ChatFormatting.DARK_GRAY));
                 }
             }
         }

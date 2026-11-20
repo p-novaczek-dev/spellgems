@@ -1,7 +1,11 @@
 package net.pnovaczek.spellgems.client.screen;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.MenuTooltipPositioner;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -9,6 +13,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.pnovaczek.spellgems.ExperienceLevels;
 import net.pnovaczek.spellgems.Spellgems;
 import net.pnovaczek.spellgems.screen.GemForgeMenu;
+
+import java.util.List;
 
 public class GemForgeScreen extends AbstractContainerScreen<GemForgeMenu> {
 
@@ -23,6 +29,9 @@ public class GemForgeScreen extends AbstractContainerScreen<GemForgeMenu> {
     private static final int ERROR_Y = 46;
     private static final int ERROR_WIDTH = 28;
     private static final int ERROR_HEIGHT = 21;
+    /** Between the right edge of the first input slot and the left edge of the result slot. */
+    private static final int ERROR_HOVER_X = 26;
+    private static final int ERROR_HOVER_WIDTH = 70;
 
     public GemForgeScreen(GemForgeMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -50,6 +59,29 @@ public class GemForgeScreen extends AbstractContainerScreen<GemForgeMenu> {
         if (this.menu.hasRecipeError()) {
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ERROR_SPRITE, x + ERROR_X, y + ERROR_Y, ERROR_WIDTH, ERROR_HEIGHT);
         }
+    }
+
+    @Override
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(graphics, mouseX, mouseY, delta);
+
+        String messageKey = this.menu.getRecipeError().messageKey();
+        if (messageKey == null
+                || (this.hoveredSlot != null && this.hoveredSlot.hasItem())
+                || !isHovering(ERROR_HOVER_X, ERROR_Y, ERROR_HOVER_WIDTH, ERROR_HEIGHT, mouseX, mouseY)) {
+            return;
+        }
+
+        Component text = Component.translatable(messageKey).withStyle(ChatFormatting.RED);
+        graphics.tooltip(
+                this.font,
+                List.of(ClientTooltipComponent.create(text.getVisualOrderText())),
+                mouseX,
+                mouseY,
+                new MenuTooltipPositioner(new ScreenRectangle(mouseX, mouseY, 1, 1)),
+                null,
+                false
+        );
     }
 
     @Override

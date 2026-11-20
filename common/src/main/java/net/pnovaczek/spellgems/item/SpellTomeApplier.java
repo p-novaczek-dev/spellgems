@@ -6,6 +6,7 @@ import net.pnovaczek.spellgems.ModComponents;
 import net.pnovaczek.spellgems.ModTags;
 import net.pnovaczek.spellgems.item.data.SpellGemData;
 import net.pnovaczek.spellgems.item.data.TomeData;
+import net.pnovaczek.spellgems.recipe.GemForgeError;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantment;
 import net.pnovaczek.spellgems.spell.enchantment.ModifierEnchantments;
 import net.pnovaczek.spellgems.spell.enchantment.StrikeEnchantment;
@@ -39,6 +40,48 @@ public final class SpellTomeApplier {
             return result;
         }
         return apply(second, first);
+    }
+
+    /**
+     * Why a gem and an enchantment tome cannot combine, or {@link GemForgeError#NONE} if the pair is not a gem and tome.
+     */
+    public static GemForgeError diagnose(ItemStack first, ItemStack second) {
+        GemForgeError error = diagnoseOrdered(first, second);
+        return error != GemForgeError.NONE ? error : diagnoseOrdered(second, first);
+    }
+
+    private static GemForgeError diagnoseOrdered(ItemStack gemStack, ItemStack tomeStack) {
+        if (gemStack.isEmpty() || tomeStack.isEmpty() || !tomeStack.is(ModTags.CATALYST_BOOKS)) {
+            return GemForgeError.NONE;
+        }
+        boolean combat = gemStack.is(ModTags.COMBAT_SPELL_GEMS);
+        boolean utility = gemStack.is(ModTags.UTILITY_SPELL_GEMS);
+        if (!combat && !utility) {
+            return GemForgeError.NONE;
+        }
+        TomeData tomeData = tomeStack.get(ModComponents.TOME_DATA);
+        SpellGemData gemData = gemStack.get(ModComponents.SPELL_GEM_DATA);
+        if (tomeData == null || tomeData.enchantmentId() == null || gemData == null) {
+            return GemForgeError.NONE;
+        }
+
+        Identifier enchantmentId = tomeData.enchantmentId();
+        return switch (getEnchantmentType(enchantmentId)) {
+            case MODIFIER -> {
+                if (!ModifierEnchantments.getCompatible(gemData.spellId()).contains(enchantmentId)) {
+                    yield GemForgeError.INCOMPATIBLE_SPELL;
+                }
+                yield gemData.modifierEffects().isEmpty() ? GemForgeError.NONE : GemForgeError.MAX_MODIFIER;
+            }
+            case STRIKE -> {
+                if (!combat) {
+                    yield GemForgeError.INCOMPATIBLE_SPELL;
+                }
+                yield gemData.strikeEffects().isEmpty() ? GemForgeError.NONE : GemForgeError.MAX_STRIKE;
+            }
+            case UTILITY -> utility ? GemForgeError.NONE : GemForgeError.INCOMPATIBLE_SPELL;
+            case UNKNOWN -> GemForgeError.NONE;
+        };
     }
 
     private static Optional<ItemStack> apply(ItemStack gemStack, ItemStack tomeStack) {
