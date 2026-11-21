@@ -2,6 +2,7 @@ package net.pnovaczek.spellgems;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import net.minecraft.resources.Identifier;
 import net.pnovaczek.spellgems.platform.Platform;
 import net.pnovaczek.spellgems.spell.SpellIds;
@@ -12,8 +13,13 @@ import java.nio.file.Path;
 public class SpellgemsConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    /** Schema version for migrations. Increment when breaking changes are made to the config structure. */
-    public int version = 1;
+    /**
+     * Written into new config files. A saved file with a lower version is discarded and replaced
+     * with defaults the next time the game loads.
+     */
+    public static final int CURRENT_VERSION = 2;
+
+    public int version = CURRENT_VERSION;
 
     public final SpellConfigs spells = new SpellConfigs();
     public final WandConfig wand = new WandConfig();
@@ -87,7 +93,7 @@ public class SpellgemsConfig {
             blink.wandDurabilityCost = 48;
             placeBlock.wandDurabilityCost = 0;
             magnet.wandDurabilityCost = 0;
-            potion.wandDurabilityCost = 192;
+            potion.wandDurabilityCost = 64;
             transmute.wandDurabilityCost = 4;
             transmute.dispenserCooldownTicks = 1;
             geodeResonance.wandDurabilityCost = 128;
@@ -351,11 +357,22 @@ public class SpellgemsConfig {
 
     public static SpellgemsConfig load() {
         Path path = Platform.paths().getConfigDir().resolve("spellgems.json");
+        File file = path.toFile();
         SpellgemsConfig config = null;
 
-        if (path.toFile().exists()) {
-            try (Reader reader = new FileReader(path.toFile())) {
-                config = GSON.fromJson(reader, SpellgemsConfig.class);
+        if (file.exists()) {
+            try (Reader reader = new FileReader(file)) {
+                JsonElement parsed = GSON.fromJson(reader, JsonElement.class);
+                int fileVersion = readVersion(parsed);
+                if (fileVersion >= CURRENT_VERSION && parsed != null && parsed.isJsonObject()) {
+                    config = GSON.fromJson(parsed, SpellgemsConfig.class);
+                } else {
+                    Spellgems.LOGGER.info(
+                            "Replacing spellgems.json (config version {}) with default settings (version {})",
+                            fileVersion,
+                            CURRENT_VERSION
+                    );
+                }
             } catch (Exception e) {
                 Spellgems.LOGGER.error("Failed to load config (using defaults)", e);
             }
@@ -366,10 +383,21 @@ public class SpellgemsConfig {
             config.validate();
             config.save();
         } else {
-            config.migrate();
             config.validate();
         }
         return config;
+    }
+
+    /** Missing or unreadable version counts as older than {@link #CURRENT_VERSION}. */
+    private static int readVersion(JsonElement parsed) {
+        if (parsed == null || !parsed.isJsonObject()) {
+            return 0;
+        }
+        JsonElement versionElement = parsed.getAsJsonObject().get("version");
+        if (versionElement == null || !versionElement.isJsonPrimitive() || !versionElement.getAsJsonPrimitive().isNumber()) {
+            return 0;
+        }
+        return versionElement.getAsInt();
     }
 
     public void save() {
@@ -378,15 +406,6 @@ public class SpellgemsConfig {
             GSON.toJson(this, writer);
         } catch (IOException e) {
             Spellgems.LOGGER.error("Failed to save config", e);
-        }
-    }
-
-    /** Performs any necessary migrations from older config versions. */
-    private void migrate() {
-        if (version < 1) {
-            version = 1;
-            // if future versions change field names or structure,
-            // copy values from legacy locations here.
         }
     }
 
