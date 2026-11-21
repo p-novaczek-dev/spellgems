@@ -79,8 +79,7 @@ public class GemForgeScreen extends AbstractContainerScreen<GemForgeMenu> {
                 mouseX,
                 mouseY,
                 new MenuTooltipPositioner(new ScreenRectangle(mouseX, mouseY, 1, 1)),
-                null,
-                false
+                null
         );
     }
 
