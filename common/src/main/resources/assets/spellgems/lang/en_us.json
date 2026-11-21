@@ -65,6 +65,7 @@
   "tooltip.spellgems.error": "ERROR",
   "tooltip.spellgems.spell_tome.description": "Can be applied to spell gems in a Gem Forge",
   "tooltip.spellgems.wand.depleted": "Cannot cast spells while depleted",
+  "message.spellgems.wand.not_enough_durability": "Not enough durability to cast this spell",
   "tooltip.spellgems.wand.repair": "Repair with Shimmersteel in an anvil, or use Mending / Recharge",
   "tooltip.spellgems.wand.configure": "Shift + Right-click to configure spells",
   "tooltip.spellgems.wand.cast": "Left-click to cast selected spell",
@@ -189,7 +190,8 @@
   "tooltip.spellgems.spell_affix.scavenge.name": "Scavenge",
   "tooltip.spellgems.spell_affix.scavenge.description": "Mobs always drop equipped armor, weapons, and tools",
   "tooltip.spellgems.spell_affix.magnet.name": "Magnet",
-  "tooltip.spellgems.spell_affix.magnet.description": "Pulls a kill's items and experience toward you",
+  "tooltip.spellgems.spell_affix.magnet.description": "Pulls dropped items and experience toward you",
+  "tooltip.spellgems.spell_affix.max_level": " (max level %s)",
 
   "enchantment.spellgems.recharge": "Recharge",
   "enchantment.spellgems.recharge.desc": "Passively restores wand durability over time.",
@@ -221,5 +223,9 @@
 
   "container.spellgems.gem_forge": "Gem Forge",
   "container.spellgems.gem_forge.level_cost": "Level Cost: %s",
-  "container.spellgems.gem_forge.affix_xp": "Scales from %s XP"
+  "container.spellgems.gem_forge.affix_xp": "Scales from %s XP",
+  "container.spellgems.gem_forge.error.incompatible_spell": "Incompatible spell",
+  "container.spellgems.gem_forge.error.no_affixes_allowed": "No affixes allowed",
+  "container.spellgems.gem_forge.error.max_modifier": "Max 1 modifier",
+  "container.spellgems.gem_forge.error.max_strike": "Max 1 on-hit"
 }
