@@ -12,6 +12,8 @@ public final class WandClientInput {
 
     /** True after a click-only wand spell has fired for the current attack-key press. */
     private static boolean clickOnlyCastThisPress;
+    /** True after the current attack-key press has already reported insufficient wand durability. */
+    private static boolean warnedInsufficientDurabilityThisPress;
 
     private WandClientInput() {
     }
@@ -22,7 +24,17 @@ public final class WandClientInput {
     }
 
     private static boolean onPreAttack(Minecraft client, net.minecraft.client.player.LocalPlayer player, int clickCount) {
-        if (!player.getMainHandItem().is(ModItems.WAND) || !WandSpellCaster.canCast(player)) {
+        if (!player.getMainHandItem().is(ModItems.WAND)) {
+            return false;
+        }
+        if (!WandSpellCaster.canCast(player)) {
+            if (WandSpellCaster.lacksDurability(player, null)) {
+                if (!warnedInsufficientDurabilityThisPress) {
+                    warnedInsufficientDurabilityThisPress = true;
+                    WandSpellCaster.warnInsufficientDurability(player);
+                }
+                return true;
+            }
             return false;
         }
 
@@ -47,6 +59,7 @@ public final class WandClientInput {
     private static void onClientTick(Minecraft client) {
         if (client.player == null || !client.options.keyAttack.isDown()) {
             clickOnlyCastThisPress = false;
+            warnedInsufficientDurabilityThisPress = false;
         }
 
         if (client.player == null) {
@@ -75,6 +88,9 @@ public final class WandClientInput {
     private static void onQuickCast(Minecraft client, int slot) {
         var player = client.player;
         if (!WandSpellCaster.canCastFromSlot(player, slot)) {
+            if (WandSpellCaster.lacksDurability(player, slot)) {
+                WandSpellCaster.warnInsufficientDurability(player);
+            }
             return;
         }
 
